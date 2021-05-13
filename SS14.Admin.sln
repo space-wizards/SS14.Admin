@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SS14.Admin", "SS14.Admin\SS14.Admin.csproj", "{40ABCA78-556E-4EA4-8FD8-B65B02FA488F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{9EF4394B-AAD3-4D61-8D0D-ED334A1E5FF5}"
+ProjectSection(SolutionItems) = preProject
+	.gitignore = .gitignore
+	global.json = global.json
+EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content.Server.Database", "SS14\Content.Server.Database\Content.Server.Database.csproj", "{0DE28821-8C9F-4770-BA7C-5D38AC77F872}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40ABCA78-556E-4EA4-8FD8-B65B02FA488F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40ABCA78-556E-4EA4-8FD8-B65B02FA488F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40ABCA78-556E-4EA4-8FD8-B65B02FA488F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40ABCA78-556E-4EA4-8FD8-B65B02FA488F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DE28821-8C9F-4770-BA7C-5D38AC77F872}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DE28821-8C9F-4770-BA7C-5D38AC77F872}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DE28821-8C9F-4770-BA7C-5D38AC77F872}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DE28821-8C9F-4770-BA7C-5D38AC77F872}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
