@@ -1,0 +1,76 @@
+﻿@page
+@using SS14.Admin.Pages.Tables
+@using SS14.Admin.Helpers
+@model SS14.Admin.Pages.BansModel
+
+@{
+    ViewData["Title"] = "Bans";
+}
+
+<form asp-page="./Index" method="get" class="container">
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    <div class="form-group row">
+        <label class="col-md-3" for="searchBar">Search name, ID, IP or admin:</label>
+        <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
+        <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
+        <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
+    </div>
+</form>
+
+<partial name="Tables/Pagination" for="Pagination"/>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th style="min-width: 210px">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "name", "Last Name"))"/>
+            /
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
+            /
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "ip", "IP"))"/>
+        </th>
+        <th>Reason</th>
+        <th style="min-width: 210px">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "time", "Ban time"))"/>
+        </th>
+        <th style="min-width: 140px">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "admin", "Banning admin"))"/>
+        </th>
+        @*<th title="If the ban was manually unbanned then the unban time is sorted by">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "expire_time", "Expiration time"))"/>
+        </th>*@
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var ban in Model.Pagination.List.PaginatedItems)
+    {
+        <tr>
+            <td>
+                @if (ban.Name != null)
+                {
+                    <strong>@ban.Name</strong>
+                    <br/>
+                }
+                @if (User.IsInRole("ADMIN") && ban.Address != null)
+                {
+                    <small>
+                        <strong>IP:</strong> <span class="monotype">@ban.Address</span>
+                    </small>
+                    <br/>
+                }
+                @if (ban.UserId != null)
+                {
+                    <small>
+                        <strong>GUID:</strong> <span class="monotype">@ban.UserId</span>
+                    </small>
+                }
+            </td>
+            <td>@ban.Reason</td>
+            <td>@ban.BanTime</td>
+            <td>@ban.Admin</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="Tables/Pagination" for="Pagination"/>

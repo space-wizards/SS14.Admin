@@ -1,14 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Threading.Tasks;
+using Content.Server.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using SS14.Admin.SignIn;
 
 namespace SS14.Admin
 {
@@ -24,8 +25,23 @@ namespace SS14.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
-            
+            services.AddScoped<SignInManager>();
+            services.AddScoped<LoginHandler>();
+
+            PostgresServerDbContext.DoOptionsCheck = false;
+
+            services.AddDbContext<PostgresServerDbContext>(options =>
+                options.UseNpgsql(
+                    Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddControllers();
+            services.AddRazorPages(options =>
+            {
+                options.Conventions.AuthorizeFolder("/Players");
+                options.Conventions.AuthorizeFolder("/Connections");
+                options.Conventions.AuthorizeFolder("/Bans");
+            });
+
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             services.AddAuthentication(options =>
@@ -33,17 +49,32 @@ namespace SS14.Admin
                     options.DefaultScheme = "Cookies";
                     options.DefaultChallengeScheme = "oidc";
                 })
-                .AddCookie("Cookies")
+                .AddCookie("Cookies", options =>
+                {
+                    options.ExpireTimeSpan = TimeSpan.FromHours(1);
+                })
                 .AddOpenIdConnect("oidc", options =>
                 {
                     options.SignInScheme = "Cookies";
-                    
+
+                    options.Authority = Configuration["Auth:Authority"];
+                    options.ClientId = Configuration["Auth:ClientId"];
+                    options.ClientSecret = Configuration["Auth:ClientSecret"];
+                    options.SaveTokens = true;
+
+                    options.Events.OnTokenValidated = async ctx =>
+                    {
+                        var handler = ctx.HttpContext.RequestServices.GetRequiredService<LoginHandler>();
+                        await handler.HandleTokenValidated(ctx);
+                    };
                 });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSerilogRequestLogging();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -55,6 +86,7 @@ namespace SS14.Admin
                 app.UseHsts();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -62,7 +94,11 @@ namespace SS14.Admin
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
+            });
         }
     }
 }

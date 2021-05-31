@@ -1,0 +1,47 @@
+﻿@page
+@using SS14.Admin.Pages.Tables
+@using SS14.Admin.Helpers
+@model SS14.Admin.Pages.Connections.ConnectionsIndexModel
+
+@{
+    ViewData["Title"] = "Connection log";
+}
+
+<form asp-page="./Index" asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container">
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    <div class="form-group row">
+        <label class="col-md-3" for="searchBar">Search:</label>
+        <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
+        <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
+        <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
+    </div>
+</form>
+
+<partial name="Tables/Pagination" for="Pagination"/>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "name", "User Name"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "time", "Time"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "addr", "IP Address"))"/>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.Pagination.List.PaginatedItems)
+    {
+        <tr>
+            <td>
+                <strong>@log.UserName</strong>
+                <br/>
+            </td>
+            <td class="monotype">@log.UserId</td>
+            <td>@log.Time</td>
+            <td class="monotype constrained-150">@log.Address</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="Tables/Pagination" for="Pagination"/>

@@ -1,0 +1,49 @@
+﻿@page
+@using SS14.Admin.Pages.Tables
+@using SS14.Admin.Helpers
+@model SS14.Admin.Pages.Players.PlayersIndexModel
+
+@{
+    ViewData["Title"] = "Players";
+}
+
+<form asp-page="./Index" method="get" class="container">
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    <div class="form-group row">
+        <label class="col-md-3" for="searchBar">Search name, ID or IP:</label>
+        <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
+        <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
+        <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
+    </div>
+</form>
+
+<partial name="Tables/Pagination" for="Pagination"/>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "name", "Last Name"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "last_seen_time", "Last seen time"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "last_seen_addr", "Last seen address"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "first_seen", "First seen"))"/>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var player in Model.Pagination.List.PaginatedItems)
+    {
+        <tr>
+            <td>
+                <strong>@player.LastSeenUserName</strong>
+                <br/>
+            </td>
+            <td class="monotype small">@player.UserId</td>
+            <td>@player.LastSeenTime</td>
+            <td class="monotype constrained-150">@player.LastSeenAddress</td>
+            <td>@player.FirstSeenTime</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="Tables/Pagination" for="Pagination"/>

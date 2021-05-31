@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace SS14.Admin
 {
@@ -24,6 +20,10 @@ namespace SS14.Admin
                     builder.AddYamlFile("appsettings.yml", false, true);
                     builder.AddYamlFile($"appsettings.{env.EnvironmentName}.yml", true, true);
                     builder.AddYamlFile("appsettings.Secret.yml", true, true);
+                })
+                .UseSerilog((ctx, cfg) =>
+                {
+                    cfg.ReadFrom.Configuration(ctx.Configuration);
                 })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }

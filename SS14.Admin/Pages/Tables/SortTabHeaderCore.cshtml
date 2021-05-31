@@ -1,0 +1,8 @@
+﻿@using SS14.Admin.Helpers
+@model SortTabHeaderModel
+
+<a asp-page="./Index"
+   asp-all-route-data="@Model.State.AllRouteData.ShallowClone()"
+   asp-route-sort="@Model.State.OrderStringForColumnButton(Model.Column)">
+    @Model.Text
+</a>
