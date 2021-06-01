@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages
@@ -19,6 +20,7 @@ namespace SS14.Admin.Pages
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         public string? CurrentFilter { get; set; }
+        public ShowFilter? Show { get; set; }
 
 
         public BansModel(PostgresServerDbContext dbContext)
@@ -30,20 +32,23 @@ namespace SS14.Admin.Pages
             string? sort,
             string? search,
             int? pageIndex,
-            int? perPage)
+            int? perPage,
+            ShowFilter show=ShowFilter.Active)
         {
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
             var bans = _dbContext.Ban
                 .Include(b => b.Unban)
-                .Join(
-                    _dbContext.Player,
+                // Confusing-ass EFCore left joins
+                .GroupJoin(_dbContext.Player,
                     ban => ban.UserId, player => player.UserId,
                     (ban, player) => new {ban, player})
-                .Join(
+                .SelectMany(b => b.player.DefaultIfEmpty(), (g, player) => new {g.ban, player})
+                .GroupJoin(
                     _dbContext.Player,
                     ban => ban.ban.BanningAdmin, admin => admin.UserId,
-                    (ban, admin) => new {ban.ban, ban.player, admin});
+                    (ban, admin) => new {ban.ban, ban.player, admin})
+                .SelectMany(b => b.admin.DefaultIfEmpty(), (g, admin) => new {g.ban, g.player, admin});
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -68,8 +73,17 @@ namespace SS14.Admin.Pages
                 }
             }
 
+            bans = show switch
+            {
+                ShowFilter.Active => bans.Where(b => b.ban.Unban == null && (b.ban.ExpirationTime == null || b.ban.ExpirationTime > DateTime.Now)),
+                ShowFilter.Expired => bans.Where(b => b.ban.Unban != null || b.ban.ExpirationTime < DateTime.Now),
+                _ => bans
+            };
+
             CurrentFilter = search;
+            Show = show;
             AllRouteData.Add("search", CurrentFilter);
+            AllRouteData.Add("show", Show.ToString());
 
             var sortState = Helpers.SortState.Build(bans);
             sortState.AddColumn("name", p => p.player!.LastSeenUserName);
@@ -85,6 +99,7 @@ namespace SS14.Admin.Pages
             bans = sortState.ApplyToQuery(bans);
 
             await Pagination.LoadLinqAsync(bans, e => e.Select(b => new Ban(
+                b.ban.Id,
                 b.player?.LastSeenUserName,
                 b.ban.UserId?.ToString(),
                 b.ban.Address?.FormatCidr(),
@@ -94,11 +109,19 @@ namespace SS14.Admin.Pages
         }
 
         public sealed record Ban(
+            int Id,
             string? Name,
             string? UserId,
             string? Address,
             string Reason,
             DateTime BanTime,
             string? Admin);
+
+        public enum ShowFilter
+        {
+            Active = 0,
+            Expired = 1,
+            All = 2,
+        }
     }
 }
