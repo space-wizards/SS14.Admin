@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Admins;
+using SS14.Admin.Helpers;
 
 namespace SS14.Admin
 {
@@ -32,8 +32,7 @@ namespace SS14.Admin
                 Debug.Fail("Unable to find identity.");
             }
 
-            var sub = identity.Claims.Single(c => c.Type == "sub").Value;
-            var guid = Guid.Parse(sub);
+            var guid = identity.Claims.GetUserId();
 
             var adminData = await _dbContext.Admin
                 .Include(a => a.AdminRank)

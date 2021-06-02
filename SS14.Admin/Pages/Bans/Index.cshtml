@@ -5,26 +5,65 @@
 
 @{
     ViewData["Title"] = "Bans";
+    var highlightBan = 0;
+    if (TempData.TryGetValue("HighlightNewBan", out var highlightObj))
+    {
+        highlightBan = (int) highlightObj;
+    }
 }
+
+<div class="container">
+    @if (TempData.TryGetValue("StatusMessage", out var stat))
+    {
+        var status = (string) stat;
+        var statusMessageClass = status.StartsWith("Error") ? "danger" : "success";
+
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    @status
+                </div>
+            </div>
+        </div>
+    }
+
+    <a class="btn btn-primary" asp-page="./Create">Create new ban</a>
+</div>
+
 
 <form asp-page="./Index" method="get" class="container">
     @FormHiddenRoutes.Make(Model.AllRouteData, "search", "show")
-    <div class="form-group row">
-        <label class="col-md-3 col-form-label" for="searchBar">Search name, ID, IP or admin:</label>
-        <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control  col-md-5"/>
-        <select class="form-control  col-md-2" name="show">
-            <option selected="@(Model.Show == BansModel.ShowFilter.Active)" value="">Active bans</option>
-            <option selected="@(Model.Show == BansModel.ShowFilter.All)" value="all">All bans</option>
-            <option selected="@(Model.Show == BansModel.ShowFilter.Expired)" value="expired">Expired/unbanned</option>
-        </select>
-        <input type="submit" value="Search" class="btn btn-primary col-md-1 "/>
-        <a class="btn btn-danger col-md-1" asp-page="./Index">Clear</a>
+    <div class="form-group row no-gutters">
+        <label class="col-lg-3 col-form-label" for="searchBar">Search name, ID, IP or admin:</label>
+        <div class="col-lg-5">
+            <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control "/>
+        </div>
+        <div class="col-lg-4">
+            <div class="row no-gutters">
+                <div class="col-6">
+                    <select class="form-control " name="show">
+                        <option selected="@(Model.Show == BansModel.ShowFilter.Active)" value="">Active bans</option>
+                        <option selected="@(Model.Show == BansModel.ShowFilter.All)" value="all">All bans</option>
+                        <option selected="@(Model.Show == BansModel.ShowFilter.Expired)" value="expired">Expired/unbanned</option>
+                    </select>
+                </div>
+                <div class="col-3">
+                    <input type="submit" value="Search" class="btn btn-primary btn-block"/>
+                </div>
+                <div class="col-3">
+                    <a class="btn btn-danger btn-block" asp-page="./Index">Clear</a>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 
 <partial name="Tables/Pagination" for="Pagination"/>
 
-<table class="table table-striped">
+<table class="table table-striped mt-3">
     <thead>
     <tr>
         <th style="min-width: 210px">
@@ -38,6 +77,7 @@
         <th style="min-width: 210px">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "time", "Ban time"))"/>
         </th>
+        <th style="min-width: 210px">Expires</th>
         <th style="min-width: 140px">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "admin", "Banning admin"))"/>
         </th>
@@ -50,7 +90,8 @@
     <tbody>
     @foreach (var ban in Model.Pagination.List.PaginatedItems)
     {
-        <tr>
+        var className = ban.Id == highlightBan ? "table-success" : "";
+        <tr class="@className">
             <td>
                 @if (ban.Name != null)
                 {
@@ -73,8 +114,25 @@
             </td>
             <td>@ban.Reason</td>
             <td>@ban.BanTime</td>
+            <td>
+                @ban.Expires
+                @if (ban.Unbanned is { } unbanned)
+                {
+                    var (time, admin) = unbanned;
+                    <br>
+                    <text><strong>Unbanned:</strong> @time by @admin</text>
+                }
+            </td>
             <td>@ban.Admin</td>
-            <td></td>
+            <td>
+                @if (!ban.Active)
+                {
+                    <form asp-page-handler="Unban">
+                        <input type="hidden" name="Id" value="@ban.Id">
+                        <input type="submit" class="btn btn-secondary" value="Unban">
+                    </form>
+                }
+            </td>
         </tr>
     }
     </tbody>

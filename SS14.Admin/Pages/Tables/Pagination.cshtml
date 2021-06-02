@@ -28,28 +28,30 @@
     var prevPageIdx = Model.PageIndex == 1 ? null : (int?) Model.PageIndex - 1;
 }
 
-<a asp-page="./Index"
-   asp-all-route-data="@Model.AllRouteData.ShallowClone()"
-   asp-route-pageIndex="@prevPageIdx"
-   class="btn btn-primary btn-sm @prevDisabled">
-    Previous
-</a>
-<a asp-page="./Index"
-   asp-all-route-data="@Model.AllRouteData.ShallowClone()"
-   asp-route-pageIndex="@nextPageIdx"
-   class="btn btn-primary btn-sm @nextDisabled">
-    Next
-</a>
+<div class="container">
+    <a asp-page="./Index"
+       asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+       asp-route-pageIndex="@prevPageIdx"
+       class="btn btn-primary btn-sm @prevDisabled">
+        Previous
+    </a>
+    <a asp-page="./Index"
+       asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+       asp-route-pageIndex="@nextPageIdx"
+       class="btn btn-primary btn-sm @nextDisabled">
+        Next
+    </a>
 
-<span class="small">
-    Page: @(Model.PageIndex + 1)
-    Total: @Model.TotalCount
-    Shown:
-    @{ await ShownCountButton(100); }
-    |
-    @{ await ShownCountButton(250); }
-    |
-    @{ await ShownCountButton(500); }
-    |
-    @{ await ShownCountButton(1000); }
-</span>
+    <span class="small">
+        Page: @(Model.PageIndex + 1)
+        Total: @Model.TotalCount
+        Shown:
+        @{ await ShownCountButton(100); }
+        |
+        @{ await ShownCountButton(250); }
+        |
+        @{ await ShownCountButton(500); }
+        |
+        @{ await ShownCountButton(1000); }
+    </span>
+</div>

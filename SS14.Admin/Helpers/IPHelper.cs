@@ -1,9 +1,27 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Sockets;
 
 namespace SS14.Admin.Helpers
 {
     public static class IPHelper
     {
+        public static bool TryParseIpOrCidr(string str, out (IPAddress, int) cidr)
+        {
+            if (IPAddress.TryParse(str, out var addr))
+            {
+                cidr = (addr, addr.AddressFamily switch
+                {
+                    AddressFamily.InterNetwork => 32,
+                    AddressFamily.InterNetworkV6 => 128,
+                    _ => throw new ArgumentException(nameof(str))
+                });
+                return true;
+            }
+
+            return TryParseCidr(str, out cidr);
+        }
+
         public static bool TryParseCidr(string str, out (IPAddress, int) cidr)
         {
             cidr = default;
@@ -20,7 +38,7 @@ namespace SS14.Admin.Helpers
 
             return true;
         }
-        
+
         public static string FormatCidr(this (IPAddress, int) cidr)
         {
             var (addr, range) = cidr;

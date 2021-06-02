@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Content.Server.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -48,7 +49,12 @@ namespace SS14.Admin.Pages
                     _dbContext.Player,
                     ban => ban.ban.BanningAdmin, admin => admin.UserId,
                     (ban, admin) => new {ban.ban, ban.player, admin})
-                .SelectMany(b => b.admin.DefaultIfEmpty(), (g, admin) => new {g.ban, g.player, admin});
+                .SelectMany(b => b.admin.DefaultIfEmpty(), (g, admin) => new {g.ban, g.player, admin})
+                .GroupJoin(
+                    _dbContext.Player,
+                    ban => ban.ban.Unban!.UnbanningAdmin, unbanAdmin => unbanAdmin.UserId,
+                    (ban, unbanAdmin) => new {ban.ban, ban.player, ban.admin, unbanAdmin})
+                .SelectMany(b => b.unbanAdmin.DefaultIfEmpty(), (g, unbanAdmin) => new {g.ban, g.player, g.admin, unbanAdmin});
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -98,14 +104,67 @@ namespace SS14.Admin.Pages
 
             bans = sortState.ApplyToQuery(bans);
 
-            await Pagination.LoadLinqAsync(bans, e => e.Select(b => new Ban(
-                b.ban.Id,
-                b.player?.LastSeenUserName,
-                b.ban.UserId?.ToString(),
-                b.ban.Address?.FormatCidr(),
-                b.ban.Reason,
-                b.ban.BanTime,
-                b.admin?.LastSeenUserName)));
+            await Pagination.LoadLinqAsync(bans, e => e.Select(b =>
+            {
+                var expires = "PERMANENT";
+                if (b.ban.ExpirationTime != null)
+                    expires = b.ban.ExpirationTime.ToString()!;
+
+                (DateTime Time, string Admin)? unbanned = null;
+                if (b.ban.Unban != null)
+                {
+                    var time = b.ban.Unban.UnbanTime;
+                    var admin = b.unbanAdmin?.LastSeenUserName ?? b.ban.Unban.UnbanningAdmin.ToString()!;
+
+                    unbanned = (time, admin);
+                }
+
+                var active = b.ban.ExpirationTime < DateTime.Now || b.ban.Unban != null;
+
+                return new Ban(
+                    b.ban.Id,
+                    b.player?.LastSeenUserName,
+                    b.ban.UserId?.ToString(),
+                    b.ban.Address?.FormatCidr(),
+                    b.ban.Reason,
+                    expires,
+                    unbanned,
+                    active,
+                    b.ban.BanTime,
+                    b.admin?.LastSeenUserName);
+            }));
+        }
+
+        public async Task<IActionResult> OnPostUnbanAsync([FromForm] UnbanModel model)
+        {
+            var id = model.Id;
+
+            var ban = await _dbContext.Ban
+                .Include(b => b.Unban)
+                .SingleOrDefaultAsync(b => b.Id == id);
+
+            if (ban == null)
+            {
+                TempData.Add("StatusMessage", "Error: Unable to find ban");
+                return RedirectToPage("./Index");
+            }
+
+            if (ban.Unban != null)
+            {
+                TempData.Add("StatusMessage", "Error: Already unbanned");
+                return RedirectToPage("./Index");
+            }
+
+            ban.Unban = new PostgresServerUnban
+            {
+                Ban = ban,
+                UnbanningAdmin = User.Claims.GetUserId(),
+                UnbanTime = DateTime.UtcNow
+            };
+
+            await _dbContext.SaveChangesAsync();
+            TempData.Add("StatusMessage", "Unban done");
+            return RedirectToPage("./Index");
         }
 
         public sealed record Ban(
@@ -114,6 +173,9 @@ namespace SS14.Admin.Pages
             string? UserId,
             string? Address,
             string Reason,
+            string Expires,
+            (DateTime Time, string Admin)? Unbanned,
+            bool Active,
             DateTime BanTime,
             string? Admin);
 
@@ -122,6 +184,11 @@ namespace SS14.Admin.Pages
             Active = 0,
             Expired = 1,
             All = 2,
+        }
+
+        public sealed class UnbanModel
+        {
+            public int Id { get; set; }
         }
     }
 }
