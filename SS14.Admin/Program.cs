@@ -25,6 +25,7 @@ namespace SS14.Admin
                 {
                     cfg.ReadFrom.Configuration(ctx.Configuration);
                 })
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .UseSystemd();
     }
 }
