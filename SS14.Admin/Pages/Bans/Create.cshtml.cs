@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Content.Server.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages.Bans
 {
+    [Authorize(Roles = "BAN")]
     [ValidateAntiForgeryToken]
     public class Create : PageModel
     {
@@ -145,8 +147,8 @@ namespace SS14.Admin.Pages.Bans
 
             _dbContext.Ban.Add(ban);
             await _dbContext.SaveChangesAsync();
-            TempData.Add("HighlightNewBan", ban.Id);
-            TempData.Add("StatusMessage", "Ban created");
+            TempData["HighlightNewBan"] = ban.Id;
+            TempData["StatusMessage"] = "Ban created";
             return RedirectToPage("./Index");
         }
 

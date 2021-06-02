@@ -38,9 +38,9 @@
                 <br/>
             </td>
             <td class="monotype small">@player.UserId</td>
-            <td>@player.LastSeenTime</td>
+            <td>@player.LastSeenTime.ToString("g")</td>
             <td class="monotype constrained-150">@player.LastSeenAddress</td>
-            <td>@player.FirstSeenTime</td>
+            <td>@player.FirstSeenTime.ToString("g")</td>
         </tr>
     }
     </tbody>

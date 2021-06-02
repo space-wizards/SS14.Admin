@@ -30,7 +30,10 @@
         </div>
     }
 
-    <a class="btn btn-primary" asp-page="./Create">Create new ban</a>
+    @if (User.IsInRole("BAN"))
+    {
+        <a class="btn btn-primary" asp-page="./Create">Create new ban</a>
+    }
 </div>
 
 
@@ -113,19 +116,24 @@
                 }
             </td>
             <td>@ban.Reason</td>
-            <td>@ban.BanTime</td>
+            <td>@ban.BanTime.ToString("g")</td>
             <td>
-                @ban.Expires
+                @(ban.Expires?.ToString("g") ?? "PERMANENT")
                 @if (ban.Unbanned is { } unbanned)
                 {
                     var (time, admin) = unbanned;
                     <br>
-                    <text><strong>Unbanned:</strong> @time by @admin</text>
+                    <text><strong>Unbanned:</strong> @time.ToString("g") by @admin</text>
+                }
+                else if (ban.Expires < DateTime.Now)
+                {
+                    <br>
+                    <strong>Expired</strong>
                 }
             </td>
             <td>@ban.Admin</td>
             <td>
-                @if (!ban.Active)
+                @if (ban.Active && User.IsInRole("BAN"))
                 {
                     <form asp-page-handler="Unban">
                         <input type="hidden" name="Id" value="@ban.Id">

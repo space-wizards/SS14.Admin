@@ -106,10 +106,6 @@ namespace SS14.Admin.Pages
 
             await Pagination.LoadLinqAsync(bans, e => e.Select(b =>
             {
-                var expires = "PERMANENT";
-                if (b.ban.ExpirationTime != null)
-                    expires = b.ban.ExpirationTime.ToString()!;
-
                 (DateTime Time, string Admin)? unbanned = null;
                 if (b.ban.Unban != null)
                 {
@@ -119,7 +115,7 @@ namespace SS14.Admin.Pages
                     unbanned = (time, admin);
                 }
 
-                var active = b.ban.ExpirationTime < DateTime.Now || b.ban.Unban != null;
+                var active = (b.ban.ExpirationTime == null || b.ban.ExpirationTime > DateTime.Now) && b.ban.Unban == null;
 
                 return new Ban(
                     b.ban.Id,
@@ -127,7 +123,7 @@ namespace SS14.Admin.Pages
                     b.ban.UserId?.ToString(),
                     b.ban.Address?.FormatCidr(),
                     b.ban.Reason,
-                    expires,
+                    b.ban.ExpirationTime,
                     unbanned,
                     active,
                     b.ban.BanTime,
@@ -173,7 +169,7 @@ namespace SS14.Admin.Pages
             string? UserId,
             string? Address,
             string Reason,
-            string Expires,
+            DateTime? Expires,
             (DateTime Time, string Admin)? Unbanned,
             bool Active,
             DateTime BanTime,
