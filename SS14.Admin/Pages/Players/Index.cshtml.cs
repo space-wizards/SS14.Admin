@@ -16,12 +16,12 @@ namespace SS14.Admin.Pages.Players
     {
         private readonly PostgresServerDbContext _dbContext;
 
-        public PaginationState<PostgresPlayer> Pagination { get; } = new(100);
-        public SortState<PostgresPlayer> SortState { get; } = new();
+        public PaginationState<Player> Pagination { get; } = new(100);
+        public SortState<Player> SortState { get; } = new();
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         public string? CurrentFilter { get; set; } = "";
-        
+
 
         public PlayersIndexModel(PostgresServerDbContext dbContext)
         {
@@ -40,13 +40,13 @@ namespace SS14.Admin.Pages.Players
             SortState.AddColumn("last_seen_addr", p => p.LastSeenAddress);
             SortState.AddColumn("first_seen", p => p.FirstSeenTime);
             SortState.Init(sort, AllRouteData);
-            
+
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
             CurrentFilter = search;
             AllRouteData.Add("search", CurrentFilter);
 
-            IQueryable<PostgresPlayer> userQuery = _dbContext.Player;
+            IQueryable<Player> userQuery = _dbContext.Player;
             if (!string.IsNullOrEmpty(search))
             {
                 if (Guid.TryParse(search, out var guid))
