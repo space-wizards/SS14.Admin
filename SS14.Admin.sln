@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Net.HttpListener", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Robust.Shared.Scripting", "SS14\RobustToolbox\Robust.Shared.Scripting\Robust.Shared.Scripting.csproj", "{CF0AE1C4-D677-4F54-B72A-542AA1569127}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content.Shared.Database", "SS14\Content.Shared.Database\Content.Shared.Database.csproj", "{925286E7-E663-4BAC-AEAA-073789277AA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,5 +116,9 @@ Global
 		{CF0AE1C4-D677-4F54-B72A-542AA1569127}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF0AE1C4-D677-4F54-B72A-542AA1569127}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF0AE1C4-D677-4F54-B72A-542AA1569127}.Release|Any CPU.Build.0 = Release|Any CPU
+		{925286E7-E663-4BAC-AEAA-073789277AA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{925286E7-E663-4BAC-AEAA-073789277AA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{925286E7-E663-4BAC-AEAA-073789277AA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{925286E7-E663-4BAC-AEAA-073789277AA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
