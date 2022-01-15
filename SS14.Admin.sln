@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{9EF4394B
 ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 	global.json = global.json
+	README.md = README.md
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content.Server.Database", "SS14\Content.Server.Database\Content.Server.Database.csproj", "{0DE28821-8C9F-4770-BA7C-5D38AC77F872}"
