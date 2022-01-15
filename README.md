@@ -50,3 +50,5 @@ Auth:
 
 authServer: "https://central.spacestation14.io/auth"
 ```
+
+When registering an OAuth app against our auth server, use `/signin-oidc` as redirect URI (relative to whatever path your SS14.Admin thing is at, so for us it's `https://central.spacestation14.io/admin/signin-oidc`).
