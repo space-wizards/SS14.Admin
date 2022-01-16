@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 using SS14.Admin.SignIn;
 
@@ -60,6 +61,7 @@ namespace SS14.Admin
                     options.ClientId = Configuration["Auth:ClientId"];
                     options.ClientSecret = Configuration["Auth:ClientSecret"];
                     options.SaveTokens = true;
+                    options.ResponseType = OpenIdConnectResponseType.Code;
 
                     options.Events.OnTokenValidated = async ctx =>
                     {
