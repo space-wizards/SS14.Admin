@@ -30,8 +30,6 @@ namespace SS14.Admin
             services.AddScoped<SignInManager>();
             services.AddScoped<LoginHandler>();
 
-            PostgresServerDbContext.DoOptionsCheck = false;
-
             services.AddDbContext<PostgresServerDbContext>(options =>
                 options.UseNpgsql(
                     Configuration.GetConnectionString("DefaultConnection")));

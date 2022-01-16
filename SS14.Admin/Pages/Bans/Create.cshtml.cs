@@ -50,7 +50,7 @@ namespace SS14.Admin.Pages.Bans
                 return;
             }
 
-            PostgresPlayer? player;
+            Player? player;
             if (Guid.TryParse(Input.NameOrUid, out var guid))
             {
                 player = await _dbContext.Player.SingleOrDefaultAsync(p => p.UserId == guid);

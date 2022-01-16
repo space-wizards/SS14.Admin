@@ -5,3 +5,4 @@ riderModule.iml
 /_ReSharper.Caches/
 
 */appsettings.Secret.yml
+**/discord.xml
