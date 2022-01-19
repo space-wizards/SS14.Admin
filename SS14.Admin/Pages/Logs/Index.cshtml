@@ -1,0 +1,157 @@
+﻿@page
+@using SS14.Admin.Pages.Tables
+@using SS14.Admin.Helpers
+@using SS14.Admin.AdminLogs
+@model SS14.Admin.Pages.Logs.LogsIndexModel
+
+@{
+    ViewData["Title"] = "Admin logs";
+}
+
+<data-grid>
+    <data-grid-filter class="flex-row">
+        <p>Filter: </p>
+        <input class="grid-search" id="search" type="text" placeholder="search [ctrl+f]"/>
+        <div id="search-popover" class="search-popover hidden" tabindex="1">
+            @foreach (LogFilterTags tag in Enum.GetValues(typeof(LogFilterTags)))
+            {
+                <div class="search-result" data-search-tag="@tag.ToString()" tabindex="0">
+                    <span class="result-tag">@tag.ToString():</span> <span class="result-content"></span>
+                </div>
+            }
+            @*<div class="search-result" tabindex="0">
+                <span class="result-tag">search:</span> damage
+            </div>
+            <div class="search-result" tabindex="0">
+                <span class="result-tag">player:</span> julian1
+            </div>
+            <div class="search-result" tabindex="0">
+                <span class="result-tag">player:</span> julian2
+            </div>
+            <div class="search-result" tabindex="0">
+                <span class="result-tag">player:</span> julian3
+            </div>
+            <div class="search-result" tabindex="0">
+                <span class="result-tag">player:</span> julian4
+            </div>
+            <div class="search-result" tabindex="0">
+                <span class="result-tag">server:</span> miros
+            </div>
+            <div class="search-result" tabindex="0">
+                <span class="result-tag">type:</span> damage
+            </div>
+            <div class="search-result" tabindex="0">
+                <span class="result-tag">round:</span> 153
+            </div>*@
+        </div>
+        <input id="litepicker" type="text" placeholder="Date from - to"/>
+        @if (Model.FromDate != default || Model.ToDate != default)
+        {
+            <button id="litepicker-close" class="btn btn-sm" ><i class="fas fa-times"></i>x</button>
+        }
+        <button class="btn btn-sm" ><i class="fas fa-filter"></i></button>
+        <div class="flex-seperator"></div>
+        <div class="applied-filters flex-row">
+            @*<div class="filter-tag" style="--tag-color: var(--color-filter-search)">
+                <span class="tag-prefix">sea:</span>
+                damage
+                <span class="tag-close fa fa-times"></span>
+            </div>
+            <div class="filter-tag" style="--tag-color: var(--color-filter-type)">
+                <span class="tag-prefix">typ:</span>
+                damage
+                <span class="tag-close fa fa-times"></span>
+            </div>*@
+        </div>
+    </data-grid-filter>
+    <table>
+        <thead>
+        <tr>
+            <th>Server</th>
+            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "impact", "Severity", TextAlignClass.Center))"/>
+            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "message", "Message"))"/>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var entry in Model.Pagination.List.PaginatedItems)
+        {
+            <tr class="on-click-dummy">
+                <td>tbd.</td>
+                <td class="text-center colored" style="--cell-color: var(@AdminLogImpactExtension.CssColorVarName(entry.Impact))">@entry.Impact.ToString()</td>
+                <td>@entry.Message</td>
+            </tr>
+        }
+        @*
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-medium)">Medium</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-medium)">Medium</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-high)">High</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Centipede</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-low)">Low</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-extreme)">Extreme</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-medium)">Medium</td>
+            <td><a class="entity-link">Ronnette Jenkins</a> received 20 damage. Old: 20 | New: 40</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-medium)">Medium</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-medium)">Medium</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-high)">High</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Centipede</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-low)">Low</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-extreme)">Extreme</td>
+            <td>Lorem ipsum dolor sit amet, consectetur adipisici elit, …</td>
+        </tr>
+        <tr class="on-click-dummy">
+            <td>Miros</td>
+            <td class="text-center colored" style="--cell-color: var(--color-severity-medium)">Medium</td>
+            <td><a class="entity-link">Ronnette Jenkins</a> received 20 damage. Old: 20 | New: 40</td>
+        </tr>
+        *@
+        </tbody>
+    </table>
+    <data-grid-footer class="flex-row">
+
+    </data-grid-footer>
+</data-grid>
+
+@section scripts {
+    <script src="~/js/datepicker.js" asp-append-version="true"></script>
+    <script src="~/js/logs-search.js" asp-append-version="true"></script>
+    <script src="~/js/logs-grid.js" asp-append-version="true"></script>
+}
