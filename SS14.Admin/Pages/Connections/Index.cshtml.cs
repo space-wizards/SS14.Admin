@@ -13,9 +13,9 @@ namespace SS14.Admin.Pages.Connections
     public class ConnectionsIndexModel : PageModel
     {
         private readonly PostgresServerDbContext _dbContext;
-        
-        public SortState<PostgresConnectionLog> SortState { get; } = new();
-        public PaginationState<PostgresConnectionLog> Pagination { get; } = new(100);
+
+        public SortState<ConnectionLog> SortState { get; } = new();
+        public PaginationState<ConnectionLog> Pagination { get; } = new(100);
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         public string? CurrentFilter { get; set; }
@@ -36,13 +36,13 @@ namespace SS14.Admin.Pages.Connections
             SortState.AddColumn("time", c => c.Time, SortOrder.Descending);
             SortState.AddColumn("addr", c => c.Address);
             SortState.Init(sort, AllRouteData);
-            
+
             Pagination.Init(pageIndex, perPage, AllRouteData);
-            
+
             CurrentFilter = search;
             AllRouteData.Add("search", CurrentFilter);
 
-            IQueryable<PostgresConnectionLog> logQuery = _dbContext.ConnectionLog;
+            IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog;
             if (!string.IsNullOrEmpty(search))
             {
                 if (Guid.TryParse(search, out var guid))

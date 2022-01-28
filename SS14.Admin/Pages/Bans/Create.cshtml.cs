@@ -135,7 +135,7 @@ namespace SS14.Admin.Pages.Bans
 
             var admin = User.Claims.GetUserId();
 
-            var ban = new PostgresServerBan
+            var ban = new ServerBan
             {
                 UserId = userId,
                 Address = addr,

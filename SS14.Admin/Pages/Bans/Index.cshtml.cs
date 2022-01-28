@@ -151,7 +151,7 @@ namespace SS14.Admin.Pages
                 return RedirectToPage("./Index");
             }
 
-            ban.Unban = new PostgresServerUnban
+            ban.Unban = new ServerUnban
             {
                 Ban = ban,
                 UnbanningAdmin = User.Claims.GetUserId(),
