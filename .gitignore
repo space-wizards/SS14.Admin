@@ -6,3 +6,5 @@ riderModule.iml
 
 */appsettings.Secret.yml
 **/discord.xml
+
+*.user
