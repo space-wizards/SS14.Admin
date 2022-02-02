@@ -154,6 +154,16 @@ namespace SS14.Admin.Pages.Bans
 
         private async Task<Guid?> FindPlayerGuidByNameAsync(string name)
         {
+            // Try our own database first, in case this is a guest or something.
+
+            var player = await _dbContext.Player
+                .Where(p => p.LastSeenUserName == name)
+                .OrderByDescending(p => p.LastSeenTime)
+                .FirstOrDefaultAsync();
+
+            if (player != null)
+                return player.UserId;
+
             var server = _cfg["AuthServer"];
             var client = new HttpClient();
 
