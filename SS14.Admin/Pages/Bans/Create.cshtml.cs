@@ -38,6 +38,7 @@ namespace SS14.Admin.Pages.Bans
         {
             public string? NameOrUid { get; set; }
             public string? IP { get; set; }
+            public string? HWid { get; set; }
             public int LengthMinutes { get; set; }
             [Required] public string Reason { get; set; } = "";
         }
@@ -70,6 +71,7 @@ namespace SS14.Admin.Pages.Bans
             else
             {
                 Input.IP = player.LastSeenAddress.ToString();
+                Input.HWid = player.LastSeenHWId is { } h ? Convert.ToBase64String(h) : null;
             }
         }
 
@@ -89,6 +91,7 @@ namespace SS14.Admin.Pages.Bans
 
             Guid? userId = null;
             (IPAddress, int)? addr = null;
+            byte[]? hwid = null;
             DateTime? expires = null;
             if (!string.IsNullOrWhiteSpace(Input.NameOrUid))
             {
@@ -128,6 +131,17 @@ namespace SS14.Admin.Pages.Bans
                 addr = parsedAddr;
             }
 
+            if (!string.IsNullOrWhiteSpace(Input.HWid))
+            {
+                const int hwidLength = 32;
+                hwid = new byte[hwidLength];
+                if (!Convert.TryFromBase64String(Input.HWid, hwid, out _))
+                {
+                    StatusMessage = "Error: Invalid HWID";
+                    return Page();
+                }
+            }
+
             if (Input.LengthMinutes != 0)
             {
                 expires = DateTime.UtcNow + TimeSpan.FromMinutes(Input.LengthMinutes);
@@ -142,7 +156,8 @@ namespace SS14.Admin.Pages.Bans
                 Reason = Input.Reason,
                 ExpirationTime = expires,
                 BanTime = DateTime.UtcNow,
-                BanningAdmin = admin
+                BanningAdmin = admin,
+                HWId = hwid
             };
 
             _dbContext.Ban.Add(ban);

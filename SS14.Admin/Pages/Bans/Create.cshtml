@@ -39,7 +39,20 @@
                     <input asp-for="Input.IP" value="@Model.Input.IP" class="form-control">
                 </div>
                 <div class="col-sm-auto">
-                    <input asp-page-handler="Fill" type="submit" value="Find last IP" class="btn btn-secondary btn-block">
+                    <input asp-page-handler="Fill" type="submit" value="Find last Info" class="btn btn-secondary btn-block">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label asp-for="Input.HWid" class="col-sm-3 col-form-label">HWID</label>
+        <div class="col-sm-9">
+            <div class="row">
+                <div class="col-sm">
+                    <input asp-for="Input.HWid" value="@Model.Input.HWid" class="form-control">
+                </div>
+                <div class="col-sm-auto">
+                    <input asp-page-handler="Fill" type="submit" value="Find last Info" class="btn btn-secondary btn-block">
                 </div>
             </div>
         </div>

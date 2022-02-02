@@ -35,6 +35,8 @@ namespace SS14.Admin.Pages.Connections
             SortState.AddColumn("uid", c => c.UserId);
             SortState.AddColumn("time", c => c.Time, SortOrder.Descending);
             SortState.AddColumn("addr", c => c.Address);
+            SortState.AddColumn("hwid", c => c.HWId);
+            SortState.AddColumn("denied", c => c.Denied);
             SortState.Init(sort, AllRouteData);
 
             Pagination.Init(pageIndex, perPage, AllRouteData);

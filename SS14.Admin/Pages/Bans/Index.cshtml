@@ -70,11 +70,13 @@
     <thead>
     <tr>
         <th style="min-width: 210px">
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "name", "Last Name"))"/>
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "name", "Name"))"/>
             /
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
             /
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "ip", "IP"))"/>
+            /
+            HWID
         </th>
         <th>Reason</th>
         <th style="min-width: 210px">
@@ -101,12 +103,22 @@
                     <strong>@ban.Name</strong>
                     <br/>
                 }
-                @if (User.IsInRole("ADMIN") && ban.Address != null)
+                @if (User.IsInRole("ADMIN"))
                 {
-                    <small>
-                        <strong>IP:</strong> <span class="monotype">@ban.Address</span>
-                    </small>
-                    <br/>
+                    if (ban.Address != null)
+                    {
+                        <small>
+                            <strong>IP:</strong> <span class="monotype">@ban.Address</span>
+                        </small>
+                        <br/>
+                    }
+                    if (ban.Hwid != null)
+                    {
+                        <small>
+                            <strong>HWID:</strong> <span class="monotype">@ban.Hwid</span>
+                        </small>
+                        <br/>
+                    }
                 }
                 @if (ban.UserId != null)
                 {
@@ -139,6 +151,15 @@
                         <input type="hidden" name="Id" value="@ban.Id">
                         <input type="submit" class="btn btn-secondary" value="Unban">
                     </form>
+                }
+                @if (ban.hitCount != 0)
+                {
+                    var plural = ban.hitCount > 1;
+                    <a asp-page="Hits" class="btn btn-secondary" asp-route-ban="@ban.Id">@ban.hitCount @(plural ? "hits" : "hit")</a>
+                }
+                else
+                {
+                    <a href="#" class="btn btn-secondary disabled">0 hits</a>
                 }
             </td>
         </tr>

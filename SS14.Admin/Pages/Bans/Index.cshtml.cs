@@ -7,8 +7,8 @@ using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using SS14.Admin.Helpers;
+using SS14.Admin.Pages.Bans;
 
 namespace SS14.Admin.Pages
 {
@@ -38,51 +38,36 @@ namespace SS14.Admin.Pages
         {
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
-            var bans = _dbContext.Ban
-                .Include(b => b.Unban)
-                // Confusing-ass EFCore left joins
-                .GroupJoin(_dbContext.Player,
-                    ban => ban.UserId, player => player.UserId,
-                    (ban, player) => new {ban, player})
-                .SelectMany(b => b.player.DefaultIfEmpty(), (g, player) => new {g.ban, player})
-                .GroupJoin(
-                    _dbContext.Player,
-                    ban => ban.ban.BanningAdmin, admin => admin.UserId,
-                    (ban, admin) => new {ban.ban, ban.player, admin})
-                .SelectMany(b => b.admin.DefaultIfEmpty(), (g, admin) => new {g.ban, g.player, admin})
-                .GroupJoin(
-                    _dbContext.Player,
-                    ban => ban.ban.Unban!.UnbanningAdmin, unbanAdmin => unbanAdmin.UserId,
-                    (ban, unbanAdmin) => new {ban.ban, ban.player, ban.admin, unbanAdmin})
-                .SelectMany(b => b.unbanAdmin.DefaultIfEmpty(), (g, unbanAdmin) => new {g.ban, g.player, g.admin, unbanAdmin});
+            var bans = BanHelper.CreateBanJoin(_dbContext)
+                .Select(b => new {b.Ban, b.Player, b.Admin, b.UnbanAdmin, HitCount = b.Ban.BanHits.Count});
 
             if (!string.IsNullOrWhiteSpace(search))
             {
                 if (Guid.TryParse(search, out var guid))
                 {
-                    bans = bans.Where(b => b.ban.UserId == guid);
+                    bans = bans.Where(b => b.Ban.UserId == guid);
                 }
                 else if (IPHelper.TryParseCidr(search, out var cidr))
                 {
-                    bans = bans.Where(b => EF.Functions.ContainsOrEqual(cidr, b.ban.Address!.Value));
+                    bans = bans.Where(b => EF.Functions.ContainsOrEqual(cidr, b.Ban.Address!.Value));
                 }
                 else if (IPAddress.TryParse(search, out var ip))
                 {
-                    bans = bans.Where(u => EF.Functions.ContainsOrEqual(u.ban.Address!.Value, ip));
+                    bans = bans.Where(u => EF.Functions.ContainsOrEqual(u.Ban.Address!.Value, ip));
                 }
                 else
                 {
                     var normalized = search.ToUpperInvariant();
                     bans = bans.Where(u =>
-                        u.player.LastSeenUserName.ToUpper().Contains(normalized) ||
-                        u.admin.LastSeenUserName.ToUpper().Contains(normalized));
+                        u.Player.LastSeenUserName.ToUpper().Contains(normalized) ||
+                        u.Admin.LastSeenUserName.ToUpper().Contains(normalized));
                 }
             }
 
             bans = show switch
             {
-                ShowFilter.Active => bans.Where(b => b.ban.Unban == null && (b.ban.ExpirationTime == null || b.ban.ExpirationTime > DateTime.Now)),
-                ShowFilter.Expired => bans.Where(b => b.ban.Unban != null || b.ban.ExpirationTime < DateTime.Now),
+                ShowFilter.Active => bans.Where(b => b.Ban.Unban == null && (b.Ban.ExpirationTime == null || b.Ban.ExpirationTime > DateTime.Now)),
+                ShowFilter.Expired => bans.Where(b => b.Ban.Unban != null || b.Ban.ExpirationTime < DateTime.Now),
                 _ => bans
             };
 
@@ -92,12 +77,12 @@ namespace SS14.Admin.Pages
             AllRouteData.Add("show", Show.ToString());
 
             var sortState = Helpers.SortState.Build(bans);
-            sortState.AddColumn("name", p => p.player!.LastSeenUserName);
-            sortState.AddColumn("ip", p => p.ban.Address);
-            sortState.AddColumn("uid", p => p.ban.UserId);
-            sortState.AddColumn("time", p => p.ban.BanTime, SortOrder.Descending);
+            sortState.AddColumn("name", p => p.Player!.LastSeenUserName);
+            sortState.AddColumn("ip", p => p.Ban.Address);
+            sortState.AddColumn("uid", p => p.Ban.UserId);
+            sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
             // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
-            sortState.AddColumn("admin", p => p.admin.LastSeenUserName);
+            sortState.AddColumn("admin", p => p.Admin.LastSeenUserName);
             sortState.Init(sort, AllRouteData);
 
             SortState = sortState;
@@ -107,32 +92,35 @@ namespace SS14.Admin.Pages
             await Pagination.LoadLinqAsync(bans, e => e.Select(b =>
             {
                 (DateTime Time, string Admin)? unbanned = null;
-                if (b.ban.Unban != null)
+                if (b.Ban.Unban != null)
                 {
-                    var time = b.ban.Unban.UnbanTime;
-                    var admin = b.unbanAdmin?.LastSeenUserName ?? b.ban.Unban.UnbanningAdmin.ToString()!;
+                    var time = b.Ban.Unban.UnbanTime;
+                    var admin = b.UnbanAdmin?.LastSeenUserName ?? b.Ban.Unban.UnbanningAdmin.ToString()!;
 
                     unbanned = (time, admin);
                 }
 
-                var active = (b.ban.ExpirationTime == null || b.ban.ExpirationTime > DateTime.Now) && b.ban.Unban == null;
-
                 return new Ban(
-                    b.ban.Id,
-                    b.player?.LastSeenUserName,
-                    b.ban.UserId?.ToString(),
-                    b.ban.Address?.FormatCidr(),
-                    b.ban.Reason,
-                    b.ban.ExpirationTime,
+                    b.Ban.Id,
+                    b.Player?.LastSeenUserName,
+                    b.Ban.UserId?.ToString(),
+                    b.Ban.Address?.FormatCidr(),
+                    b.Ban.HWId is { } h ? Convert.ToBase64String(h) : null,
+                    b.Ban.Reason,
+                    b.Ban.ExpirationTime,
                     unbanned,
-                    active,
-                    b.ban.BanTime,
-                    b.admin?.LastSeenUserName);
+                    BanHelper.IsBanActive(b.Ban),
+                    b.Ban.BanTime,
+                    b.Admin?.LastSeenUserName,
+                    b.HitCount);
             }));
         }
 
         public async Task<IActionResult> OnPostUnbanAsync([FromForm] UnbanModel model)
         {
+            if (!User.IsInRole("BAN"))
+                return Forbid();
+
             var id = model.Id;
 
             var ban = await _dbContext.Ban
@@ -168,12 +156,14 @@ namespace SS14.Admin.Pages
             string? Name,
             string? UserId,
             string? Address,
+            string? Hwid,
             string Reason,
             DateTime? Expires,
             (DateTime Time, string Admin)? Unbanned,
             bool Active,
             DateTime BanTime,
-            string? Admin);
+            string? Admin,
+            int hitCount);
 
         public enum ShowFilter
         {
