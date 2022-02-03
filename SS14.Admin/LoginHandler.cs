@@ -43,7 +43,7 @@ namespace SS14.Admin
 
             if (adminData == null)
             {
-                ctx.Response.Redirect(_linkGenerator.GetUriByPage(ctx.HttpContext, "/LoginFailed"));
+                ctx.Response.Redirect(_linkGenerator.GetUriByPage(ctx.HttpContext, "/LoginFailed")!);
 
                 ctx.HandleResponse();
                 return;

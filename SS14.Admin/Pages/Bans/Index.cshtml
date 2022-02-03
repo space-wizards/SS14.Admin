@@ -8,14 +8,14 @@
     var highlightBan = 0;
     if (TempData.TryGetValue("HighlightNewBan", out var highlightObj))
     {
-        highlightBan = (int) highlightObj;
+        highlightBan = (int) highlightObj!;
     }
 }
 
 <div class="container">
     @if (TempData.TryGetValue("StatusMessage", out var stat))
     {
-        var status = (string) stat;
+        var status = (string) stat!;
         var statusMessageClass = status.StartsWith("Error") ? "danger" : "success";
 
         <div class="row">

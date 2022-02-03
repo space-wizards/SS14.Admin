@@ -15,12 +15,12 @@ namespace SS14.Admin.Controllers
                 RedirectUri = Url.Page("/Index")
             });
         }
-        
+
         [Route("Logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("Cookies");
-            return Redirect(Url.Page("/Index"));
+            return RedirectToPage("/Index");
         }
     }
 }

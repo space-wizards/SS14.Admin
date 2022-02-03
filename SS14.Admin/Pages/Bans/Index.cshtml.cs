@@ -59,8 +59,8 @@ namespace SS14.Admin.Pages
                 {
                     var normalized = search.ToUpperInvariant();
                     bans = bans.Where(u =>
-                        u.Player.LastSeenUserName.ToUpper().Contains(normalized) ||
-                        u.Admin.LastSeenUserName.ToUpper().Contains(normalized));
+                        u.Player!.LastSeenUserName.ToUpper().Contains(normalized) ||
+                        u.Admin!.LastSeenUserName.ToUpper().Contains(normalized));
                 }
             }
 
@@ -82,7 +82,7 @@ namespace SS14.Admin.Pages
             sortState.AddColumn("uid", p => p.Ban.UserId);
             sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
             // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
-            sortState.AddColumn("admin", p => p.Admin.LastSeenUserName);
+            sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
             sortState.Init(sort, AllRouteData);
 
             SortState = sortState;
