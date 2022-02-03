@@ -86,6 +86,9 @@
         <th style="min-width: 140px">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "admin", "Banning admin"))"/>
         </th>
+        <th title="How many times this ban was 'hit' by somebody trying to connect.">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "hits", "Ban hits"))"/>
+        </th>
         @*<th title="If the ban was manually unbanned then the unban time is sorted by">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "expire_time", "Expiration time"))"/>
         </th>*@
@@ -145,13 +148,6 @@
             </td>
             <td>@ban.Admin</td>
             <td>
-                @if (ban.Active && User.IsInRole("BAN"))
-                {
-                    <form asp-page-handler="Unban">
-                        <input type="hidden" name="Id" value="@ban.Id">
-                        <input type="submit" class="btn btn-secondary" value="Unban">
-                    </form>
-                }
                 @if (ban.hitCount != 0)
                 {
                     var plural = ban.hitCount > 1;
@@ -160,6 +156,15 @@
                 else
                 {
                     <a href="#" class="btn btn-secondary disabled">0 hits</a>
+                }
+            </td>
+            <td>
+                @if (ban.Active && User.IsInRole("BAN"))
+                {
+                    <form asp-page-handler="Unban">
+                        <input type="hidden" name="Id" value="@ban.Id">
+                        <input type="submit" class="btn btn-secondary" value="Unban">
+                    </form>
                 }
             </td>
         </tr>

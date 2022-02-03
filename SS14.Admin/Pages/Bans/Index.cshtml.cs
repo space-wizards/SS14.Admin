@@ -83,6 +83,7 @@ namespace SS14.Admin.Pages
             sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
             // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
             sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
+            sortState.AddColumn("hits", p => p.HitCount);
             sortState.Init(sort, AllRouteData);
 
             SortState = sortState;
