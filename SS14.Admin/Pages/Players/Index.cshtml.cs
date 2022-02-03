@@ -7,8 +7,6 @@ using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
-using SS14.Admin.Pages.Tables;
-using SS14.Admin.SignIn;
 
 namespace SS14.Admin.Pages.Players
 {
@@ -38,6 +36,7 @@ namespace SS14.Admin.Pages.Players
             SortState.AddColumn("uid", p => p.UserId);
             SortState.AddColumn("last_seen_time", p => p.LastSeenTime);
             SortState.AddColumn("last_seen_addr", p => p.LastSeenAddress);
+            SortState.AddColumn("last_seen_hwid", p => p.LastSeenHWId);
             SortState.AddColumn("first_seen", p => p.FirstSeenTime);
             SortState.Init(sort, AllRouteData);
 

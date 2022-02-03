@@ -1,6 +1,7 @@
 ﻿@page
 @using SS14.Admin.Pages.Tables
 @using SS14.Admin.Helpers
+@using SS14.Admin.Pages.Bans
 @model SS14.Admin.Pages.Players.PlayersIndexModel
 
 @{
@@ -26,6 +27,7 @@
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "last_seen_time", "Last seen time"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "last_seen_addr", "Last seen address"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "last_seen_hwid", "Last seen HWID"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "first_seen", "First seen"))"/>
     </tr>
     </thead>
@@ -40,6 +42,7 @@
             <td class="monotype small">@player.UserId</td>
             <td>@player.LastSeenTime.ToString("g")</td>
             <td class="monotype constrained-150">@player.LastSeenAddress</td>
+            <td class="monotype constrained-150">@BanHelper.FormatHwid(player.LastSeenHWId)</td>
             <td>@player.FirstSeenTime.ToString("g")</td>
         </tr>
     }
