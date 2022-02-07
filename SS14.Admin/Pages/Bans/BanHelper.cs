@@ -17,18 +17,18 @@ public static class BanHelper
             .Include(b => b.Unban)
             .LeftJoin(dbContext.Player,
                 ban => ban.UserId, player => player.UserId,
-                lj => new { ban = lj.Left, player = lj.Right })
+                (ban, player) => new { ban, player })
             .LeftJoin(dbContext.Player,
                 ban => ban.ban.BanningAdmin, admin => admin.UserId,
-                lj => new { lj.Left.ban, lj.Left.player, admin = lj.Right })
+                (ban, admin) => new { ban.ban, ban.player, admin })
             .LeftJoin(dbContext.Player,
                 ban => ban.ban.Unban!.UnbanningAdmin, unbanAdmin => unbanAdmin.UserId,
-                lj => new BanJoin
+                (ban, unbanAdmin) => new BanJoin
                 {
-                    Ban = lj.Left.ban,
-                    Player = lj.Left.player,
-                    Admin = lj.Left.admin,
-                    UnbanAdmin = lj.Right
+                    Ban = ban.ban,
+                    Player = ban.player,
+                    Admin = ban.admin,
+                    UnbanAdmin = unbanAdmin
                 });
     }
 
@@ -58,17 +58,21 @@ public static class BanHelper
         IEnumerable<TRight> right,
         Expression<Func<TLeft, TKey>> leftKey,
         Expression<Func<TRight, TKey>> rightKey,
-        Expression<Func<LeftJoinObj<TLeft, TRight>, TOutput>> join)
+        Expression<Func<TLeft, TRight, TOutput>> join)
     {
+        var paramJ = Expression.Parameter(typeof(LeftJoinInternal<TLeft, TRight>));
+        var paramR = Expression.Parameter(typeof(TRight));
+        var body = Expression.Invoke(join, Expression.Field(paramJ, "L"), paramR);
+        var l = Expression.Lambda<Func<LeftJoinInternal<TLeft, TRight>, TRight, TOutput>>(body, paramJ, paramR);
+
         return left
-            .GroupJoin(right, leftKey, rightKey, (l, r) => new { l, r })
-            .SelectMany(j => j.r.DefaultIfEmpty(), (j, r) => new LeftJoinObj<TLeft, TRight> { Left = j.l, Right = r })
-            .Select(join);
+            .GroupJoin(right, leftKey, rightKey, (l, r) => new LeftJoinInternal<TLeft, TRight> { L = l, R = r })
+            .SelectMany(j => j.R.DefaultIfEmpty(), l);
     }
 
-    public sealed class LeftJoinObj<TLeft, TRight>
+    private sealed class LeftJoinInternal<TLeft, TRight>
     {
-        public TLeft Left { get; set; } = default!;
-        public TRight? Right { get; set; }
+        public TLeft L = default!;
+        public IEnumerable<TRight> R = default!;
     }
 }

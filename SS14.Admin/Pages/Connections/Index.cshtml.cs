@@ -45,26 +45,7 @@ namespace SS14.Admin.Pages.Connections
             AllRouteData.Add("search", CurrentFilter);
 
             IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog;
-            if (!string.IsNullOrEmpty(search))
-            {
-                if (Guid.TryParse(search, out var guid))
-                {
-                    logQuery = logQuery.Where(u => u.UserId == guid);
-                }
-                else if (IPHelper.TryParseCidr(search, out var cidr))
-                {
-                    logQuery = logQuery.Where(u => EF.Functions.Contains(cidr, u.Address));
-                }
-                else if (IPAddress.TryParse(search, out var ip))
-                {
-                    logQuery = logQuery.Where(u => u.Address.Equals(ip));
-                }
-                else
-                {
-                    var normalized = search.ToUpperInvariant();
-                    logQuery = logQuery.Where(u => u.UserName.ToUpper().Contains(normalized));
-                }
-            }
+            logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
 
             var sortedQuery = SortState.ApplyToQuery(logQuery).ThenByDescending(s => s.Time);
 

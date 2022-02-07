@@ -46,26 +46,7 @@ namespace SS14.Admin.Pages.Players
             AllRouteData.Add("search", CurrentFilter);
 
             IQueryable<Player> userQuery = _dbContext.Player;
-            if (!string.IsNullOrEmpty(search))
-            {
-                if (Guid.TryParse(search, out var guid))
-                {
-                    userQuery = userQuery.Where(u => u.UserId == guid);
-                }
-                else if (IPHelper.TryParseCidr(search, out var cidr))
-                {
-                    userQuery = userQuery.Where(u => EF.Functions.Contains(cidr, u.LastSeenAddress));
-                }
-                else if (IPAddress.TryParse(search, out var ip))
-                {
-                    userQuery = userQuery.Where(u => u.LastSeenAddress.Equals(ip));
-                }
-                else
-                {
-                    var normalized = search.ToUpperInvariant();
-                    userQuery = userQuery.Where(u => u.LastSeenUserName.ToUpper().Contains(normalized));
-                }
-            }
+            userQuery = SearchHelper.SearchPlayers(userQuery, search);
 
             userQuery = SortState.ApplyToQuery(userQuery);
 

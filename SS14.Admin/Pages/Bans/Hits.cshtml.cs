@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -58,31 +56,12 @@ public class Hits : PageModel
         CurrentFilter = search;
         AllRouteData.Add("search", CurrentFilter);
 
-        IQueryable<ConnectionLog> logQuery = _dbContext.ServerBanHit
+        var logQuery = _dbContext.ServerBanHit
             .Include(b => b.Connection)
             .Where(bh => bh.BanId == banEntry.Ban.Id)
             .Select(bh => bh.Connection);
 
-        if (!string.IsNullOrEmpty(search))
-        {
-            if (Guid.TryParse(search, out var guid))
-            {
-                logQuery = logQuery.Where(u => u.UserId == guid);
-            }
-            else if (IPHelper.TryParseCidr(search, out var cidr))
-            {
-                logQuery = logQuery.Where(u => EF.Functions.Contains(cidr, u.Address));
-            }
-            else if (IPAddress.TryParse(search, out var ip))
-            {
-                logQuery = logQuery.Where(u => u.Address.Equals(ip));
-            }
-            else
-            {
-                var normalized = search.ToUpperInvariant();
-                logQuery = logQuery.Where(u => u.UserName.ToUpper().Contains(normalized));
-            }
-        }
+        logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
 
         var sortedQuery = SortState.ApplyToQuery(logQuery).ThenByDescending(s => s.Time);
 

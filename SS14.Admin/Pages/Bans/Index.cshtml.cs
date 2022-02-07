@@ -38,31 +38,8 @@ namespace SS14.Admin.Pages
         {
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
-            var bans = BanHelper.CreateBanJoin(_dbContext)
+            var bans = SearchHelper.SearchServerBans(BanHelper.CreateBanJoin(_dbContext), search)
                 .Select(b => new {b.Ban, b.Player, b.Admin, b.UnbanAdmin, HitCount = b.Ban.BanHits.Count});
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                if (Guid.TryParse(search, out var guid))
-                {
-                    bans = bans.Where(b => b.Ban.UserId == guid);
-                }
-                else if (IPHelper.TryParseCidr(search, out var cidr))
-                {
-                    bans = bans.Where(b => EF.Functions.ContainsOrEqual(cidr, b.Ban.Address!.Value));
-                }
-                else if (IPAddress.TryParse(search, out var ip))
-                {
-                    bans = bans.Where(u => EF.Functions.ContainsOrEqual(u.Ban.Address!.Value, ip));
-                }
-                else
-                {
-                    var normalized = search.ToUpperInvariant();
-                    bans = bans.Where(u =>
-                        u.Player!.LastSeenUserName.ToUpper().Contains(normalized) ||
-                        u.Admin!.LastSeenUserName.ToUpper().Contains(normalized));
-                }
-            }
 
             bans = show switch
             {

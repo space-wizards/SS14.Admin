@@ -51,6 +51,8 @@ namespace SS14.Admin.Pages.Bans
                 return;
             }
 
+            Input.NameOrUid = Input.NameOrUid.Trim();
+
             Player? player;
             if (Guid.TryParse(Input.NameOrUid, out var guid))
             {
@@ -95,6 +97,7 @@ namespace SS14.Admin.Pages.Bans
             DateTime? expires = null;
             if (!string.IsNullOrWhiteSpace(Input.NameOrUid))
             {
+                Input.NameOrUid = Input.NameOrUid.Trim();
                 if (Guid.TryParse(Input.NameOrUid, out var guid))
                 {
                     userId = guid;
@@ -122,6 +125,7 @@ namespace SS14.Admin.Pages.Bans
 
             if (!string.IsNullOrWhiteSpace(Input.IP))
             {
+                Input.IP = Input.IP.Trim();
                 if (!IPHelper.TryParseIpOrCidr(Input.IP, out var parsedAddr))
                 {
                     StatusMessage = "Error: Invalid IP address/CIDR range";
@@ -133,8 +137,8 @@ namespace SS14.Admin.Pages.Bans
 
             if (!string.IsNullOrWhiteSpace(Input.HWid))
             {
-                const int hwidLength = 32;
-                hwid = new byte[hwidLength];
+                Input.HWid = Input.HWid.Trim();
+                hwid = new byte[Constants.HwidLength];
                 if (!Convert.TryFromBase64String(Input.HWid, hwid, out _))
                 {
                     StatusMessage = "Error: Invalid HWID";
