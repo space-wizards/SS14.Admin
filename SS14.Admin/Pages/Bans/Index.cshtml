@@ -8,14 +8,14 @@
     var highlightBan = 0;
     if (TempData.TryGetValue("HighlightNewBan", out var highlightObj))
     {
-        highlightBan = (int) highlightObj!;
+        highlightBan = (int)highlightObj!;
     }
 }
 
 <div class="container">
     @if (TempData.TryGetValue("StatusMessage", out var stat))
     {
-        var status = (string) stat!;
+        var status = (string)stat!;
         var statusMessageClass = status.StartsWith("Error") ? "danger" : "success";
 
         <div class="row">
@@ -64,112 +64,4 @@
     </div>
 </form>
 
-<partial name="Tables/Pagination" for="Pagination"/>
-
-<table class="table table-striped mt-3">
-    <thead>
-    <tr>
-        <th style="min-width: 210px">
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "name", "Name"))"/>
-            /
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
-            /
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "ip", "IP"))"/>
-            /
-            HWID
-        </th>
-        <th>Reason</th>
-        <th style="min-width: 210px">
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "time", "Ban time"))"/>
-        </th>
-        <th style="min-width: 210px">Expires</th>
-        <th style="min-width: 140px">
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "admin", "Banning admin"))"/>
-        </th>
-        <th title="How many times this ban was 'hit' by somebody trying to connect.">
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "hits", "Ban hits"))"/>
-        </th>
-        @*<th title="If the ban was manually unbanned then the unban time is sorted by">
-            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "expire_time", "Expiration time"))"/>
-        </th>*@
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var ban in Model.Pagination.List.PaginatedItems)
-    {
-        var className = ban.Id == highlightBan ? "table-success" : "";
-        <tr class="@className">
-            <td>
-                @if (ban.Name != null)
-                {
-                    <strong>@ban.Name</strong>
-                    <br/>
-                }
-                @if (User.IsInRole("ADMIN"))
-                {
-                    if (ban.Address != null)
-                    {
-                        <small>
-                            <strong>IP:</strong> <span class="monotype">@ban.Address</span>
-                        </small>
-                        <br/>
-                    }
-                    if (ban.Hwid != null)
-                    {
-                        <small>
-                            <strong>HWID:</strong> <span class="monotype">@ban.Hwid</span>
-                        </small>
-                        <br/>
-                    }
-                }
-                @if (ban.UserId != null)
-                {
-                    <small>
-                        <strong>GUID:</strong> <span class="monotype">@ban.UserId</span>
-                    </small>
-                }
-            </td>
-            <td>@ban.Reason</td>
-            <td>@ban.BanTime.ToString("g")</td>
-            <td>
-                @(ban.Expires?.ToString("g") ?? "PERMANENT")
-                @if (ban.Unbanned is { } unbanned)
-                {
-                    var (time, admin) = unbanned;
-                    <br>
-                    <text><strong>Unbanned:</strong> @time.ToString("g") by @admin</text>
-                }
-                else if (ban.Expires < DateTime.Now)
-                {
-                    <br>
-                    <strong>Expired</strong>
-                }
-            </td>
-            <td>@ban.Admin</td>
-            <td>
-                @if (ban.hitCount != 0)
-                {
-                    var plural = ban.hitCount > 1;
-                    <a asp-page="Hits" class="btn btn-secondary" asp-route-ban="@ban.Id">@ban.hitCount @(plural ? "hits" : "hit")</a>
-                }
-                else
-                {
-                    <a href="#" class="btn btn-secondary disabled">0 hits</a>
-                }
-            </td>
-            <td>
-                @if (ban.Active && User.IsInRole("BAN"))
-                {
-                    <form asp-page-handler="Unban">
-                        <input type="hidden" name="Id" value="@ban.Id">
-                        <input type="submit" class="btn btn-secondary" value="Unban">
-                    </form>
-                }
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<partial name="Tables/Pagination" for="Pagination"/>
+<partial name="Tables/BansTable" model="@(new BansTableModel(Model.SortState, Model.Pagination, highlightBan))"/>

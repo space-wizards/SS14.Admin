@@ -1,7 +1,6 @@
 ﻿@page "{ban}"
 @using SS14.Admin.Helpers
 @using SS14.Admin.Pages.Tables
-@using Content.Server.Database
 @model SS14.Admin.Pages.Bans.Hits
 
 @{
@@ -55,7 +54,7 @@
 </div>
 
 
-<form asp-page="./Index" asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container">
+<form asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container">
     @FormHiddenRoutes.Make(Model.AllRouteData, "search")
     <div class="form-group row">
         <label class="col-md-3" for="searchBar">Search:</label>
@@ -65,51 +64,4 @@
     </div>
 </form>
 
-<partial name="Tables/Pagination" for="Pagination"/>
-
-<table class="table table-striped mt-3">
-    <thead>
-    <tr>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "name", "User Name"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "time", "Time"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "addr", "IP Address"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "hwid", "HWID"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "denied", "Status"))"/>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var log in Model.Pagination.List.PaginatedItems)
-    {
-        <tr>
-            <td>
-                <strong>@log.UserName</strong>
-                <br/>
-            </td>
-            <td class="monotype">@log.UserId</td>
-            <td>@log.Time.ToString("g")</td>
-            <td class="monotype constrained-150">@log.Address</td>
-            <td class="monotype constrained-150">@(log.HWId is { } hwid ? Convert.ToBase64String(hwid) : null)</td>
-            <td>
-                @switch (log.Denied)
-                {
-                    case ConnectionDenyReason.Ban:
-                        <strong>Denied: Banned</strong>
-                        break;
-                    case ConnectionDenyReason.Whitelist:
-                        <strong>Denied: Whitelist</strong>
-                        break;
-                    case ConnectionDenyReason.Full:
-                        <strong>Denied: Server Full</strong>
-                        break;
-                    case null:
-                        <span>Accepted</span>
-                        break;
-                }
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<partial name="Tables/Pagination" for="Pagination"/>
+<partial name="Tables/ConnectionsTable" model="@(new ConnectionsTableModel(Model.SortState, Model.Pagination))"/>

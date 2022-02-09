@@ -7,21 +7,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
-using SS14.Admin.Pages.Connections;
+using SS14.Admin.Pages.Bans;
 
-namespace SS14.Admin.Pages.Bans;
+namespace SS14.Admin.Pages.Connections;
 
-public class Hits : PageModel
+public sealed class Hits : PageModel
 {
     private readonly PostgresServerDbContext _dbContext;
 
-    public BanHelper.BanJoin Ban { get; set; } = default!;
-
+    public ConnectionLog Log { get; set; } = default!;
     public ISortState SortState { get; private set; } = default!;
-    public PaginationState<ConnectionsIndexModel.Connection> Pagination { get; } = new(100);
+    public PaginationState<BansModel.Ban> Pagination { get; } = new(100);
     public Dictionary<string, string?> AllRouteData { get; } = new();
-
     public string? CurrentFilter { get; set; }
+
 
     public Hits(PostgresServerDbContext dbContext)
     {
@@ -29,7 +28,7 @@ public class Hits : PageModel
     }
 
     public async Task<IActionResult> OnGetAsync(
-        int ban,
+        int connection,
         string? sort,
         string? search,
         int? pageIndex,
@@ -37,27 +36,28 @@ public class Hits : PageModel
     {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead);
 
-        var banEntry = await BanHelper.CreateBanJoin(_dbContext).SingleOrDefaultAsync(b => b.Ban.Id == ban);
+        var logEntry = await _dbContext.ConnectionLog.SingleOrDefaultAsync(c => c.Id == connection);
 
-        if (banEntry == null)
+        if (logEntry == null)
             return NotFound();
 
-        Ban = banEntry;
-
-
-        Pagination.Init(pageIndex, perPage, AllRouteData);
+        Log = logEntry;
 
         CurrentFilter = search;
         AllRouteData.Add("search", CurrentFilter);
+        AllRouteData.Add("connection", connection.ToString());
 
-        var logQuery = _dbContext.ServerBanHit
-            .Include(b => b.Connection)
-            .Where(bh => bh.BanId == banEntry.Ban.Id)
-            .Select(bh => bh.Connection);
+        Pagination.Init(pageIndex, perPage, AllRouteData);
 
-        logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
+        var banQuery = SearchHelper.SearchServerBans(BanHelper.CreateBanJoin(_dbContext), search)
+            .Join(_dbContext.ServerBanHit, bj => bj.Ban.Id, bh => bh.BanId, (join, hit) => new
+            {
+                join, hit
+            })
+            .Where(bh => bh.hit.ConnectionId == logEntry.Id)
+            .Select(bh => bh.join);
 
-        SortState = await ConnectionsIndexModel.LoadSortConnectionsTableData(Pagination, logQuery, sort, AllRouteData);
+        SortState = await BansModel.LoadSortBanTableData(Pagination, banQuery, sort, AllRouteData);
 
         return Page();
     }

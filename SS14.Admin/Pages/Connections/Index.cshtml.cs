@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Content.Server.Database;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SS14.Admin.Helpers;
 
@@ -11,8 +12,8 @@ namespace SS14.Admin.Pages.Connections
     {
         private readonly PostgresServerDbContext _dbContext;
 
-        public SortState<ConnectionLog> SortState { get; } = new();
-        public PaginationState<ConnectionLog> Pagination { get; } = new(100);
+        public ISortState SortState { get; private set; } = default!;
+        public PaginationState<Connection> Pagination { get; } = new(100);
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         public string? CurrentFilter { get; set; }
@@ -37,13 +38,6 @@ namespace SS14.Admin.Pages.Connections
             bool showWhitelist,
             bool showFull)
         {
-            SortState.AddColumn("name", c => c.UserName);
-            SortState.AddColumn("uid", c => c.UserId);
-            SortState.AddColumn("time", c => c.Time, SortOrder.Descending);
-            SortState.AddColumn("addr", c => c.Address);
-            SortState.AddColumn("hwid", c => c.HWId);
-            SortState.AddColumn("denied", c => c.Denied);
-            SortState.Init(sort, AllRouteData);
 
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
@@ -90,9 +84,38 @@ namespace SS14.Admin.Pages.Connections
 
             logQuery = logQuery.Where(c => acceptableDenies.Contains(c.Denied));
 
-            var sortedQuery = SortState.ApplyToQuery(logQuery).ThenByDescending(s => s.Time);
-
-            await Pagination.LoadAsync(sortedQuery);
+            SortState = await LoadSortConnectionsTableData(Pagination, logQuery, sort, AllRouteData);
         }
+
+        [MustUseReturnValue]
+        public static async Task<ISortState> LoadSortConnectionsTableData(
+            PaginationState<Connection> pagination,
+            IQueryable<ConnectionLog> query,
+            string? sort,
+            Dictionary<string, string?> allRouteData)
+        {
+            var logs = query.Select(c => new { c, HitCount = c.BanHits.Count });
+
+            var sortState = Helpers.SortState.Build(logs);
+
+            sortState.AddColumn("name", c => c.c.UserName);
+            sortState.AddColumn("uid", c => c.c.UserId);
+            sortState.AddColumn("time", c => c.c.Time, SortOrder.Descending);
+            sortState.AddColumn("addr", c => c.c.Address);
+            sortState.AddColumn("hwid", c => c.c.HWId);
+            sortState.AddColumn("denied", c => c.c.Denied);
+            sortState.AddColumn("hits", c => c.c.BanHits.Count);
+            sortState.Init(sort, allRouteData);
+
+            logs = sortState.ApplyToQuery(logs);
+
+            await pagination.LoadLinqAsync(logs, e => e.Select(c => new Connection(c.c, c.HitCount)));
+
+            return sortState;
+        }
+
+        public sealed record Connection(
+            ConnectionLog Log,
+            int BanHitCount);
     }
 }
