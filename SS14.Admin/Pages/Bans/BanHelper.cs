@@ -67,7 +67,7 @@ public static class BanHelper
 
         return left
             .GroupJoin(right, leftKey, rightKey, (l, r) => new LeftJoinInternal<TLeft, TRight> { L = l, R = r })
-            .SelectMany(j => j.R.DefaultIfEmpty(), l);
+            .SelectMany(j => j.R.DefaultIfEmpty()!, l);
     }
 
     private sealed class LeftJoinInternal<TLeft, TRight>

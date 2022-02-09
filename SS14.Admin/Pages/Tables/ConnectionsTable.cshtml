@@ -6,7 +6,7 @@
 <table class="table table-striped mt-3">
     <thead>
     <tr>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "name", "User Name"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model!.SortState, "name", "User Name"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "time", "Time"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "addr", "IP Address"))"/>
