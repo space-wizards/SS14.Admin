@@ -9,12 +9,31 @@
 }
 
 <form asp-page="./Index" asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container">
-    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search", "showAccepted", "showBanned", "showWhitelist", "showFull")
     <div class="form-group row">
         <label class="col-md-3" for="searchBar">Search:</label>
         <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
         <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
         <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
+    </div>
+    <div class="form-group row">
+        <span class="col-md-2 col-form-label">Show:</span>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showAccepted" name="showAccepted" @(Model.ShowAccepted ? "checked" : "") value="true">
+            <label class="form-check-label" for="showAccepted">Accepted</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showBanned" name="showBanned" @(Model.ShowBanned ? "checked" : "") value="true">
+            <label class="form-check-label" for="showBanned">Banned</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showWhitelist" name="showWhitelist" @(Model.ShowWhitelist ? "checked" : "") value="true">
+            <label class="form-check-label" for="showWhitelist">Whitelist</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showFull" name="showFull" @(Model.ShowFull ? "checked" : "") value="true">
+            <label class="form-check-label" for="showFull">Server Full</label>
+        </div>
     </div>
 </form>
 
