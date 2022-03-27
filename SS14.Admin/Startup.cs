@@ -40,6 +40,7 @@ namespace SS14.Admin
                 options.Conventions.AuthorizeFolder("/Players");
                 options.Conventions.AuthorizeFolder("/Connections");
                 options.Conventions.AuthorizeFolder("/Bans");
+                options.Conventions.AuthorizeFolder("/Logs");
             });
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

@@ -16,14 +16,14 @@ namespace SS14.Admin.Helpers
     public static class SortState
     {
         // This method allows us to make a SortState<T> for anonymous types used in EFCore queries,
-        // so that complex joined queries can use SortState<T>. 
+        // so that complex joined queries can use SortState<T>.
         // ReSharper disable once UnusedParameter.Global
         public static SortState<T> Build<T>(IQueryable<T> _)
         {
             return new();
         }
     }
-    
+
     public sealed class SortState<T> : ISortState
     {
         public string? CurColumn;
@@ -35,7 +35,10 @@ namespace SS14.Admin.Helpers
         {
             if (DefaultColumn == null)
                 throw new InvalidOperationException("No default column set!");
-            
+
+            AllRouteData = allRouteData;
+            allRouteData.Add("sort", reqOrder);
+
             if (reqOrder != null)
             {
                 if (reqOrder.EndsWith("_desc"))
@@ -52,11 +55,8 @@ namespace SS14.Admin.Helpers
 
                 CurOrder = _columns[DefaultColumn].SortDefault!.Value;
             }
-            
-            AllRouteData = allRouteData;
-            allRouteData.Add("sort", reqOrder);
         }
-        
+
         public string OrderStringForColumnButton(string column)
         {
             var colReg = _columns[column];
@@ -86,7 +86,7 @@ namespace SS14.Admin.Helpers
                 _ => SortOrder.Ascending
             };
         }
-        
+
         public IDictionary<string, string?> AllRouteData { get; private set; } = ImmutableDictionary<string, string?>.Empty;
 
         public void AddColumn<TKey>(string name, Expression<Func<T, TKey>> expr, SortOrder? sortDefault = null)
@@ -119,7 +119,7 @@ namespace SS14.Admin.Helpers
                     _ => throw new InvalidOperationException()
                 };
             }
-        } 
+        }
     }
 
     public enum SortOrder

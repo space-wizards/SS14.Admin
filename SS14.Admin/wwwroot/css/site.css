@@ -1,5 +1,23 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
+:root {
+    --background-color: white;
+    --header-color-secondary: #6c7ae0;
+    /*--header-color-secondary: #463F3A;*/
+    --header-color: #50514F;
+    --row-color: #f8f6ff;
+    --text-color-dark: #50514f;
+    --text-accent-color-dark: #848683;
+    --text-color-light: white;
+
+    --color-severity-low: var(--text-color-dark);
+    --color-severity-medium: #F8C630;
+    --color-severity-high: #FA8420;
+    --color-severity-extreme: #C21906;
+
+    --color-filter-search: #9AC4F8;
+    --color-filter-type: #F78764;
+}
 
 a.navbar-brand {
   white-space: normal;
@@ -77,4 +95,314 @@ body {
 .constrained-150 {
   max-width: 150px;
   overflow-wrap: break-word;
+}
+
+/* Proper DataGrid styling
+-------------------------------------------------------- */
+data-grid {
+    display: block;
+    width: 100%;
+
+    /*layout*/
+    --search-box-width: 400px;
+    --footer-height: 3rem;
+}
+
+data-grid data-grid-filter {
+    padding: 15px;
+    padding-bottom: 0;
+    width: 100%;
+    align-items: baseline;
+    background: var(--header-color-secondary);
+    color: var(--text-color-light);
+    font-weight: normal;
+    font-size: 1.1rem;
+}
+
+data-grid-filter input {
+    height: 30px;
+    min-width: 220px;
+}
+
+data-grid-filter .grid-search {
+    width: var(--search-box-width);
+}
+
+data-grid-filter .grid-search.search-box-active {
+    border-style: none;
+    border-radius: 3px 3px 0 0;
+    border-bottom: none;
+}
+
+data-grid .search-popover {
+    z-index: 999;
+    width: var(--search-box-width);
+    background-color: white;
+    color: var(--text-color-dark);
+    border-top: solid 1px var(--text-color-dark);
+    padding: 4px;
+    font-size: 0.9rem;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+data-grid .search-result:first-of-type {
+    margin: 0;
+}
+
+data-grid .search-result {
+    margin: 4px 0;
+    cursor: pointer;
+    transition: transform linear 0.05s, background-color linear 0.05s;
+}
+
+data-grid .search-result:hover {
+    background-color: var(--row-color);
+}
+
+data-grid .search-result:focus {
+    transform: translateX(2px);
+}
+
+data-grid .search-popover .result-tag {
+    display: inline-block;
+    font-weight: bold;
+    min-width: 50px;
+}
+
+data-grid-filter button.btn {
+    color: var(--text-color-light);
+}
+
+data-grid-filter button.btn:hover {
+    color: var(--header-color);
+}
+
+data-grid-filter button:active {
+    transform: scale(0.95);
+}
+
+data-grid .applied-filters {
+    overflow-x: hidden;
+}
+
+data-grid .filter-tag {
+    border: none;
+    border-radius: 1em;
+    padding: 4px 8px;
+    height: 2.3em;
+    text-decoration: none;
+    font-size: .8rem;
+    text-align: center;
+    /*noinspection CssUnresolvedCustomProperty*/
+    background-color: var(--tag-color, var(--header-color))
+}
+
+data-grid .filter-tag > .tag-prefix {
+    font-weight: bold;
+}
+
+data-grid .filter-tag > .tag-close {
+    font-size: .9em;
+    color: var(--text-color-dark);
+    margin-left: 4px;
+    cursor: pointer;
+}
+
+
+data-grid .flex-row {
+    display: flex;
+    gap: 15px;
+}
+
+data-grid .flex-seperator {
+    flex-grow: 1;
+}
+
+data-grid > table {
+    display: grid;
+    border-collapse: collapse;
+    min-width: 100%;
+    overflow-y: auto;
+    font-size: 1rem;
+}
+
+data-grid > table > tbody {
+    overflow-y: scroll;
+}
+
+data-grid > table .text-center
+{
+    text-align: center;
+}
+
+data-grid > table td.colored
+{
+    /*noinspection CssUnresolvedCustomProperty*/
+    color: var(--cell-color, var(--text-color-dark));
+    font-weight: bold;
+}
+
+data-grid > table thead,
+data-grid > table tbody,
+data-grid > table tr {
+    display: contents;
+}
+
+data-grid > table th,
+data-grid > table td {
+    padding: 4px 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 2.2em;
+}
+
+data-grid > table th:first-of-type,
+data-grid > table td:first-of-type {
+    padding-left: 2rem;
+}
+
+data-grid > table th {
+    position: sticky;
+    top: 0;
+    background: var(--header-color);
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.1em;
+    color: var(--text-color-light);
+}
+
+data-grid > table th a,
+data-grid > table th a:hover {
+    color: var(--text-color-light);
+}
+
+data-grid > table th:last-child {
+    border: 0;
+}
+
+data-grid > table td {
+    color: var(--text-color-dark);
+}
+
+data-grid > table tr:nth-child(even) td {
+    background: var(--row-color);
+}
+
+data-grid-footer {
+    height: var(--footer-height, 0);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.on-click {
+    cursor: pointer;
+}
+
+.on-click > * {
+    border-bottom: 1px dashed #00000000;
+    transition: border-color linear .05s;
+}
+
+.on-click:hover > * {
+    border-bottom: 1px dashed var(--text-color-dark);
+}
+
+.entity-link {
+    text-decoration-line: none;
+    font-weight: bold;
+}
+
+.side-panel-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.side-panel-overlay {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-color: #00000077;
+    pointer-events: all;
+}
+
+.side-panel {
+    position: absolute;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    width: 26vw;
+    background-color: var(--background-color, white);
+    pointer-events: all;
+    padding: 1rem;
+    color: var(--text-color-dark)
+}
+
+.transition-right {
+    will-change: transform;
+    transition: transform cubic-bezier(.79,.14,.15,.86) 0.5s;
+}
+
+.hidden-right {
+    transform: translateX(100%);
+}
+
+.log-json-entry {
+    padding-left: 1rem;
+}
+
+.log-json-entry > p,
+.log-json-entry > a{
+    padding-left: 1rem;
+    margin-top: -0.5rem;
+    margin-bottom: 4px;
+}
+
+.log-json-entry:last-child {
+    margin-bottom: 8px;
+}
+
+.log-muted {
+    font-weight: lighter;
+    font-style: italic;
+    color: var(--text-accent-color-dark)
+}
+
+.log-player-link {
+
+}
+
+hr.line-inset {
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.log-details-header {
+    /*noinspection CssUnresolvedCustomProperty*/
+    background-color: var(--cell-color, var(--header-color));
+    color: var(--text-color-light);
+    margin: -1rem -1rem 4px;
+    padding: 1rem;
+}
+
+.log-details-sub {
+    display: flex;
+    justify-content: left;
+    gap: 1rem;
+    font-style: normal;
+}
+
+.log-details-sub > p{
+    margin: 0 0 0.5rem;
 }

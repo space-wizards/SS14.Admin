@@ -27,6 +27,7 @@ class DatePicker {
 
                         context.parameters.set(this.fromDateKey, start);
                         context.parameters.set(this.toDateKey, end);
+                        context.parameters.delete(context.parameterNames.PAGE_INDEX);
                         context.update();
                     })
                 }
@@ -42,6 +43,7 @@ class DatePicker {
                 this.picker.clearSelection();
                 context.parameters.delete(this.fromDateKey);
                 context.parameters.delete(this.toDateKey);
+                context.parameters.delete(context.parameterNames.PAGE_INDEX);
                 context.update();
             });
         }

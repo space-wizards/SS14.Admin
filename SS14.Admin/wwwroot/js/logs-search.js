@@ -115,6 +115,7 @@ function searchConfirmed(filterData)
     if (filters.findIndex(value => value.key === filterData.key && value.value === filterData.value) >= 0) return;
     filters.push(filterData);
     const json = JSON.stringify(filters);
+    context.parameters.delete(context.parameterNames.PAGE_INDEX);
     context.updateQuery(FILTERS_KEY, json);
 }
 
@@ -128,6 +129,7 @@ function removeFilterTag(tagID) {
     tag.parentNode.removeChild(tag);
 
     const json = JSON.stringify(filters);
+    context.parameters.delete(context.parameterNames.PAGE_INDEX);
     context.updateQuery(FILTERS_KEY, json);
 }
 

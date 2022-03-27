@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using SS14.Admin.AdminLogs;
 using SS14.Admin.Helpers;
 using SS14.Admin.Models;
 
@@ -30,32 +32,38 @@ namespace SS14.Admin.Pages.Logs
             _dbContext = dbContext;
         }
 
-        public async Task OnGetAsync(string? sort)
+        public async Task OnGetAsync(string? sort, int? pageIndex, int? perPage)
         {
             AllRouteData.Add("fromDate", FromDate.ToString("yyyy-MM-dd"));
             AllRouteData.Add("toDate", ToDate.ToString("yyyy-MM-dd"));
             AllRouteData.Add("filters", JsonSerializer.Serialize(Filters, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
 
-
-
-            /*SortState.AddColumn("name", p => p.LastSeenUserName, SortOrder.Ascending);
-            SortState.AddColumn("uid", p => p.UserId);
-            SortState.AddColumn("last_seen_time", p => p.LastSeenTime);
-            SortState.AddColumn("last_seen_addr", p => p.LastSeenAddress);
-            SortState.AddColumn("first_seen", p => p.FirstSeenTime);*/
             SortState.AddColumn("date", entry => entry.Date, SortOrder.Descending);
             SortState.AddColumn("impact", entry => entry.Impact);
+            SortState.AddColumn("type", entry => entry.Type);
             SortState.AddColumn("message", entry => entry.Message);
             SortState.Init(sort, AllRouteData);
 
-            Pagination.Init(0, 100, AllRouteData);
+            Pagination.Init(pageIndex, perPage, AllRouteData);
 
-            IQueryable<AdminLog> logQuery = _dbContext.AdminLog;
+            //.Include(log => log.Players)
+            //.ThenInclude(player => player.Player)
+
+            IQueryable<AdminLog> logQuery = _dbContext.AdminLog
+                .Include(log => log.Round)
+                .ThenInclude(round => round.Server);
 
             logQuery = ApplyDateFilter(logQuery, FromDate);
             logQuery = ApplyDateFilter(logQuery, ToDate, true);
 
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var filter in Filters ?? Enumerable.Empty<AdminLogFilterModel>())
+            {
+                logQuery = filter.Key.FilterQueryPart(_dbContext, filter.Value, logQuery);
+            }
+
             logQuery = SortState.ApplyToQuery(logQuery);
+            Console.WriteLine(logQuery.ToQueryString());
             await Pagination.LoadAsync(logQuery);
         }
 
