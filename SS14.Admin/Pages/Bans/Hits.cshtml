@@ -1,0 +1,67 @@
+﻿@page "{ban}"
+@using SS14.Admin.Helpers
+@using SS14.Admin.Pages.Tables
+@model SS14.Admin.Pages.Bans.Hits
+
+@{
+    ViewData["Title"] = "Ban Hits";
+}
+
+<div class="container">
+    <h1>Ban hits for ban @Model.Ban.Ban.Id</h1>
+
+    <dl class="row">
+        <dt class="col-sm-2">Name:</dt>
+        <dd class="col-sm-10">@Model.Ban.Player?.LastSeenUserName</dd>
+        <dt class="col-sm-2">User ID:</dt>
+        <dd class="col-sm-10 monotype">@Model.Ban.Ban.UserId</dd>
+        @if (User.IsInRole("ADMIN"))
+        {
+            <dt class="col-sm-2">IP:</dt>
+            <dd class="col-sm-10 monotype">@Model.Ban.Ban.Address?.FormatCidr()</dd>
+            <dt class="col-sm-2">HWID:</dt>
+            <dd class="col-sm-10 monotype">@BanHelper.FormatHwid(Model.Ban.Ban.HWId)</dd>
+        }
+        <dt class="col-sm-2">Time:</dt>
+        <dd class="col-sm-10">@Model.Ban.Ban.BanTime.ToString("g")</dd>
+        <dt class="col-sm-2">Expires:</dt>
+        <dd class="col-sm-10">
+            @(Model.Ban.Ban.ExpirationTime?.ToString("g") ?? "PERMANENT")
+            @if (Model.Ban.Ban.Unban is { } unbanned)
+            {
+                <br>
+                <text><strong>Unbanned:</strong> @unbanned.UnbanTime.ToString("g") by @Model.Ban.UnbanAdmin?.LastSeenUserName</text>
+            }
+            else if (Model.Ban.Ban.ExpirationTime < DateTime.Now)
+            {
+                <br>
+                <strong>Expired</strong>
+            }
+        </dd>
+        <dt class="col-sm-2">Banning admin:</dt>
+        <dd class="col-sm-10">@Model.Ban.Admin?.LastSeenUserName</dd>
+        @if (BanHelper.IsBanActive(Model.Ban.Ban) && User.IsInRole("BAN"))
+        {
+            <dt class="col-sm-2">Actions:</dt>
+            <dd class="col-sm-10">
+                <form asp-page-handler="Unban" asp-page="Index">
+                    <input type="hidden" name="Id" value="@Model.Ban.Ban.Id">
+                    <input type="submit" class="btn btn-secondary" value="Unban">
+                </form>
+            </dd>
+        }
+    </dl>
+</div>
+
+
+<form asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container">
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    <div class="form-group row">
+        <label class="col-md-3" for="searchBar">Search:</label>
+        <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
+        <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
+        <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
+    </div>
+</form>
+
+<partial name="Tables/ConnectionsTable" model="@(new ConnectionsTableModel(Model.SortState, Model.Pagination))"/>

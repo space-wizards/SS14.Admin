@@ -5,7 +5,7 @@
 {
     async Task ShownCountButton(int count)
     {
-        if (count == Model.PerPage)
+        if (count == Model!.PerPage)
         {
             @count
         }
@@ -22,6 +22,9 @@
 }
 
 @{
+    if (Model == null)
+        throw new ArgumentNullException();
+
     var prevDisabled = !Model.HasPrevPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
     var nextPageIdx = Model.PageIndex + 1;

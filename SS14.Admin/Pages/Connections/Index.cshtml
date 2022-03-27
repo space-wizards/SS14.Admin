@@ -1,6 +1,7 @@
 ﻿@page
 @using SS14.Admin.Pages.Tables
 @using SS14.Admin.Helpers
+@using Content.Server.Database
 @model SS14.Admin.Pages.Connections.ConnectionsIndexModel
 
 @{
@@ -8,40 +9,32 @@
 }
 
 <form asp-page="./Index" asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container">
-    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search", "showAccepted", "showBanned", "showWhitelist", "showFull")
     <div class="form-group row">
         <label class="col-md-3" for="searchBar">Search:</label>
         <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
         <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
         <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
     </div>
+    <div class="form-group row">
+        <span class="col-md-2 col-form-label">Show:</span>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showAccepted" name="showAccepted" @(Model.ShowAccepted ? "checked" : "") value="true">
+            <label class="form-check-label" for="showAccepted">Accepted</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showBanned" name="showBanned" @(Model.ShowBanned ? "checked" : "") value="true">
+            <label class="form-check-label" for="showBanned">Banned</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showWhitelist" name="showWhitelist" @(Model.ShowWhitelist ? "checked" : "") value="true">
+            <label class="form-check-label" for="showWhitelist">Whitelist</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showFull" name="showFull" @(Model.ShowFull ? "checked" : "") value="true">
+            <label class="form-check-label" for="showFull">Server Full</label>
+        </div>
+    </div>
 </form>
 
-<partial name="Tables/Pagination" for="Pagination"/>
-
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "name", "User Name"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "time", "Time"))"/>
-        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "addr", "IP Address"))"/>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var log in Model.Pagination.List.PaginatedItems)
-    {
-        <tr>
-            <td>
-                <strong>@log.UserName</strong>
-                <br/>
-            </td>
-            <td class="monotype">@log.UserId</td>
-            <td>@log.Time.ToString("g")</td>
-            <td class="monotype constrained-150">@log.Address</td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<partial name="Tables/Pagination" for="Pagination"/>
+<partial name="Tables/ConnectionsTable" model="@(new ConnectionsTableModel(Model.SortState, Model.Pagination))"/>

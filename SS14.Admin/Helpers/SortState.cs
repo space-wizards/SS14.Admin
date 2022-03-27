@@ -36,9 +36,6 @@ namespace SS14.Admin.Helpers
             if (DefaultColumn == null)
                 throw new InvalidOperationException("No default column set!");
 
-            AllRouteData = allRouteData;
-            allRouteData.Add("sort", reqOrder);
-
             if (reqOrder != null)
             {
                 if (reqOrder.EndsWith("_desc"))
@@ -55,6 +52,9 @@ namespace SS14.Admin.Helpers
 
                 CurOrder = _columns[DefaultColumn].SortDefault!.Value;
             }
+
+            AllRouteData = allRouteData;
+            allRouteData.Add("sort", reqOrder);
         }
 
         public string OrderStringForColumnButton(string column)

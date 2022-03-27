@@ -63,6 +63,9 @@ namespace SS14.Admin
                     options.ClientSecret = Configuration["Auth:ClientSecret"];
                     options.SaveTokens = true;
                     options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.Scope.Add("openid");
+                    options.Scope.Add("profile");
+                    options.GetClaimsFromUserInfoEndpoint = true;
 
                     options.Events.OnTokenValidated = async ctx =>
                     {

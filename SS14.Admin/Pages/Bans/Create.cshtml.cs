@@ -38,6 +38,7 @@ namespace SS14.Admin.Pages.Bans
         {
             public string? NameOrUid { get; set; }
             public string? IP { get; set; }
+            public string? HWid { get; set; }
             public int LengthMinutes { get; set; }
             [Required] public string Reason { get; set; } = "";
         }
@@ -49,6 +50,8 @@ namespace SS14.Admin.Pages.Bans
                 StatusMessage = "Error: Must provide name/UID.";
                 return;
             }
+
+            Input.NameOrUid = Input.NameOrUid.Trim();
 
             Player? player;
             if (Guid.TryParse(Input.NameOrUid, out var guid))
@@ -70,6 +73,7 @@ namespace SS14.Admin.Pages.Bans
             else
             {
                 Input.IP = player.LastSeenAddress.ToString();
+                Input.HWid = player.LastSeenHWId is { } h ? Convert.ToBase64String(h) : null;
             }
         }
 
@@ -89,9 +93,11 @@ namespace SS14.Admin.Pages.Bans
 
             Guid? userId = null;
             (IPAddress, int)? addr = null;
+            byte[]? hwid = null;
             DateTime? expires = null;
             if (!string.IsNullOrWhiteSpace(Input.NameOrUid))
             {
+                Input.NameOrUid = Input.NameOrUid.Trim();
                 if (Guid.TryParse(Input.NameOrUid, out var guid))
                 {
                     userId = guid;
@@ -119,6 +125,7 @@ namespace SS14.Admin.Pages.Bans
 
             if (!string.IsNullOrWhiteSpace(Input.IP))
             {
+                Input.IP = Input.IP.Trim();
                 if (!IPHelper.TryParseIpOrCidr(Input.IP, out var parsedAddr))
                 {
                     StatusMessage = "Error: Invalid IP address/CIDR range";
@@ -128,6 +135,17 @@ namespace SS14.Admin.Pages.Bans
                 addr = parsedAddr;
             }
 
+            if (!string.IsNullOrWhiteSpace(Input.HWid))
+            {
+                Input.HWid = Input.HWid.Trim();
+                hwid = new byte[Constants.HwidLength];
+                if (!Convert.TryFromBase64String(Input.HWid, hwid, out _))
+                {
+                    StatusMessage = "Error: Invalid HWID";
+                    return Page();
+                }
+            }
+
             if (Input.LengthMinutes != 0)
             {
                 expires = DateTime.UtcNow + TimeSpan.FromMinutes(Input.LengthMinutes);
@@ -135,14 +153,15 @@ namespace SS14.Admin.Pages.Bans
 
             var admin = User.Claims.GetUserId();
 
-            var ban = new PostgresServerBan
+            var ban = new ServerBan
             {
                 UserId = userId,
                 Address = addr,
                 Reason = Input.Reason,
                 ExpirationTime = expires,
                 BanTime = DateTime.UtcNow,
-                BanningAdmin = admin
+                BanningAdmin = admin,
+                HWId = hwid
             };
 
             _dbContext.Ban.Add(ban);
@@ -154,6 +173,16 @@ namespace SS14.Admin.Pages.Bans
 
         private async Task<Guid?> FindPlayerGuidByNameAsync(string name)
         {
+            // Try our own database first, in case this is a guest or something.
+
+            var player = await _dbContext.Player
+                .Where(p => p.LastSeenUserName == name)
+                .OrderByDescending(p => p.LastSeenTime)
+                .FirstOrDefaultAsync();
+
+            if (player != null)
+                return player.UserId;
+
             var server = _cfg["AuthServer"];
             var client = new HttpClient();
 

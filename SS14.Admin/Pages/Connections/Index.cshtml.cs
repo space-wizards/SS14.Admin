@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Content.Server.Database;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages.Connections
@@ -13,12 +11,16 @@ namespace SS14.Admin.Pages.Connections
     public class ConnectionsIndexModel : PageModel
     {
         private readonly PostgresServerDbContext _dbContext;
-        
-        public SortState<PostgresConnectionLog> SortState { get; } = new();
-        public PaginationState<PostgresConnectionLog> Pagination { get; } = new(100);
+
+        public ISortState SortState { get; private set; } = default!;
+        public PaginationState<Connection> Pagination { get; } = new(100);
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         public string? CurrentFilter { get; set; }
+        public bool ShowAccepted { get; set; }
+        public bool ShowBanned { get; set; }
+        public bool ShowWhitelist { get; set; }
+        public bool ShowFull { get; set; }
 
         public ConnectionsIndexModel(PostgresServerDbContext dbContext)
         {
@@ -29,44 +31,91 @@ namespace SS14.Admin.Pages.Connections
             string? sort,
             string? search,
             int? pageIndex,
-            int? perPage)
+            int? perPage,
+            bool showSet,
+            bool showAccepted,
+            bool showBanned,
+            bool showWhitelist,
+            bool showFull)
         {
-            SortState.AddColumn("name", c => c.UserName);
-            SortState.AddColumn("uid", c => c.UserId);
-            SortState.AddColumn("time", c => c.Time, SortOrder.Descending);
-            SortState.AddColumn("addr", c => c.Address);
-            SortState.Init(sort, AllRouteData);
-            
-            Pagination.Init(pageIndex, perPage, AllRouteData);
-            
-            CurrentFilter = search;
-            AllRouteData.Add("search", CurrentFilter);
 
-            IQueryable<PostgresConnectionLog> logQuery = _dbContext.ConnectionLog;
-            if (!string.IsNullOrEmpty(search))
+            Pagination.Init(pageIndex, perPage, AllRouteData);
+
+            if (!showSet)
             {
-                if (Guid.TryParse(search, out var guid))
-                {
-                    logQuery = logQuery.Where(u => u.UserId == guid);
-                }
-                else if (IPHelper.TryParseCidr(search, out var cidr))
-                {
-                    logQuery = logQuery.Where(u => EF.Functions.Contains(cidr, u.Address));
-                }
-                else if (IPAddress.TryParse(search, out var ip))
-                {
-                    logQuery = logQuery.Where(u => u.Address.Equals(ip));
-                }
-                else
-                {
-                    var normalized = search.ToUpperInvariant();
-                    logQuery = logQuery.Where(u => u.UserName.ToUpper().Contains(normalized));
-                }
+                // So whoever designed <input> checkboxes was clearly dunked in the head with a frying pan.
+                // A checkbox that is unchecked is NEVER sent in the form/query params.
+                // This means it is impossible for us to distinguish between "this box is explicitly unchecked" and
+                // "not set use default value".
+                // Thank you HTML, you never fail to be fucking stupid.
+                // Use the showSet query param to indicate a "these checkboxes have explicit values".
+                // Ugh.
+                showAccepted = true;
+                showBanned = true;
+                showWhitelist = true;
+                showFull = true;
             }
 
-            var sortedQuery = SortState.ApplyToQuery(logQuery).ThenByDescending(s => s.Time);
+            CurrentFilter = search;
+            ShowAccepted = showAccepted;
+            ShowBanned = showBanned;
+            ShowWhitelist = showWhitelist;
+            ShowFull = showFull;
 
-            await Pagination.LoadAsync(sortedQuery);
+            AllRouteData.Add("search", CurrentFilter);
+            AllRouteData.Add("showAccepted", showAccepted.ToString());
+            AllRouteData.Add("showBanned", showBanned.ToString());
+            AllRouteData.Add("showWhitelist", showWhitelist.ToString());
+            AllRouteData.Add("showFull", showFull.ToString());
+            AllRouteData.Add("showSet", "true");
+
+            IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog;
+            logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
+
+            var acceptableDenies = new List<ConnectionDenyReason?>();
+            if (showAccepted)
+                acceptableDenies.Add(null);
+            if (showBanned)
+                acceptableDenies.Add(ConnectionDenyReason.Ban);
+            if (showWhitelist)
+                acceptableDenies.Add(ConnectionDenyReason.Whitelist);
+            if (showFull)
+                acceptableDenies.Add(ConnectionDenyReason.Full);
+
+            logQuery = logQuery.Where(c => acceptableDenies.Contains(c.Denied));
+
+            SortState = await LoadSortConnectionsTableData(Pagination, logQuery, sort, AllRouteData);
         }
+
+        [MustUseReturnValue]
+        public static async Task<ISortState> LoadSortConnectionsTableData(
+            PaginationState<Connection> pagination,
+            IQueryable<ConnectionLog> query,
+            string? sort,
+            Dictionary<string, string?> allRouteData)
+        {
+            var logs = query.Select(c => new { c, HitCount = c.BanHits.Count });
+
+            var sortState = Helpers.SortState.Build(logs);
+
+            sortState.AddColumn("name", c => c.c.UserName);
+            sortState.AddColumn("uid", c => c.c.UserId);
+            sortState.AddColumn("time", c => c.c.Time, SortOrder.Descending);
+            sortState.AddColumn("addr", c => c.c.Address);
+            sortState.AddColumn("hwid", c => c.c.HWId);
+            sortState.AddColumn("denied", c => c.c.Denied);
+            sortState.AddColumn("hits", c => c.c.BanHits.Count);
+            sortState.Init(sort, allRouteData);
+
+            logs = sortState.ApplyToQuery(logs);
+
+            await pagination.LoadLinqAsync(logs, e => e.Select(c => new Connection(c.c, c.HitCount)));
+
+            return sortState;
+        }
+
+        public sealed record Connection(
+            ConnectionLog Log,
+            int BanHitCount);
     }
 }

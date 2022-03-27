@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using System;
 using System.Diagnostics;
 using SS14.Admin.Helpers;
@@ -24,3 +25,11 @@ namespace SS14.Admin.Pages.Tables
         };
     }
 }
+=======
+﻿using SS14.Admin.Helpers;
+
+namespace SS14.Admin.Pages.Tables
+{
+    public sealed record SortTabHeaderModel(ISortState State, string Column, string Text);
+}
+>>>>>>> 7e3844519ee56f61fe08a43ac34a9021935582c3

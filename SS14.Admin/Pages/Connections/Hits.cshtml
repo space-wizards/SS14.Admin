@@ -1,0 +1,42 @@
+﻿@page
+@using SS14.Admin.Pages.Bans
+@using SS14.Admin.Pages.Tables
+@using SS14.Admin.Helpers
+@model SS14.Admin.Pages.Connections.Hits
+
+@{
+    ViewData["Title"] = "Connection Bans Hit";
+}
+
+<div class="container">
+    <h1>Bans hits for connection @Model.Log.Id</h1>
+
+    <dl class="row">
+        <dt class="col-sm-2">Name:</dt>
+        <dd class="col-sm-10">@Model.Log.UserName</dd>
+        <dt class="col-sm-2">User ID:</dt>
+        <dd class="col-sm-10 monotype">@Model.Log.UserId</dd>
+        @if (User.IsInRole("ADMIN"))
+        {
+            <dt class="col-sm-2">IP:</dt>
+            <dd class="col-sm-10 monotype">@Model.Log.Address</dd>
+            <dt class="col-sm-2">HWID:</dt>
+            <dd class="col-sm-10 monotype">@BanHelper.FormatHwid(Model.Log.HWId)</dd>
+        }
+        <dt class="col-sm-2">Time:</dt>
+        <dd class="col-sm-10">@Model.Log.Time.ToString("g")</dd>
+    </dl>
+</div>
+
+
+<form asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container">
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    <div class="form-group row">
+        <label class="col-md-3" for="searchBar">Search:</label>
+        <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
+        <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
+        <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
+    </div>
+</form>
+
+<partial name="Tables/BansTable" model="@(new BansTableModel(Model.SortState, Model.Pagination, null))"/>
