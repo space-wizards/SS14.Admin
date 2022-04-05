@@ -34,8 +34,8 @@ namespace SS14.Admin.Pages.Logs
 
         public async Task OnGetAsync(string? sort, int? pageIndex, int? perPage)
         {
-            AllRouteData.Add("fromDate", FromDate.ToString("yyyy-MM-dd"));
-            AllRouteData.Add("toDate", ToDate.ToString("yyyy-MM-dd"));
+            if (FromDate != DateTime.MinValue) AllRouteData.Add("fromDate", FromDate.ToString("yyyy-MM-dd"));
+            if (FromDate != DateTime.MaxValue) AllRouteData.Add("toDate", ToDate.ToString("yyyy-MM-dd"));
             AllRouteData.Add("filters", JsonSerializer.Serialize(Filters, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
 
             SortState.AddColumn("date", entry => entry.Date, SortOrder.Descending);

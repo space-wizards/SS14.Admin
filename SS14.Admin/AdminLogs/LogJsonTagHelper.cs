@@ -13,8 +13,8 @@ namespace SS14.Admin.AdminLogs;
 public class LogJsonTagHelper : TagHelper
 {
     private readonly PostgresServerDbContext _dbContext;
-    public JsonDocument Json { get; set; }
-
+    public JsonDocument Json { get; set; } = default!;
+    
     public LogJsonTagHelper(PostgresServerDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -100,8 +100,7 @@ public class LogJsonTagHelper : TagHelper
 
     private string BuildEntryTitle(string name, string type, string value = "")
     {
-        //What the actual fuck?!
         var textInfo = Thread.CurrentThread.CurrentCulture.TextInfo;
-        return $"<h4 class=\"log-json-title\">{textInfo.ToTitleCase(name)} <span class=\"log-muted\">:{type}</span> {value}</h4>";
+        return $"<h5 class=\"log-json-title\">{textInfo.ToTitleCase(name)} <span class=\"log-muted\">:{type}</span> {value}</h5>";
     }
 }

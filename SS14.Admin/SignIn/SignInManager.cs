@@ -22,8 +22,8 @@ namespace SS14.Admin.SignIn
         {
             if (!principal.Identities.Any(i => i.IsAuthenticated))
                 return null;
-            return new SignInData("dummy", true);
-            //return new SignInData(principal.Claims.Single(c => c.Type == "name").Value, principal.IsInRole("ADMIN"));
+
+            return new SignInData(principal.Claims.Single(c => c.Type == "name").Value, principal.IsInRole("ADMIN"));
         }
     }
 }
