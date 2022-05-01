@@ -124,7 +124,7 @@ function removeFilterTag(tagID) {
     if (tag == null) return false;
 
     const filterData = JSON.parse(tag.getAttribute(DATA_FILTER_TAG));
-    const index = filters.indexOf(filterData);
+    const index = filters.findIndex(value => value.key === filterData.key && value.value === filterData.value);
     filters.splice(index, 1);
     tag.parentNode.removeChild(tag);
 
