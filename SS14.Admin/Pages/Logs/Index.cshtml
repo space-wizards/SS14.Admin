@@ -58,7 +58,6 @@
         {
             <button id="litepicker-close" class="btn btn-sm" ><i class="fas fa-times"></i>x</button>
         }
-        <div class="flex-seperator"></div>
         <div class="applied-filters flex-row">
         </div>
     </data-grid-filter>
@@ -82,7 +81,10 @@
                 <td>@entry.Type</td>
                 <td>@entry.Message</td>
                 <template>
-                    <h2 class="log-details-header" style="--cell-color: var(@entry.Impact.CssColorVarName())">Details</h2>
+                    <div class="log-details-header flex-row" style="--cell-color: var(@entry.Impact.CssColorVarName())">
+                        <h2>Details</h2>
+                        <span class="details-close fa fa-times" onclick="onDetailsClose()">x</span>
+                    </div>
                     <div class="log-details-sub log-muted">
                         <p>Server: <a href="#">@entry.Round?.Server?.Name</a></p>
                         <p>Round: <a href="#">@entry.RoundId</a></p>

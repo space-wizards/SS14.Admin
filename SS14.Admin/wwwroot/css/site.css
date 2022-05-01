@@ -109,14 +109,18 @@ data-grid {
 }
 
 data-grid data-grid-filter {
-    padding: 15px;
-    padding-bottom: 0;
+    padding: 8px 15px;
     width: 100%;
     align-items: baseline;
     background: var(--header-color-secondary);
     color: var(--text-color-light);
     font-weight: normal;
     font-size: 1.1rem;
+}
+
+data-grid data-grid-filter p {
+    margin: 0;
+    margin-bottom: 2px;
 }
 
 data-grid-filter input {
@@ -203,15 +207,20 @@ data-grid .filter-tag > .tag-prefix {
 
 data-grid .filter-tag > .tag-close {
     font-size: .9em;
-    color: var(--text-color-dark);
+    /*color: var(--text-color-dark);*/
     margin-left: 4px;
     cursor: pointer;
 }
 
+.details-close {
+    font-size: 1.5rem;
+    cursor: pointer;
+}
 
 data-grid .flex-row {
     display: flex;
     gap: 15px;
+    align-items: center;
 }
 
 data-grid .flex-seperator {
@@ -389,6 +398,8 @@ hr.line-inset {
 }
 
 .log-details-header {
+    display: flex;
+    justify-content: space-between;
     /*noinspection CssUnresolvedCustomProperty*/
     background-color: var(--cell-color, var(--header-color));
     color: var(--text-color-light);
