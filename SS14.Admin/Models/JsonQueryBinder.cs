@@ -52,7 +52,6 @@ namespace SS14.Admin.Models
             }
             catch (Exception e) when (e is FormatException or OverflowException)
             {
-                Console.WriteLine(e);
                 bindingContext.ActionContext.ModelState.TryAddModelError(string.Empty, e, bindingContext.ModelMetadata);
             }
 

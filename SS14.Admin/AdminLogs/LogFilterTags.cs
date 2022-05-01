@@ -22,7 +22,7 @@ namespace SS14.Admin.AdminLogs
             return tag switch
             {
                 LogFilterTags.Player => query.Where(log => log.Players.Any(player => EF.Functions.ILike(player.Player.LastSeenUserName, "%" + value + "%"))), //TODO: Implement player query
-                LogFilterTags.Server => query.Where(log => log.Round!.Server!.Name.Contains(value)),
+                LogFilterTags.Server => query.Where(log => EF.Functions.ILike(log.Round!.Server!.Name, "%" + value + "%")),
                 LogFilterTags.Type => query.Where(log => Enum.TryParse(value, true, out type) && log.Type == type),
                 LogFilterTags.Search => context.SearchLogs(query, value),
                 _ => throw new ArgumentOutOfRangeException(nameof(tag), tag, null)

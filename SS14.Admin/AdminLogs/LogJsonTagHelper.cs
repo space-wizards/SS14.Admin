@@ -14,7 +14,7 @@ public class LogJsonTagHelper : TagHelper
 {
     private readonly PostgresServerDbContext _dbContext;
     public JsonDocument Json { get; set; } = default!;
-    
+
     public LogJsonTagHelper(PostgresServerDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -69,8 +69,8 @@ public class LogJsonTagHelper : TagHelper
     {
         result = entry.Name switch
         {
-            "coordinates" => ParsePositon(entry),
-            "position" => ParsePositon(entry),
+            "coordinates" => ParsePosition(entry),
+            "position" => ParsePosition(entry),
             _ => default
         };
 
@@ -83,7 +83,7 @@ public class LogJsonTagHelper : TagHelper
         _ => $"<p>{property.Name}: {property.Value.GetRawText() ?? "NULL"}</p>"
     };
 
-    private string ParsePositon(JsonProperty property)
+    private string ParsePosition(JsonProperty property)
     {
         if (!property.Value.TryGetProperty("x", out var x) || !property.Value.TryGetProperty("y", out var y)) return "";
         return $"<p class=\"log-position\">X: {x} Y: {y}<p>";
