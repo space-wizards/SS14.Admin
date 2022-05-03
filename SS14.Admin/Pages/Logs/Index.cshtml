@@ -1,0 +1,115 @@
+﻿@page
+@using SS14.Admin.Pages.Tables
+@using SS14.Admin.AdminLogs
+@model SS14.Admin.Pages.Logs.LogsIndexModel
+
+@{
+    ViewData["Title"] = "Admin logs";
+}
+
+<style>
+    body {
+        margin-bottom: 0 !important;
+    }
+
+    nav.mb-3 {
+        margin-bottom: 0 !important;
+    }
+
+    body > .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    main.pb-3 {
+        padding-bottom: 0 !important;
+    }
+
+    /*Specific layout for this page*/
+    .data-grid-table {
+            grid-template-columns:
+            minmax(120px, 0.1fr)
+            minmax(110px, 0.1fr)
+            minmax(180px, 0.2fr)
+            minmax(110px, 0.2fr)
+            minmax(150px, 1.5fr);
+            max-height: calc(calc(100vh - 116px) - var(--footer-height, 0));
+    }
+
+    data-grid-footer {
+        padding-top: 0.5rem;
+    }
+</style>
+
+<data-grid>
+    <data-grid-filter class="flex-row">
+        <p>Filter: </p>
+        <input class="grid-search" id="search" type="text" placeholder="search [ctrl+f]"/>
+        <div id="search-popover" class="search-popover hidden" tabindex="1">
+            @foreach (LogFilterTags tag in Enum.GetValues(typeof(LogFilterTags)))
+            {
+                <div class="search-result" data-search-tag="@tag.ToString()" tabindex="0">
+                    <span class="result-tag">@tag.ToString():</span> <span class="result-content"></span>
+                </div>
+            }
+        </div>
+        <input id="litepicker" type="text" placeholder="Date from - to"/>
+        @if (Model.FromDate != default || Model.ToDate != default)
+        {
+            <button id="litepicker-close" class="btn btn-sm" ><i class="fas fa-times"></i>x</button>
+        }
+        <div class="applied-filters flex-row">
+        </div>
+    </data-grid-filter>
+    <table class="data-grid-table">
+        <thead>
+        <tr>
+            <th>Server</th>
+            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "impact", "Severity", TextAlignClass.Center))"/>
+            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "date", "Date"))"/>
+            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "type", "Type"))"/>
+            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "message", "Message"))"/>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var entry in Model.Pagination.List.PaginatedItems)
+        {
+            <tr class="on-click data-log">
+                <td>@entry.Round?.Server?.Name</td>
+                <td class="text-center colored" style="--cell-color: var(@entry.Impact.CssColorVarName())">@entry.Impact.ToString()</td>
+                <td>@entry.Date</td>
+                <td>@entry.Type</td>
+                <td>@entry.Message</td>
+                <template>
+                    <div class="log-details-header flex-row" style="--cell-color: var(@entry.Impact.CssColorVarName())">
+                        <h2>Details</h2>
+                        <span class="details-close fa fa-times" onclick="onDetailsClose()">x</span>
+                    </div>
+                    <div class="log-details-sub log-muted">
+                        <p>Server: <a href="#">@entry.Round?.Server?.Name</a></p>
+                        <p>Round: <a href="#">@entry.RoundId</a></p>
+                    </div>
+                    <h3>Message:</h3>
+                    <p>@entry.Message</p>
+                    <hr class="line-inset">
+                    <h4>Data:</h4>
+                    <log-json json="entry.Json"></log-json>
+                </template>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <data-grid-footer class="flex-row">
+        <partial name="Tables/Pagination" for="Pagination"/>
+    </data-grid-footer>
+</data-grid>
+<div class="side-panel-container">
+    <div id="side-panel-overlay" class="side-panel-overlay hidden"></div>
+    <div id="side-panel" class="side-panel transition-right hidden-right"></div>
+</div>
+
+@section scripts {
+    <script src="~/js/datepicker.js" asp-append-version="true"></script>
+    <script src="~/js/logs-search.js" asp-append-version="true"></script>
+    <script src="~/js/logs-grid.js" asp-append-version="true"></script>
+}
