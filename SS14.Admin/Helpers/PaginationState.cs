@@ -14,7 +14,6 @@ namespace SS14.Admin.Helpers
         bool HasPrevPage { get; }
         int PageIndex { get; }
         int PerPage { get; }
-        int TotalCount { get; }
         int DefaultPerPage { get; }
     }
 
@@ -23,7 +22,7 @@ namespace SS14.Admin.Helpers
         public int DefaultPerPage { get; }
         public int PageIndex { get; private set; }
         public int PerPage { get; private set; }
-        public int TotalCount => List.TotalCount;
+
         public PaginatedList<T> List = default!;
         public bool HasPrevPage => List.HasPrevPage;
         public bool HasNextPage => List.HasNextPage;
