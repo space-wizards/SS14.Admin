@@ -39,7 +39,7 @@ namespace SS14.Admin.Helpers
             TotalCount = totalCount;
         }
 
-        public bool HasNextPage => PageIndex < PageCount - 1;
+        public bool HasNextPage => PaginatedItems.Length >= PageSize;
         public bool HasPrevPage => PageIndex > 0;
 
         public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> query, int pageIndex, int pageSize, int? count = null)
