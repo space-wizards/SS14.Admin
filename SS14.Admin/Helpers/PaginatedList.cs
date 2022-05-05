@@ -15,7 +15,7 @@ namespace SS14.Admin.Helpers
         bool HasNextPage { get; }
         bool HasPrevPage { get; }
     }
-    
+
     public sealed class PaginatedList<T> : IPaginatedList
     {
         public T[] PaginatedItems { get; }
@@ -28,13 +28,13 @@ namespace SS14.Admin.Helpers
         {
             PaginatedItems = Array.Empty<T>();
         }
-        
+
         public PaginatedList(T[] paginatedItems, int totalCount, int pageIndex, int pageSize)
         {
             PageIndex = pageIndex;
             PageSize = pageSize;
             PageCount = (int) Math.Ceiling(totalCount / (double) pageSize);
-            
+
             PaginatedItems = paginatedItems;
             TotalCount = totalCount;
         }
@@ -42,17 +42,17 @@ namespace SS14.Admin.Helpers
         public bool HasNextPage => PageIndex < PageCount - 1;
         public bool HasPrevPage => PageIndex > 0;
 
-        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> query, int pageIndex, int pageSize)
+        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> query, int pageIndex, int pageSize, int? count = null)
         {
-            return await CreateLinqAsync(query, e => e, pageIndex, pageSize);
+            return await CreateLinqAsync(query, e => e, pageIndex, pageSize, count);
         }
-        
+
         public static async Task<PaginatedList<T>> CreateLinqAsync<TQuery>(
-            IQueryable<TQuery> query, 
-            Func<IEnumerable<TQuery>, IEnumerable<T>> convert, 
-            int pageIndex, int pageSize)
+            IQueryable<TQuery> query,
+            Func<IEnumerable<TQuery>, IEnumerable<T>> convert,
+            int pageIndex, int pageSize, int? optCount = null)
         {
-            var count = await query.CountAsync();
+            var count = optCount ?? await query.CountAsync();
             var items = await query
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
