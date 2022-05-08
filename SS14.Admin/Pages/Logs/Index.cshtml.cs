@@ -45,7 +45,7 @@ namespace SS14.Admin.Pages.Logs
             SortState.Init(sort, AllRouteData);
 
             Pagination.Init(pageIndex, perPage, AllRouteData);
-            
+
             IQueryable<AdminLog> logQuery = _dbContext.AdminLog
                 .Include(log => log.Round)
                 .ThenInclude(round => round.Server);
@@ -61,7 +61,7 @@ namespace SS14.Admin.Pages.Logs
 
             logQuery = SortState.ApplyToQuery(logQuery);
             Console.WriteLine(logQuery.ToQueryString());
-            await Pagination.LoadAsync(logQuery);
+            await Pagination.LoadAsync(logQuery, _dbContext.CountAdminLogs());
         }
 
         private static IQueryable<AdminLog> ApplyDateFilter(IQueryable<AdminLog> query, DateTime date, bool isEndDate = false)

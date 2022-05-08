@@ -49,9 +49,9 @@ namespace SS14.Admin.Helpers
                 AllRouteData.Add("perPage", PerPage.ToString(CultureInfo.InvariantCulture));
         }
 
-        public async Task LoadAsync(IQueryable<T> query)
+        public async Task LoadAsync(IQueryable<T> query, int? count = null)
         {
-            List = await PaginatedList<T>.CreateAsync(query, PageIndex, PerPage);
+            List = await PaginatedList<T>.CreateAsync(query, PageIndex, PerPage, count);
         }
 
         public async Task LoadLinqAsync<TQuery>(
