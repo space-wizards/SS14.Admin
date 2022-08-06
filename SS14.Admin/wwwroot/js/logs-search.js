@@ -1,11 +1,12 @@
-﻿//Date picker
+﻿// Date picker
 const datepicker = new DatePicker('litepicker', 'litepicker-close');
 
-//Search popover
+// Search popover
 const DATA_FILTER_TAG = 'data-filter-tag';
 const DATA_SEARCH_TAG = 'data-search-tag';
 const DEFAULT_TAG = 'Search';
-const FILTERS_KEY = 'filters'
+const FILTERS_KEY = 'filters';
+const PER_PAGE = 'perPage';
 
 const filters = [];
 
@@ -139,6 +140,16 @@ function createFilterTag(filterData, index)
     const dom = new DOMParser().parseFromString(Tag(filterData, id), 'text/html');
     const tagElement = dom.body.firstElementChild;
     filterTagsContainer.appendChild(tagElement);
+}
+
+// Count Select
+const countSelect = document.getElementById("count-select");
+
+countSelect.addEventListener("change", OnCountSelected)
+
+function OnCountSelected(event)
+{
+    context.updateQuery(PER_PAGE, event.target.value);
 }
 
 //Search key combination

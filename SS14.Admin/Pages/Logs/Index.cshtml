@@ -1,10 +1,15 @@
 ﻿@page
-@using SS14.Admin.Pages.Tables
 @using SS14.Admin.AdminLogs
+@using SS14.Admin.Helpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model SS14.Admin.Pages.Logs.LogsIndexModel
 
 @{
     ViewData["Title"] = "Admin logs";
+    var prevDisabled = Model.PageIndex == 0 ? "disabled" : "";
+    var nextDisabled = Model.Items.Count == 0 ? "disabled" : "";
+    var nextPageIdx = Model.PageIndex + 1;
+    var prevPageIdx = Model.PageIndex == 1 ? null : (int?) Model.PageIndex - 1;
 }
 
 <style>
@@ -65,14 +70,14 @@
         <thead>
         <tr>
             <th>Server</th>
-            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "impact", "Severity", TextAlignClass.Center))"/>
-            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "date", "Date"))"/>
-            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "type", "Type"))"/>
-            <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "message", "Message"))"/>
+            <th>Severity</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Message</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var entry in Model.Pagination.List.PaginatedItems)
+        @foreach (var entry in Model.Items)
         {
             <tr class="on-click data-log">
                 <td>@entry.Round?.Server?.Name</td>
@@ -99,8 +104,34 @@
         }
         </tbody>
     </table>
-    <data-grid-footer class="flex-row">
-        <partial name="Tables/Pagination" for="Pagination"/>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="flex-row flex-center">
+            <p class="m-4">No log entries found.</p>
+        </div>
+    }
+
+    <data-grid-footer class="flex-row flex-center">
+        <a asp-page="./Index"
+           asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+           asp-route-pageIndex="@prevPageIdx"
+           class="btn btn-primary btn-sm @prevDisabled">
+            Previous
+        </a>
+        <div class="form-horizontal">
+            <select name="count" id="count-select" class="form-control form-control-sm" value="@Model.PerPage">
+                <option value="100">100</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+            </select>
+        </div>
+        <a asp-page="./Index"
+           asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+           asp-route-pageIndex="@nextPageIdx"
+           class="btn btn-primary btn-sm @nextDisabled">
+            Next
+        </a>
     </data-grid-footer>
 </data-grid>
 <div class="side-panel-container">

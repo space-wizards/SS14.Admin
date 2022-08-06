@@ -223,6 +223,10 @@ data-grid .flex-row {
     align-items: center;
 }
 
+data-grid .flex-center {
+    justify-content: center;
+}
+
 data-grid .flex-seperator {
     flex-grow: 1;
 }

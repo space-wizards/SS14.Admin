@@ -16,52 +16,45 @@ namespace SS14.Admin.Pages.Logs
     public class LogsIndexModel : PageModel
     {
         private readonly PostgresServerDbContext _dbContext;
-        public PaginationState<AdminLog> Pagination { get; } = new(100);
-        public SortState<AdminLog> SortState { get; } = new();
+
+        public List<AdminLog> Items { get; set; } = new();
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         [BindProperty(SupportsGet = true)]
-        public DateTime FromDate { get; set; }
+        public DateTime FromDate { get; set; } = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+
         [BindProperty(SupportsGet = true)]
-        public DateTime ToDate { get; set; }
+        public DateTime ToDate { get; set; } = DateTime.Now;
+
         [BindProperty(SupportsGet = true), ModelBinder(BinderType = typeof(JsonQueryBinder))]
         public List<AdminLogFilterModel>? Filters { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageIndex { get; set; } = 0;
+
+        [BindProperty(SupportsGet = true)]
+        public int PerPage { get; set; } = 100;
 
         public LogsIndexModel(PostgresServerDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task OnGetAsync(string? sort, int? pageIndex, int? perPage)
+        public async Task OnGetAsync()
         {
-            if (FromDate != DateTime.MinValue) AllRouteData.Add("fromDate", FromDate.ToString("yyyy-MM-dd"));
-            if (ToDate != DateTime.MaxValue) AllRouteData.Add("toDate", ToDate.ToString("yyyy-MM-dd"));
+            AllRouteData.Add("fromDate", FromDate.ToString("yyyy-MM-dd"));
+            AllRouteData.Add("toDate", ToDate.ToString("yyyy-MM-dd"));
             AllRouteData.Add("filters", JsonSerializer.Serialize(Filters, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
 
-            SortState.AddColumn("date", entry => entry.Date, SortOrder.Descending);
-            SortState.AddColumn("impact", entry => entry.Impact);
-            SortState.AddColumn("type", entry => entry.Type);
-            SortState.AddColumn("message", entry => entry.Message);
-            SortState.Init(sort, AllRouteData);
-
-            Pagination.Init(pageIndex, perPage, AllRouteData);
-
-            IQueryable<AdminLog> logQuery = _dbContext.AdminLog
-                .Include(log => log.Round)
-                .ThenInclude(round => round.Server);
-
-            logQuery = ApplyDateFilter(logQuery, FromDate);
-            logQuery = ApplyDateFilter(logQuery, ToDate, true);
-
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var filter in Filters ?? Enumerable.Empty<AdminLogFilterModel>())
-            {
-                logQuery = filter.Key.FilterQueryPart(_dbContext, filter.Value, logQuery);
-            }
-
-            logQuery = SortState.ApplyToQuery(logQuery);
-            Console.WriteLine(logQuery.ToQueryString());
-            await Pagination.LoadAsync(logQuery, _dbContext.CountAdminLogs());
+            Items = AdminLogRepository.List(
+                _dbContext,
+                _dbContext.AdminLog,
+                Filters ?? new List<AdminLogFilterModel>(),
+                FromDate,
+                ToDate,
+                PerPage,
+                PageIndex * PerPage
+            );
         }
 
         private static IQueryable<AdminLog> ApplyDateFilter(IQueryable<AdminLog> query, DateTime date, bool isEndDate = false)

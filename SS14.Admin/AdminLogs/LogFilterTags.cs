@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using Content.Server.Database;
 using Content.Shared.Database;
-using Microsoft.EntityFrameworkCore;
 
 namespace SS14.Admin.AdminLogs
 {
@@ -16,17 +14,33 @@ namespace SS14.Admin.AdminLogs
 
     public static class LogFilterTagsExtension
     {
-        public static IQueryable<AdminLog> FilterQueryPart(this LogFilterTags tag, ServerDbContext context, string value, IQueryable<AdminLog> query)
+        public static string FilterQueryPart(this LogFilterTags tag, ServerDbContext context)
         {
-            LogType type;
             return tag switch
             {
-                LogFilterTags.Player => query.Where(log => log.Players.Any(player => EF.Functions.ILike(player.Player.LastSeenUserName, "%" + value + "%"))),
-                LogFilterTags.Server => query.Where(log => EF.Functions.ILike(log.Round!.Server!.Name, "%" + value + "%")),
-                LogFilterTags.Type => query.Where(log => Enum.TryParse(value, true, out type) && log.Type == type),
-                LogFilterTags.Search => context.SearchLogs(query, value),
+                LogFilterTags.Player => "p.player_user_id = #",
+                LogFilterTags.Server => "s.name = #",
+                LogFilterTags.Type => "a.type = #::integer",
+                LogFilterTags.Search => TextSearchForContext(context),
                 _ => throw new ArgumentOutOfRangeException(nameof(tag), tag, null)
             };
+        }
+
+        public static string? TransformValue(this LogFilterTags tag, ServerDbContext context, string value)
+        {
+            return tag switch
+            {
+                LogFilterTags.Player => AdminLogRepository.FindPlayerByName(context.Player, value)?.UserId.ToString(),
+                LogFilterTags.Type => Enum.TryParse(value, out LogType type) ? Convert.ToInt32(type).ToString() : default,
+                LogFilterTags.Server => value,
+                LogFilterTags.Search => value,
+                _ => throw new ArgumentOutOfRangeException(nameof(tag), tag, null)
+            };
+        }
+
+        private static string TextSearchForContext(ServerDbContext context)
+        {
+            return context is PostgresServerDbContext ? "to_tsvector('english'::regconfig, a.message) @@ to_tsquery('english'::regconfig, #)" : " a.message LIKE %#%";
         }
     }
 }
