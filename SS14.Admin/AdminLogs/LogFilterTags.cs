@@ -30,7 +30,7 @@ namespace SS14.Admin.AdminLogs
         {
             return tag switch
             {
-                LogFilterTags.Player => AdminLogRepository.FindPlayerByName(context.Player, value)?.UserId.ToString(),
+                LogFilterTags.Player => AdminLogRepository.FindPlayerByName(context.Player, value)?.Result.UserId.ToString(),
                 LogFilterTags.Type => Enum.TryParse(value, out LogType type) ? Convert.ToInt32(type).ToString() : default,
                 LogFilterTags.Server => value,
                 LogFilterTags.Search => value,

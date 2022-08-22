@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using SS14.Admin.AdminLogs;
-using SS14.Admin.Helpers;
 using SS14.Admin.Models;
 
 namespace SS14.Admin.Pages.Logs
@@ -46,12 +44,15 @@ namespace SS14.Admin.Pages.Logs
             AllRouteData.Add("toDate", ToDate.ToString("yyyy-MM-dd"));
             AllRouteData.Add("filters", JsonSerializer.Serialize(Filters, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
 
-            Items = AdminLogRepository.List(
+            Items = await AdminLogRepository.FindAdminLogs(
                 _dbContext,
                 _dbContext.AdminLog,
-                Filters ?? new List<AdminLogFilterModel>(),
+                null,
                 FromDate,
                 ToDate,
+                null,
+                null,
+                null,
                 PerPage,
                 PageIndex * PerPage
             );
