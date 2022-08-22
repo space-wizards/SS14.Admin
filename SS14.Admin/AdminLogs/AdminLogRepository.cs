@@ -65,7 +65,7 @@ public static class AdminLogRepository
 
     private static string TextSearchForContext(ServerDbContext context)
     {
-        return context is PostgresServerDbContext ? "to_tsvector('english'::regconfig, a.message) @@ to_tsquery('english'::regconfig, #)" : " a.message LIKE %#%";
+        return context is PostgresServerDbContext ? "to_tsvector('english'::regconfig, a.message) @@ websearch_to_tsquery('english'::regconfig, #)" : " a.message LIKE %#%";
     }
 
     private static string EnumerateParameters(string query)
