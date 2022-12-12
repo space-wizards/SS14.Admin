@@ -28,13 +28,23 @@
 <div class="container">
     <h2>Play time</h2>
 
-    <dl class="row">
+    <table class="table table-striped mt-3">
+        <thead>
+        <tr>
+            <th>Timer</th>
+            <th>Time played (h:mm)</th>
+        </tr>
+        </thead>
+        <tbody>
         @foreach (var tracker in Model.PlayTimes)
         {
-            <dt class="col-sm-4">@tracker.Tracker:</dt>
-            <dl class="col-sm-8">@tracker.TimeSpent.ToString(@"%h\:mm")</dl>
+            <tr>
+                <td class="font-weight-bold">@tracker.Tracker</td>
+                <td>@tracker.TimeSpent.ToString(@"%h\:mm")</td>
+            </tr>
         }
-    </dl>
+        </tbody>
+    </table>
 </div>
 
 <div class="container">
