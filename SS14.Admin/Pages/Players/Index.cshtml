@@ -29,6 +29,7 @@
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "last_seen_addr", "Last seen address"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "last_seen_hwid", "Last seen HWID"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "first_seen", "First seen"))"/>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -44,6 +45,9 @@
             <td class="monotype constrained-150">@player.LastSeenAddress</td>
             <td class="monotype constrained-150">@BanHelper.FormatHwid(player.LastSeenHWId)</td>
             <td>@player.FirstSeenTime.ToString("g")</td>
+            <td>
+                <a asp-page="/Players/Info" asp-route-userId="@player.UserId" class="btn btn-secondary">Player Info</a>
+            </td>
         </tr>
     }
     </tbody>

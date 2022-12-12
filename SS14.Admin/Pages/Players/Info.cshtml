@@ -1,0 +1,73 @@
+﻿@page "{userId}"
+@using SS14.Admin.Pages.Bans
+@model SS14.Admin.Pages.Players.Info
+
+@{
+    ViewData["Title"] = $"Player Info for {Model.Player.LastSeenUserName}";
+}
+
+<div class="container">
+    <h1>Player information for @Model.Player.LastSeenUserName</h1>
+
+    <dl class="row">
+        <dt class="col-sm-2">User ID:</dt>
+        <dd class="col-sm-10 monotype">@Model.Player.UserId</dd>
+        <dt class="col-sm-2">Last seen username:</dt>
+        <dd class="col-sm-10">@Model.Player.LastSeenUserName</dd>
+        <dt class="col-sm-2">First seen time:</dt>
+        <dd class="col-sm-10">@Model.Player.FirstSeenTime.ToString("g")</dd>
+        <dt class="col-sm-2">Last seen time:</dt>
+        <dd class="col-sm-10">@Model.Player.LastSeenTime.ToString("g")</dd>
+        <dt class="col-sm-2">Last seen address:</dt>
+        <dd class="col-sm-10 monotype">@Model.Player.LastSeenAddress</dd>
+        <dt class="col-sm-2">Last seen HWID:</dt>
+        <dd class="col-sm-10 monotype">@BanHelper.FormatHwid(Model.Player.LastSeenHWId)</dd>
+    </dl>
+</div>
+
+<div class="container">
+    <h2>Play time</h2>
+
+    <dl class="row">
+        @foreach (var tracker in Model.PlayTimes)
+        {
+            <dt class="col-sm-2">@tracker.Tracker:</dt>
+            <dl class="col-sm-10">@tracker.TimeSpent.ToString(@"%h\:mm")</dl>
+        }
+    </dl>
+</div>
+
+<div class="container">
+    <h2>Notes</h2>
+
+    <span class="small">Total: @Model.Notes.Length</span>
+    <table class="table table-striped mt-3">
+        <thead>
+        <tr>
+            <th>Message</th>
+            <th>Round</th>
+            <th>Created</th>
+            <th>Edited</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var note in Model.Notes)
+        {
+            <tr>
+                <td>
+                    @note.Message
+                </td>
+                <td>
+                    @note.RoundId
+                </td>
+                <td>
+                    @note.CreatedAt.ToString("g")<br/>by @note.CreatedBy.LastSeenUserName
+                </td>
+                <td>
+                    @note.CreatedAt.ToString("g")<br/>by @note.CreatedBy.LastSeenUserName
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
