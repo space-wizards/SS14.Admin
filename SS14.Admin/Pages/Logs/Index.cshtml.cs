@@ -32,6 +32,9 @@ namespace SS14.Admin.Pages.Logs
         public int? RoundId { get; set; }
 
         [BindProperty(SupportsGet = true)]
+        public OrderColumn Sort { get; set; } = OrderColumn.Date;
+
+        [BindProperty(SupportsGet = true)]
         public int PageIndex { get; set; } = 0;
 
         [BindProperty(SupportsGet = true)]
@@ -66,6 +69,7 @@ namespace SS14.Admin.Pages.Logs
                 type != null ? parsedTag : null,
                 search?.Value,
                 RoundId,
+                Sort,
                 PerPage,
                 PageIndex * PerPage
             );
@@ -79,6 +83,12 @@ namespace SS14.Admin.Pages.Logs
                 return query.Where(e => e.Date.CompareTo(date.AddHours(23)) <= 0);
 
             return query.Where(e => e.Date.CompareTo(date) >= 0);
+        }
+
+        public enum OrderColumn
+        {
+            Date,
+            Impact
         }
     }
 }

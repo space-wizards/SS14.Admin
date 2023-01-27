@@ -53,7 +53,7 @@
         <p>Filter: </p>
         <input class="grid-search" id="search" type="text" placeholder="search [ctrl+f]"/>
         <div id="search-popover" class="search-popover hidden" tabindex="1">
-            @foreach (LogFilterTags tag in Enum.GetValues(typeof(LogFilterTags)))
+            @foreach (var tag in Enum.GetValues<LogFilterTags>())
             {
                 <div class="search-result" data-search-tag="@tag.ToString()" tabindex="0">
                     <span class="result-tag">@tag.ToString():</span> <span class="result-content"></span>
@@ -66,6 +66,14 @@
         {
             <button id="litepicker-close" class="btn btn-sm"><i class="fas fa-times"></i>x</button>
         }
+        <!-- The dropdown for sort is also temporary until my next PR -->
+        <p>Sort: </p>
+        <select id="sort-select">
+            @foreach (var sortColumn in Enum.GetValues<LogsIndexModel.OrderColumn>())
+            {
+                <option value="@sortColumn.ToString()" selected="@sortColumn.Equals(Model.Sort)">@sortColumn.ToString()</option>
+            }
+        </select>
         <div class="applied-filters flex-row">
         </div>
     </data-grid-filter>

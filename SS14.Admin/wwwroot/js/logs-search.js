@@ -8,6 +8,7 @@ const DEFAULT_TAG = 'Search';
 const FILTERS_KEY = 'filters';
 const PER_PAGE = 'perPage';
 const ROUND_ID = 'roundId';
+const SORT = 'sort';
 
 const filters = [];
 
@@ -163,6 +164,12 @@ function OnRoundInput(event)
     context.updateQuery(ROUND_ID, event.target.value);
 }
 
+var sortSelect = document.getElementById("sort-select");
+sortSelect.addEventListener("change", OnSortChange);
+
+function OnSortChange(event) {
+    context.updateQuery(SORT, event.target.value);
+}
 //Search key combination
 document.onkeydown = function (e) {
     if (e.ctrlKey && e.key === 'f') {
