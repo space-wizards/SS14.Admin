@@ -7,6 +7,7 @@ const DATA_SEARCH_TAG = 'data-search-tag';
 const DEFAULT_TAG = 'Search';
 const FILTERS_KEY = 'filters';
 const PER_PAGE = 'perPage';
+const ROUND_ID = 'roundId';
 
 const filters = [];
 
@@ -150,6 +151,16 @@ countSelect.addEventListener("change", OnCountSelected)
 function OnCountSelected(event)
 {
     context.updateQuery(PER_PAGE, event.target.value);
+}
+
+// Round ID Input
+const roundIdInput = document.getElementById("round-input");
+
+roundIdInput.addEventListener("change", OnRoundInput)
+
+function OnRoundInput(event)
+{
+    context.updateQuery(ROUND_ID, event.target.value);
 }
 
 //Search key combination

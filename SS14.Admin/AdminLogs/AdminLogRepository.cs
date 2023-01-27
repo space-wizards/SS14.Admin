@@ -2,14 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Content.Server.Database;
 using Content.Shared.Database;
 using Microsoft.EntityFrameworkCore;
-using SS14.Admin.Models;
 
 namespace SS14.Admin.AdminLogs;
 
@@ -17,24 +14,34 @@ public static class AdminLogRepository
 {
     private static readonly Regex ParameterRegex = new(Regex.Escape("#"));
 
-    public static async Task<List<AdminLog>> FindAdminLogs(ServerDbContext context, DbSet<AdminLog> adminLogs, string? playerUserId,
-        DateTime? fromDate, DateTime? toDate, string? serverName, LogType? type, string? search, int limit = 100, int offset = 0)
+    public static async Task<List<AdminLog>> FindAdminLogs(
+        ServerDbContext context,
+        DbSet<AdminLog> adminLogs,
+        string? playerUserId,
+        DateTime? fromDate, DateTime? toDate,
+        string? serverName,
+        LogType? type,
+        string? search,
+        int? roundId,
+        int limit = 100, int offset = 0)
     {
         var fromDateValue = fromDate?.ToString("o", CultureInfo.InvariantCulture);
         var toDateValue = toDate?.AddHours(23).ToString("o", CultureInfo.InvariantCulture);
         var typeInt = type.HasValue ? Convert.ToInt32(type).ToString() : null;
 
-        var values = new List<string>();
+        var values = new List<object>();
         if (fromDateValue != null && toDateValue != null)
         {
             values.Add(fromDateValue);
             values.Add(toDateValue);
         }
 
-        if (playerUserId != null) values.Add(playerUserId);
+        if (playerUserId != null) values.Add(Guid.Parse(playerUserId));
         if (serverName != null) values.Add(serverName);
         if (typeInt != null) values.Add(typeInt);
         if (search != null) values.Add(search);
+        if (roundId.HasValue) values.Add(roundId);
+
 
         values.Add(limit.ToString());
         values.Add(offset.ToString());
@@ -46,16 +53,18 @@ public static class AdminLogRepository
             {(playerUserId != null ? "INNER JOIN admin_log_player AS p ON p.log_id = a.admin_log_id" : "")}
             WHERE
                 {(fromDateValue != null && toDateValue != null ? "a.date BETWEEN #::timestamp with time zone AND #::timestamp with time zone AND" : "")}
-                {(playerUserId != null ? "p.player_user_id = #" : "")}
+                {(playerUserId != null ? "p.player_user_id = # AND" : "")}
                 {(serverName != null ? "s.name = # AND" : "")}
                 {(typeInt != null ? "a.type = #::integer AND" : "")}
                 {(search != null ? $"{TextSearchForContext(context)} AND" : "")}
+                {(roundId != null ? "r.round_id = #::integer AND" : "")}
                 TRUE
             ORDER BY a.date DESC
-            LIMIT # OFFSET #
+            LIMIT #::bigint OFFSET #::bigint
         ";
 
-        return await adminLogs.FromSqlRaw(EnumerateParameters(query), values).ToListAsync();
+        var result = adminLogs.FromSqlRaw(EnumerateParameters(query), values.ToArray());
+        return await result.ToListAsync();
     }
 
     public static async Task<Player?> FindPlayerByName(DbSet<Player> players, string name)

@@ -14,23 +14,11 @@ namespace SS14.Admin.AdminLogs
 
     public static class LogFilterTagsExtension
     {
-        public static string FilterQueryPart(this LogFilterTags tag, ServerDbContext context)
-        {
-            return tag switch
-            {
-                LogFilterTags.Player => "p.player_user_id = #",
-                LogFilterTags.Server => "s.name = #",
-                LogFilterTags.Type => "a.type = #::integer",
-                LogFilterTags.Search => TextSearchForContext(context),
-                _ => throw new ArgumentOutOfRangeException(nameof(tag), tag, null)
-            };
-        }
-
         public static string? TransformValue(this LogFilterTags tag, ServerDbContext context, string value)
         {
             return tag switch
             {
-                LogFilterTags.Player => AdminLogRepository.FindPlayerByName(context.Player, value)?.Result.UserId.ToString(),
+                LogFilterTags.Player => AdminLogRepository.FindPlayerByName(context.Player, value).Result?.UserId.ToString(),
                 LogFilterTags.Type => Enum.TryParse(value, out LogType type) ? Convert.ToInt32(type).ToString() : default,
                 LogFilterTags.Server => value,
                 LogFilterTags.Search => value,

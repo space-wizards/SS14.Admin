@@ -48,6 +48,8 @@
 
 <data-grid>
     <data-grid-filter class="flex-row">
+        <p>Round: </p>
+        <input type="number" placeholder="any" id="round-input" value="@Model.RoundId"/>
         <p>Filter: </p>
         <input class="grid-search" id="search" type="text" placeholder="search [ctrl+f]"/>
         <div id="search-popover" class="search-popover hidden" tabindex="1">
@@ -58,10 +60,11 @@
                 </div>
             }
         </div>
+        <p>Date Range: </p>
         <input id="litepicker" type="text" placeholder="Date from - to"/>
         @if (Model.FromDate != default || Model.ToDate != default)
         {
-            <button id="litepicker-close" class="btn btn-sm" ><i class="fas fa-times"></i>x</button>
+            <button id="litepicker-close" class="btn btn-sm"><i class="fas fa-times"></i>x</button>
         }
         <div class="applied-filters flex-row">
         </div>

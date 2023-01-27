@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Content.Server.Database;
+using Content.Shared.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SS14.Admin.AdminLogs;
@@ -28,6 +29,9 @@ namespace SS14.Admin.Pages.Logs
         public List<AdminLogFilterModel>? Filters { get; set; }
 
         [BindProperty(SupportsGet = true)]
+        public int? RoundId { get; set; }
+
+        [BindProperty(SupportsGet = true)]
         public int PageIndex { get; set; } = 0;
 
         [BindProperty(SupportsGet = true)]
@@ -44,15 +48,24 @@ namespace SS14.Admin.Pages.Logs
             AllRouteData.Add("toDate", ToDate.ToString("yyyy-MM-dd"));
             AllRouteData.Add("filters", JsonSerializer.Serialize(Filters, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
 
+            //I will replace the filter tag stuff in my next PR so this is just temporary
+            var playerUserId = Filters?.Find(tag => tag.Key == LogFilterTags.Player);
+            var serverName = Filters?.Find(tag => tag.Key == LogFilterTags.Server);
+            var type = Filters?.Find(tag => tag.Key == LogFilterTags.Type);
+            var search = Filters?.Find(tag => tag.Key == LogFilterTags.Search);
+
+            Enum.TryParse<LogType>(type?.Key.TransformValue(_dbContext, type.Value) ?? string.Empty, true, out var parsedTag);
+
             Items = await AdminLogRepository.FindAdminLogs(
                 _dbContext,
                 _dbContext.AdminLog,
-                null,
+                playerUserId?.Key.TransformValue(_dbContext, playerUserId.Value),
                 FromDate,
                 ToDate,
-                null,
-                null,
-                null,
+                serverName?.Value,
+                type != null ? parsedTag : null,
+                search?.Value,
+                RoundId,
                 PerPage,
                 PageIndex * PerPage
             );
