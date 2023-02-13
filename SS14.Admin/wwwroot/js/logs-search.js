@@ -1,11 +1,14 @@
-﻿//Date picker
+﻿// Date picker
 const datepicker = new DatePicker('litepicker', 'litepicker-close');
 
-//Search popover
+// Search popover
 const DATA_FILTER_TAG = 'data-filter-tag';
 const DATA_SEARCH_TAG = 'data-search-tag';
 const DEFAULT_TAG = 'Search';
-const FILTERS_KEY = 'filters'
+const FILTERS_KEY = 'filters';
+const PER_PAGE = 'perPage';
+const ROUND_ID = 'roundId';
+const SORT = 'sort';
 
 const filters = [];
 
@@ -141,6 +144,32 @@ function createFilterTag(filterData, index)
     filterTagsContainer.appendChild(tagElement);
 }
 
+// Count Select
+const countSelect = document.getElementById("count-select");
+
+countSelect.addEventListener("change", OnCountSelected)
+
+function OnCountSelected(event)
+{
+    context.updateQuery(PER_PAGE, event.target.value);
+}
+
+// Round ID Input
+const roundIdInput = document.getElementById("round-input");
+
+roundIdInput.addEventListener("change", OnRoundInput)
+
+function OnRoundInput(event)
+{
+    context.updateQuery(ROUND_ID, event.target.value);
+}
+
+var sortSelect = document.getElementById("sort-select");
+sortSelect.addEventListener("change", OnSortChange);
+
+function OnSortChange(event) {
+    context.updateQuery(SORT, event.target.value);
+}
 //Search key combination
 document.onkeydown = function (e) {
     if (e.ctrlKey && e.key === 'f') {
