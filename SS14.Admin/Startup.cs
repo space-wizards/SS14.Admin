@@ -115,7 +115,6 @@ namespace SS14.Admin
             }
 
             app.UseAuthentication();
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
