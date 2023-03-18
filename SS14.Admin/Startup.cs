@@ -27,9 +27,11 @@ namespace SS14.Admin
             services.AddScoped<BanHelper>();
             services.AddHttpContextAccessor();
 
-            services.AddDbContext<PostgresServerDbContext>(options =>
-                options.UseNpgsql(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            var connStr = Configuration.GetConnectionString("DefaultConnection");
+            if (connStr == null)
+                throw new InvalidOperationException("Need to specify DefaultConnection connection string");
+
+            services.AddDbContext<PostgresServerDbContext>(options => options.UseNpgsql(connStr));
 
             services.AddControllers();
             services.AddRazorPages(options =>
@@ -93,7 +95,7 @@ namespace SS14.Admin
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
             };
 
-            foreach (var ip in Configuration.GetSection("ForwardProxies").Get<string[]>())
+            foreach (var ip in Configuration.GetSection("ForwardProxies").Get<string[]>() ?? Array.Empty<string>())
             {
                 forwardedHeadersOptions.KnownProxies.Add(IPAddress.Parse(ip));
             }
