@@ -40,7 +40,7 @@
         {
             <tr>
                 <td class="font-weight-bold">@tracker.Tracker</td>
-                <td>@tracker.TimeSpent.ToString(@"%h\:mm")</td>
+                <td>@((int)tracker.TimeSpent.TotalHours):@tracker.TimeSpent.Minutes</td>
             </tr>
         }
         </tbody>
