@@ -40,7 +40,7 @@
 <form asp-page="./Index" method="get" class="container">
     @FormHiddenRoutes.Make(Model.AllRouteData, "search", "show")
     <div class="form-group row no-gutters">
-        <label class="col-lg-3 col-form-label" for="searchBar">Search name, ID, IP or admin:</label>
+        <label class="col-lg-3 col-form-label" for="searchBar">Search name, ID, HWID, IP or admin:</label>
         <div class="col-lg-5">
             <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control "/>
         </div>
