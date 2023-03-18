@@ -33,17 +33,13 @@ public static class SearchHelper
         return query.Where(expr);
     }
 
-    public static IQueryable<BanHelper.BanJoin<TBan, TUnban>> SearchServerBans<TBan, TUnban>(
-        IQueryable<BanHelper.BanJoin<TBan, TUnban>> query,
-        string? search)
+    private static Expression<Func<BanHelper.BanJoin<TBan, TUnban>, bool>> MakeCommonBanSearchExpression<TBan, TUnban>(
+        string search)
         where TBan : IBanCommon<TUnban>
         where TUnban : IUnbanCommon
     {
-        if (string.IsNullOrEmpty(search))
-            return query;
-
-        search = search.Trim();
         var normalized = search.ToUpperInvariant();
+
         Expression<Func<BanHelper.BanJoin<TBan, TUnban>, bool>> expr = u =>
             u.Player!.LastSeenUserName.ToUpper().Contains(normalized) ||
             u.Admin!.LastSeenUserName.ToUpper().Contains(normalized);
@@ -60,6 +56,37 @@ public static class SearchHelper
         var hwid = new byte[Constants.HwidLength];
         if (Convert.TryFromBase64String(search, hwid, out var len) && len == Constants.HwidLength)
             CombineSearch(ref expr, u => u.Ban.HWId == hwid);
+
+        return expr;
+    }
+
+    public static IQueryable<BanHelper.BanJoin<ServerBan, ServerUnban>> SearchServerBans(
+        IQueryable<BanHelper.BanJoin<ServerBan, ServerUnban>> query,
+        string? search)
+    {
+        if (string.IsNullOrEmpty(search))
+            return query;
+
+        search = search.Trim();
+
+        var expr = MakeCommonBanSearchExpression<ServerBan, ServerUnban>(search);
+
+        return query.Where(expr);
+    }
+
+    public static IQueryable<BanHelper.BanJoin<ServerRoleBan, ServerRoleUnban>> SearchRoleBans(
+        IQueryable<BanHelper.BanJoin<ServerRoleBan, ServerRoleUnban>> query,
+        string? search)
+    {
+        if (string.IsNullOrEmpty(search))
+            return query;
+
+        search = search.Trim();
+
+        var expr = MakeCommonBanSearchExpression<ServerRoleBan, ServerRoleUnban>(search);
+
+        // Match role name exactly.
+        CombineSearch(ref expr, u => u.Ban.RoleId == search);
 
         return query.Where(expr);
     }
@@ -90,7 +117,7 @@ public static class SearchHelper
         return query.Where(expr);
     }
 
-    public static void CombineSearch<T>(
+    private static void CombineSearch<T>(
         ref Expression<Func<T, bool>> a,
         Expression<Func<T, bool>> b)
     {
