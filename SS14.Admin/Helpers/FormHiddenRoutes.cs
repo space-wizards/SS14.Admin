@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Html;
+﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SS14.Admin.Helpers
@@ -19,7 +17,7 @@ namespace SS14.Admin.Helpers
                 tag.Attributes.Add("type", "hidden");
                 tag.Attributes.Add("name", k);
                 tag.Attributes.Add("value", v);
-                
+
                 // ReSharper disable once MustUseReturnValue
                 builder.AppendHtml(tag);
             }

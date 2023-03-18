@@ -1,5 +1,4 @@
-﻿using System;
-using Content.Server.Database;
+﻿using Content.Server.Database;
 using Content.Shared.Database;
 
 namespace SS14.Admin.AdminLogs

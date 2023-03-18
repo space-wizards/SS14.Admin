@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SS14.Admin.Admins
+﻿namespace SS14.Admin.Admins
 {
     /// <summary>
     ///     Permissions that admins can have.

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SS14.Admin.Helpers
+﻿namespace SS14.Admin.Helpers
 {
     public static class CollectionHelper
     {

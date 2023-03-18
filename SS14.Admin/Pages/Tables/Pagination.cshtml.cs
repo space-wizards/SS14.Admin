@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages.Tables

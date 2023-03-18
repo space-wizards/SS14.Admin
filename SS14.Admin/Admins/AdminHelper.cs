@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DBAdmin = Content.Server.Database.Admin;
+﻿using DBAdmin = Content.Server.Database.Admin;
 
 namespace SS14.Admin.Admins
 {
