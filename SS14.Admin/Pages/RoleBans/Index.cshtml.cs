@@ -122,7 +122,7 @@ public class Index : PageModel
 
             return new RoleBan(
                 b.Ban.Id,
-                b.Player?.LastSeenUserName,
+                b.Player,
                 b.Ban.UserId?.ToString(),
                 b.Ban.Address?.FormatCidr(),
                 b.Ban.HWId is { } h ? Convert.ToBase64String(h) : null,
@@ -140,7 +140,7 @@ public class Index : PageModel
 
     public sealed record RoleBan(
         int Id,
-        string? Name,
+        Player? Player,
         string? UserId,
         string? Address,
         string? Hwid,

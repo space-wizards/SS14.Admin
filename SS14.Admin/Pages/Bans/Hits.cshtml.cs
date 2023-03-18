@@ -55,7 +55,12 @@ public class Hits : PageModel
 
         logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
 
-        SortState = await ConnectionsIndexModel.LoadSortConnectionsTableData(Pagination, logQuery, sort, AllRouteData);
+        SortState = await ConnectionsIndexModel.LoadSortConnectionsTableData(
+            Pagination,
+            _dbContext,
+            logQuery,
+            sort,
+            AllRouteData);
 
         return Page();
     }

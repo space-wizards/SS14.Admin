@@ -38,9 +38,11 @@
         var className = ban.Id == Model.HighlightBan ? "table-success" : "";
         <tr class="@className">
             <td>
-                @if (ban.Name != null)
+                @if (ban.Player != null)
                 {
-                    <strong>@ban.Name</strong>
+                    <a asp-page="/Players/Info" asp-route-userId="@ban.Player.UserId">
+                        <strong>@ban.Player.LastSeenUserName</strong>
+                    </a>
                     <br/>
                 }
                 @if (User.IsInRole("ADMIN"))

@@ -81,17 +81,21 @@ namespace SS14.Admin.Pages.Connections
 
             logQuery = logQuery.Where(c => acceptableDenies.Contains(c.Denied));
 
-            SortState = await LoadSortConnectionsTableData(Pagination, logQuery, sort, AllRouteData);
+            SortState = await LoadSortConnectionsTableData(Pagination, _dbContext, logQuery, sort, AllRouteData);
         }
 
         [MustUseReturnValue]
         public static async Task<ISortState> LoadSortConnectionsTableData(
             PaginationState<Connection> pagination,
+            PostgresServerDbContext dbContext,
             IQueryable<ConnectionLog> query,
             string? sort,
             Dictionary<string, string?> allRouteData)
         {
-            var logs = query.Select(c => new { c, HitCount = c.BanHits.Count });
+            var logs = query.LeftJoin(
+                dbContext.Player,
+                c => c.UserId, p => p.UserId,
+                (c, p) => new { c, HitCount = c.BanHits.Count, Player = p });
 
             var sortState = Helpers.SortState.Build(logs);
 
@@ -106,13 +110,14 @@ namespace SS14.Admin.Pages.Connections
 
             logs = sortState.ApplyToQuery(logs);
 
-            await pagination.LoadLinqAsync(logs, e => e.Select(c => new Connection(c.c, c.HitCount)));
+            await pagination.LoadLinqAsync(logs, e => e.Select(c => new Connection(c.c, c.HitCount, c.Player)));
 
             return sortState;
         }
 
         public sealed record Connection(
             ConnectionLog Log,
-            int BanHitCount);
+            int BanHitCount,
+            Player? Player);
     }
 }

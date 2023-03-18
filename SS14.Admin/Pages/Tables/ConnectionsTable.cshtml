@@ -16,11 +16,20 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var (log, banHits) in Model.Pagination.List.PaginatedItems)
+    @foreach (var (log, banHits, player) in Model.Pagination.List.PaginatedItems)
     {
         <tr>
             <td>
-                <strong>@log.UserName</strong>
+                @if (player == null)
+                {
+                    <strong>@log.UserName</strong>
+                }
+                else
+                {
+                    <a asp-page="/Players/Info" asp-route-userId="@player.UserId">
+                        <strong>@log.UserName</strong>
+                    </a>
+                }
                 <br/>
             </td>
             <td class="monotype">@log.UserId</td>

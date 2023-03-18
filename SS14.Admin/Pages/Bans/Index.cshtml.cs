@@ -123,7 +123,7 @@ namespace SS14.Admin.Pages
 
                 return new Ban(
                     b.Ban.Id,
-                    b.Player?.LastSeenUserName,
+                    b.Player,
                     b.Ban.UserId?.ToString(),
                     b.Ban.Address?.FormatCidr(),
                     b.Ban.HWId is { } h ? Convert.ToBase64String(h) : null,
@@ -141,7 +141,7 @@ namespace SS14.Admin.Pages
 
         public sealed record Ban(
             int Id,
-            string? Name,
+            Player? Player,
             string? UserId,
             string? Address,
             string? Hwid,
