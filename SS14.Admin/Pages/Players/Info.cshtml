@@ -1,5 +1,6 @@
 ﻿@page "{userId}"
 @using SS14.Admin.Pages.Bans
+@using Content.Server.Database
 @model SS14.Admin.Pages.Players.Info
 
 @{
@@ -46,6 +47,38 @@
         </tbody>
     </table>
 </div>
+
+<div class="container">
+    <h2>Character profiles</h2>
+
+    <table class="table table-striped mt-3">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Sex</th>
+            <th>Gender</th>
+            <th>Species</th>
+            <th>Favorite job</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var profile in Model.Profiles)
+        {
+            <tr>
+                <td class="font-weight-bold">@profile.CharacterName</td>
+                <td>@profile.Age</td>
+                <td>@profile.Sex</td>
+                <td>@profile.Gender</td>
+                <td>@profile.Species</td>
+                @{ var favJob = profile.Jobs.SingleOrDefault(e => e.Priority == DbJobPriority.High); }
+                <td>@(favJob == null ? "none" : favJob.JobName)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
 
 <div class="container">
     <h2>Notes</h2>

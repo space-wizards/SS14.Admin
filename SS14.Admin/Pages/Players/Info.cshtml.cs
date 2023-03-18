@@ -16,6 +16,7 @@ public sealed class Info : PageModel
 
     public AdminNote[] Notes { get; set; } = default!;
     public PlayTime[] PlayTimes { get; set; } = default!;
+    public Profile[] Profiles { get; set; } = default!;
 
     public Info(PostgresServerDbContext dbContext)
     {
@@ -39,6 +40,12 @@ public sealed class Info : PageModel
 
         PlayTimes = await _dbContext.PlayTime
             .Where(t => t.PlayerId == userId)
+            .ToArrayAsync();
+
+        Profiles = await _dbContext.Profile
+            .Where(t => t.Preference.UserId == userId)
+            .OrderBy(t => t.Slot)
+            .Include(t => t.Jobs)
             .ToArrayAsync();
 
         return Page();
