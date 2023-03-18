@@ -1,0 +1,102 @@
+﻿@model SS14.Admin.Pages.Tables.RoleBansTableModel
+
+
+<partial name="Tables/Pagination" for="Pagination"/>
+
+<table class="table table-striped mt-3">
+    <thead>
+    <tr>
+        <th style="min-width: 210px">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "name", "Name"))"/>
+            /
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "uid", "User ID"))"/>
+            /
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "ip", "IP"))"/>
+            /
+            HWID
+        </th>
+        <th>Reason</th>
+        <th style="min-width: 210px">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "role", "Role"))"/>
+        </th>
+        <th style="min-width: 210px">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "time", "Ban time"))"/>
+        </th>
+        <th style="min-width: 210px">Expires</th>
+        <th style="min-width: 140px">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "admin", "Banning admin"))"/>
+        </th>
+        @*<th title="If the ban was manually unbanned then the unban time is sorted by">
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "expire_time", "Expiration time"))"/>
+        </th>*@
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var ban in Model.Pagination.List.PaginatedItems)
+    {
+        var className = ban.Id == Model.HighlightBan ? "table-success" : "";
+        <tr class="@className">
+            <td>
+                @if (ban.Name != null)
+                {
+                    <strong>@ban.Name</strong>
+                    <br/>
+                }
+                @if (User.IsInRole("ADMIN"))
+                {
+                    if (ban.Address != null)
+                    {
+                        <small>
+                            <strong>IP:</strong> <span class="monotype">@ban.Address</span>
+                        </small>
+                        <br/>
+                    }
+                    if (ban.Hwid != null)
+                    {
+                        <small>
+                            <strong>HWID:</strong> <span class="monotype">@ban.Hwid</span>
+                        </small>
+                        <br/>
+                    }
+                }
+                @if (ban.UserId != null)
+                {
+                    <small>
+                        <strong>GUID:</strong> <span class="monotype">@ban.UserId</span>
+                    </small>
+                }
+            </td>
+            <td>@ban.Reason</td>
+            <td>@ban.Role</td>
+            <td>@ban.BanTime.ToString("g")</td>
+            <td>
+                @(ban.Expires?.ToString("g") ?? "PERMANENT")
+                @if (ban.Unbanned is { } unbanned)
+                {
+                    var (time, admin) = unbanned;
+                    <br>
+                    <text><strong>Unbanned:</strong> @time.ToString("g") by @admin</text>
+                }
+                else if (ban.Expires < DateTime.Now)
+                {
+                    <br>
+                    <strong>Expired</strong>
+                }
+            </td>
+            <td>@ban.Admin</td>
+            <td>
+                @if (ban.Active && User.IsInRole("BAN"))
+                {
+                    <form asp-page="/RoleBans/Index" asp-page-handler="Unban">
+                        <input type="hidden" name="Id" value="@ban.Id">
+                        <input type="submit" class="btn btn-secondary" value="Unban">
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="Tables/Pagination" for="Pagination"/>

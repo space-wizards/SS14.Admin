@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Data;
 using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
-using SS14.Admin.Pages.Bans;
 
 namespace SS14.Admin.Pages.Connections;
 
 public sealed class Hits : PageModel
 {
     private readonly PostgresServerDbContext _dbContext;
+    private readonly BanHelper _banHelper;
 
     public ConnectionLog Log { get; set; } = default!;
     public ISortState SortState { get; private set; } = default!;
@@ -22,9 +19,10 @@ public sealed class Hits : PageModel
     public string? CurrentFilter { get; set; }
 
 
-    public Hits(PostgresServerDbContext dbContext)
+    public Hits(PostgresServerDbContext dbContext, BanHelper banHelper)
     {
         _dbContext = dbContext;
+        _banHelper = banHelper;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -49,7 +47,7 @@ public sealed class Hits : PageModel
 
         Pagination.Init(pageIndex, perPage, AllRouteData);
 
-        var banQuery = SearchHelper.SearchServerBans(BanHelper.CreateBanJoin(_dbContext), search)
+        var banQuery = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search)
             .Join(_dbContext.ServerBanHit, bj => bj.Ban.Id, bh => bh.BanId, (join, hit) => new
             {
                 join, hit

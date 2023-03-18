@@ -1,16 +1,11 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using Content.Server.Database;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
+using SS14.Admin.Helpers;
 using SS14.Admin.SignIn;
 
 namespace SS14.Admin
@@ -29,6 +24,8 @@ namespace SS14.Admin
         {
             services.AddScoped<SignInManager>();
             services.AddScoped<LoginHandler>();
+            services.AddScoped<BanHelper>();
+            services.AddHttpContextAccessor();
 
             services.AddDbContext<PostgresServerDbContext>(options =>
                 options.UseNpgsql(

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SS14.Admin.Helpers;
 
-namespace SS14.Admin.Pages.Bans
+namespace SS14.Admin.Pages.RoleBans
 {
     [Authorize(Roles = "BAN")]
     [ValidateAntiForgeryToken]
@@ -29,6 +29,7 @@ namespace SS14.Admin.Pages.Bans
             public string? IP { get; set; }
             public string? HWid { get; set; }
             public int LengthMinutes { get; set; }
+            [Required] public string Role { get; set; } = "";
             [Required] public string Reason { get; set; } = "";
         }
 
@@ -53,10 +54,19 @@ namespace SS14.Admin.Pages.Bans
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
-            var ban = new ServerBan();
+            if (string.IsNullOrWhiteSpace(Input.Role))
+            {
+                StatusMessage = "Error: Must provide role.";
+                return Page();
+            }
+
+            var roleBan = new ServerRoleBan
+            {
+                RoleId = Input.Role.Trim()
+            };
 
             var error = await _banHelper.FillBanCommon(
-                ban,
+                roleBan,
                 Input.NameOrUid,
                 Input.IP,
                 Input.HWid,
@@ -69,10 +79,10 @@ namespace SS14.Admin.Pages.Bans
                 return Page();
             }
 
-            _dbContext.Ban.Add(ban);
+            _dbContext.RoleBan.Add(roleBan);
             await _dbContext.SaveChangesAsync();
-            TempData["HighlightNewBan"] = ban.Id;
-            TempData["StatusMessage"] = "Ban created";
+            TempData["HighlightNewBan"] = roleBan.Id;
+            TempData["StatusMessage"] = "Role ban created";
             return RedirectToPage("./Index");
         }
     }

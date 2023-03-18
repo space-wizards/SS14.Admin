@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Data;
 using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,8 +11,9 @@ namespace SS14.Admin.Pages.Bans;
 public class Hits : PageModel
 {
     private readonly PostgresServerDbContext _dbContext;
+    private readonly BanHelper _banHelper;
 
-    public BanHelper.BanJoin Ban { get; set; } = default!;
+    public BanHelper.BanJoin<ServerBan, ServerUnban> Ban { get; set; } = default!;
 
     public ISortState SortState { get; private set; } = default!;
     public PaginationState<ConnectionsIndexModel.Connection> Pagination { get; } = new(100);
@@ -23,9 +21,10 @@ public class Hits : PageModel
 
     public string? CurrentFilter { get; set; }
 
-    public Hits(PostgresServerDbContext dbContext)
+    public Hits(PostgresServerDbContext dbContext, BanHelper banHelper)
     {
         _dbContext = dbContext;
+        _banHelper = banHelper;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -37,13 +36,12 @@ public class Hits : PageModel
     {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead);
 
-        var banEntry = await BanHelper.CreateBanJoin(_dbContext).SingleOrDefaultAsync(b => b.Ban.Id == ban);
+        var banEntry = await _banHelper.CreateServerBanJoin().SingleOrDefaultAsync(b => b.Ban.Id == ban);
 
         if (banEntry == null)
             return NotFound();
 
         Ban = banEntry;
-
 
         Pagination.Init(pageIndex, perPage, AllRouteData);
 

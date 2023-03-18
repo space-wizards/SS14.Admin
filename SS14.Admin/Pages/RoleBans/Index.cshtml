@@ -1,0 +1,67 @@
+﻿@page
+@using SS14.Admin.Pages.Tables
+@using SS14.Admin.Helpers
+@model SS14.Admin.Pages.RoleBans.Index
+
+@{
+    ViewData["Title"] = "Bans";
+    var highlightBan = 0;
+    if (TempData.TryGetValue("HighlightNewBan", out var highlightObj))
+    {
+        highlightBan = (int)highlightObj!;
+    }
+}
+
+<div class="container">
+    @if (TempData.TryGetValue("StatusMessage", out var stat))
+    {
+        var status = (string)stat!;
+        var statusMessageClass = status.StartsWith("Error") ? "danger" : "success";
+
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    @status
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (User.IsInRole("BAN"))
+    {
+        <a class="btn btn-primary" asp-page="./Create">Create new ban</a>
+    }
+</div>
+
+
+<form asp-page="./Index" method="get" class="container">
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search", "show")
+    <div class="form-group row no-gutters">
+        <label class="col-lg-3 col-form-label" for="searchBar">Search name, ID, role, IP or admin:</label>
+        <div class="col-lg-5">
+            <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control "/>
+        </div>
+        <div class="col-lg-4">
+            <div class="row no-gutters">
+                <div class="col-6">
+                    <select class="form-control " name="show">
+                        <option selected="@(Model.Show == Index.ShowFilter.Active)" value="">Active bans</option>
+                        <option selected="@(Model.Show == Index.ShowFilter.All)" value="all">All bans</option>
+                        <option selected="@(Model.Show == Index.ShowFilter.Expired)" value="expired">Expired/unbanned</option>
+                    </select>
+                </div>
+                <div class="col-3">
+                    <input type="submit" value="Search" class="btn btn-primary btn-block"/>
+                </div>
+                <div class="col-3">
+                    <a class="btn btn-danger btn-block" asp-page="./Index">Clear</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<partial name="Tables/RoleBansTable" model="@(new RoleBansTableModel(Model.SortState, Model.Pagination, highlightBan))"/>

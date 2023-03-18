@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Content.Server.Database;
+﻿using Content.Server.Database;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
-using SS14.Admin.Pages.Bans;
 
 namespace SS14.Admin.Pages
 {
     public class BansModel : PageModel
     {
         private readonly PostgresServerDbContext _dbContext;
+        private readonly BanHelper _banHelper;
 
         public ISortState SortState { get; private set; } = default!;
         public PaginationState<Ban> Pagination { get; } = new(100);
@@ -24,9 +20,10 @@ namespace SS14.Admin.Pages
         public ShowFilter? Show { get; set; }
 
 
-        public BansModel(PostgresServerDbContext dbContext)
+        public BansModel(PostgresServerDbContext dbContext, BanHelper banHelper)
         {
             _dbContext = dbContext;
+            _banHelper = banHelper;
         }
 
         public async Task OnGetAsync(
@@ -38,7 +35,7 @@ namespace SS14.Admin.Pages
         {
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
-            var bans = SearchHelper.SearchServerBans(BanHelper.CreateBanJoin(_dbContext), search);
+            var bans = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search);
 
             bans = show switch
             {
@@ -94,7 +91,7 @@ namespace SS14.Admin.Pages
         [MustUseReturnValue]
         public static async Task<ISortState> LoadSortBanTableData(
             PaginationState<Ban> pagination,
-            IQueryable<BanHelper.BanJoin> query,
+            IQueryable<BanHelper.BanJoin<ServerBan, ServerUnban>> query,
             string? sort,
             Dictionary<string, string?> allRouteData)
         {

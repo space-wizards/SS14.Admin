@@ -36,16 +36,18 @@ public static class SearchHelper
         return query.Where(expr);
     }
 
-    public static IQueryable<BanHelper.BanJoin> SearchServerBans(
-        IQueryable<BanHelper.BanJoin> query,
+    public static IQueryable<BanHelper.BanJoin<TBan, TUnban>> SearchServerBans<TBan, TUnban>(
+        IQueryable<BanHelper.BanJoin<TBan, TUnban>> query,
         string? search)
+        where TBan : IBanCommon<TUnban>
+        where TUnban : IUnbanCommon
     {
         if (string.IsNullOrEmpty(search))
             return query;
 
         search = search.Trim();
         var normalized = search.ToUpperInvariant();
-        Expression<Func<BanHelper.BanJoin, bool>> expr = u =>
+        Expression<Func<BanHelper.BanJoin<TBan, TUnban>, bool>> expr = u =>
             u.Player!.LastSeenUserName.ToUpper().Contains(normalized) ||
             u.Admin!.LastSeenUserName.ToUpper().Contains(normalized);
 
