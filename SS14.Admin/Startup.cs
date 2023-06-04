@@ -41,6 +41,7 @@ namespace SS14.Admin
                 options.Conventions.AuthorizeFolder("/Bans");
                 options.Conventions.AuthorizeFolder("/RoleBans");
                 options.Conventions.AuthorizeFolder("/Logs");
+                options.Conventions.AuthorizeFolder("/Characters");
             });
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

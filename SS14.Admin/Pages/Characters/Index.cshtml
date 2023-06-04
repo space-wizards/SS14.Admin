@@ -1,0 +1,64 @@
+@page
+@using SS14.Admin.Helpers
+@using SS14.Admin.Pages.Tables
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Content.Server.Database
+@model SS14.Admin.Pages.Characters.CharactersIndexModel
+
+@{
+    ViewData["Title"] = "Characters";
+}
+
+<form asp-page="./Index" method="get" class="container">
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search")
+    <div class="form-group row">
+        <label class="col-md-3" for="searchBar">Search character name:</label>
+        <input type="text" id="searchBar" name="search" value="@Model.CurrentFilter" class="form-control form-control-sm col-md-7"/>
+        <input type="submit" value="Search" class="btn btn-primary col-md-1 btn-sm"/>
+        <a class="btn btn-danger btn-sm col-md-1" asp-page="./Index">Clear</a>
+    </div>
+</form>
+
+<partial name="Tables/Pagination" for="Pagination"/>
+
+<table class="table table-striped mt-3">
+    <thead>
+    <tr>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "player_name", "Player"))"/>
+        <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "character_name", "Character Name"))"/>
+        <th>Age</th>
+        <th>Sex</th>
+        <th>Gender</th>
+        <th>Species</th>
+        <th>Favorite job</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var (profile, player) in Model.Pagination.List.PaginatedItems)
+    {
+        <tr>
+            <td>
+            @if (player == null)
+            {
+                <span class="monotype small">@profile.Preference.UserId</span>
+            }
+            else
+            {
+                <a asp-page="/Players/Info" asp-route-userId="@player.UserId">
+                    <strong>@player.LastSeenUserName</strong>
+                </a>
+            }
+            </td>
+            <td>@profile.CharacterName</td>
+            <td>@profile.Age</td>
+            <td>@profile.Sex</td>
+            <td>@profile.Gender</td>
+            <td>@profile.Species</td>
+            @{ var favJob = profile.Jobs.SingleOrDefault(e => e.Priority == DbJobPriority.High); }
+            <td>@(favJob == null ? "none" : favJob.JobName)</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="Tables/Pagination" for="Pagination"/>
