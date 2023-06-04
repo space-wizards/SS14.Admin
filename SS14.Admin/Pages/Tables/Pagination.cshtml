@@ -12,8 +12,7 @@
         else
         {
             var nullCount = Model.DefaultPerPage == count ? null : (int?) count;
-            <a asp-page="./Index"
-               asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+            <a asp-all-route-data="@Model.AllRouteData.ShallowClone()"
                asp-route-perPage="@nullCount">
                 @count
             </a>
@@ -32,14 +31,12 @@
 }
 
 <div class="container">
-    <a asp-page="./Index"
-       asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+    <a asp-all-route-data="@Model.AllRouteData.ShallowClone()"
        asp-route-pageIndex="@prevPageIdx"
        class="btn btn-primary btn-sm @prevDisabled">
         Previous
     </a>
-    <a asp-page="./Index"
-       asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+    <a asp-all-route-data="@Model.AllRouteData.ShallowClone()"
        asp-route-pageIndex="@nextPageIdx"
        class="btn btn-primary btn-sm @nextDisabled">
         Next
