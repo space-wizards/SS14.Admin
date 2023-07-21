@@ -45,7 +45,7 @@ public static class SearchHelper
             u.Admin!.LastSeenUserName.ToUpper().Contains(normalized);
 
         if (Guid.TryParse(search, out var guid))
-            CombineSearch(ref expr, b => b.Ban.UserId == guid);
+            CombineSearch(ref expr, b => b.Ban.PlayerUserId == guid);
 
         if (IPHelper.TryParseCidr(search, out var cidr))
             CombineSearch(ref expr, b => EF.Functions.ContainsOrEqual(cidr, b.Ban.Address!.Value));

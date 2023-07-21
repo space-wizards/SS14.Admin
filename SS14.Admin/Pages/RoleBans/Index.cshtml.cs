@@ -100,7 +100,7 @@ public class Index : PageModel
         var sortState = Helpers.SortState.Build(bans);
         sortState.AddColumn("name", p => p.Player!.LastSeenUserName);
         sortState.AddColumn("ip", p => p.Ban.Address);
-        sortState.AddColumn("uid", p => p.Ban.UserId);
+        sortState.AddColumn("uid", p => p.Ban.PlayerUserId);
         sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
         // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
         sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
@@ -123,7 +123,7 @@ public class Index : PageModel
             return new RoleBan(
                 b.Ban.Id,
                 b.Player,
-                b.Ban.UserId?.ToString(),
+                b.Ban.PlayerUserId?.ToString(),
                 b.Ban.Address?.FormatCidr(),
                 b.Ban.HWId is { } h ? Convert.ToBase64String(h) : null,
                 b.Ban.Reason,

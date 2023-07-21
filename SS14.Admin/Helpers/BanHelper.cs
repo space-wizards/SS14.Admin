@@ -45,7 +45,7 @@ public sealed class BanHelper
         return bans
             .Include(b => b.Unban)
             .LeftJoin(_dbContext.Player,
-                ban => ban.UserId, player => player.UserId,
+                ban => ban.PlayerUserId, player => player.UserId,
                 (ban, player) => new { ban, player })
             .LeftJoin(_dbContext.Player,
                 ban => ban.ban.BanningAdmin, admin => admin.UserId,
@@ -125,13 +125,13 @@ public sealed class BanHelper
             nameOrUid = nameOrUid.Trim();
             if (Guid.TryParse(nameOrUid, out var guid))
             {
-                ban.UserId = guid;
+                ban.PlayerUserId = guid;
             }
             else
             {
                 try
                 {
-                    ban.UserId = await FindPlayerGuidByNameAsync(nameOrUid);
+                    ban.PlayerUserId = await FindPlayerGuidByNameAsync(nameOrUid);
                 }
                 catch (Exception e)
                 {
@@ -139,7 +139,7 @@ public sealed class BanHelper
                     return "Error: Unknown error occured fetching user ID from auth server.";
                 }
 
-                if (ban.UserId == null)
+                if (ban.PlayerUserId == null)
                 {
                     return $"Error: Unable to find user with name {nameOrUid}";
                 }
