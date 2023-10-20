@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content.Server.Database", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content.Shared.Database", "SS14\Content.Shared.Database\Content.Shared.Database.csproj", "{34DBD258-BB73-4A8D-9159-C7CBECE1AB8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Robust.Analyzers", "SS14\RobustToolbox\Robust.Analyzers\Robust.Analyzers.csproj", "{F718671B-FAD0-4783-90B8-32059AB9552F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,5 +33,9 @@ Global
 		{34DBD258-BB73-4A8D-9159-C7CBECE1AB8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34DBD258-BB73-4A8D-9159-C7CBECE1AB8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34DBD258-BB73-4A8D-9159-C7CBECE1AB8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F718671B-FAD0-4783-90B8-32059AB9552F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F718671B-FAD0-4783-90B8-32059AB9552F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F718671B-FAD0-4783-90B8-32059AB9552F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F718671B-FAD0-4783-90B8-32059AB9552F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
