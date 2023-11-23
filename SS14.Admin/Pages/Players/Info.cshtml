@@ -16,9 +16,9 @@
         <dt class="col-sm-2">Last seen username:</dt>
         <dd class="col-sm-10">@Model.Player.LastSeenUserName</dd>
         <dt class="col-sm-2">First seen time:</dt>
-        <dd class="col-sm-10">@Model.Player.FirstSeenTime.ToString("yyyy/MM/dd HH:mm:ss")</dd>
+        <dd class="col-sm-10">@Model.Player.FirstSeenTime.ToString("yyyy-MM-dd HH:mm:ss")</dd>
         <dt class="col-sm-2">Last seen time:</dt>
-        <dd class="col-sm-10">@Model.Player.LastSeenTime.ToString("yyyy/MM/dd HH:mm:ss")</dd>
+        <dd class="col-sm-10">@Model.Player.LastSeenTime.ToString("yyyy-MM-dd HH:mm:ss")</dd>
         <dt class="col-sm-2">Last seen address:</dt>
         <dd class="col-sm-10 monotype">@Model.Player.LastSeenAddress</dd>
         <dt class="col-sm-2">Last seen HWID:</dt>
@@ -104,10 +104,10 @@
                     @note.RoundId
                 </td>
                 <td>
-                    @note.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")<br/>by @note.CreatedBy.LastSeenUserName
+                    @note.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")<br/>by @note.CreatedBy.LastSeenUserName
                 </td>
                 <td>
-                    @note.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")<br/>by @note.CreatedBy.LastSeenUserName
+                    @note.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")<br/>by @note.CreatedBy.LastSeenUserName
                 </td>
             </tr>
         }

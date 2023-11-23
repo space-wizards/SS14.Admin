@@ -70,14 +70,14 @@
                 }
             </td>
             <td>@ban.Reason</td>
-            <td>@ban.BanTime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+            <td>@ban.BanTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
             <td>
-                @(ban.Expires?.ToString("yyyy/MM/dd HH:mm:ss") ?? "PERMANENT")
+                @(ban.Expires?.ToString("yyyy-MM-dd HH:mm:ss") ?? "PERMANENT")
                 @if (ban.Unbanned is { } unbanned)
                 {
                     var (time, admin) = unbanned;
                     <br>
-                    <text><strong>Unbanned:</strong> @time.ToString("yyyy/MM/dd HH:mm:ss") by @admin</text>
+                    <text><strong>Unbanned:</strong> @time.ToString("yyyy-MM-dd HH:mm:ss") by @admin</text>
                 }
                 else if (ban.Expires < DateTime.Now)
                 {

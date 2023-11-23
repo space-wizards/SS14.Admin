@@ -33,7 +33,7 @@
                 <br/>
             </td>
             <td class="monotype">@log.UserId</td>
-            <td>@log.Time.ToString("yyyy/MM/dd HH:mm:ss")</td>
+            <td>@log.Time.ToString("yyyy-MM-dd HH:mm:ss")</td>
             <td class="monotype constrained-150">@log.Address</td>
             <td class="monotype constrained-150">@(log.HWId is { } hwid ? Convert.ToBase64String(hwid) : null)</td>
             <td>

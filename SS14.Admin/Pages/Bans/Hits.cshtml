@@ -23,14 +23,14 @@
             <dd class="col-sm-10 monotype">@BanHelper.FormatHwid(Model.Ban.Ban.HWId)</dd>
         }
         <dt class="col-sm-2">Time:</dt>
-        <dd class="col-sm-10">@Model.Ban.Ban.BanTime.ToString("yyyy/MM/dd HH:mm:ss")</dd>
+        <dd class="col-sm-10">@Model.Ban.Ban.BanTime.ToString("yyyy-MM-dd HH:mm:ss")</dd>
         <dt class="col-sm-2">Expires:</dt>
         <dd class="col-sm-10">
-            @(Model.Ban.Ban.ExpirationTime?.ToString("yyyy/MM/dd HH:mm:ss") ?? "PERMANENT")
+            @(Model.Ban.Ban.ExpirationTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? "PERMANENT")
             @if (Model.Ban.Ban.Unban is { } unbanned)
             {
                 <br>
-                <text><strong>Unbanned:</strong> @unbanned.UnbanTime.ToString("yyyy/MM/dd HH:mm:ss") by @Model.Ban.UnbanAdmin?.LastSeenUserName</text>
+                <text><strong>Unbanned:</strong> @unbanned.UnbanTime.ToString("yyyy-MM-dd HH:mm:ss") by @Model.Ban.UnbanAdmin?.LastSeenUserName</text>
             }
             else if (Model.Ban.Ban.ExpirationTime < DateTime.Now)
             {
