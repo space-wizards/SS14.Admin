@@ -33,6 +33,10 @@
             <input type="checkbox" class="form-check-input" id="showFull" name="showFull" @(Model.ShowFull ? "checked" : "") value="true">
             <label class="form-check-label" for="showFull">Server Full</label>
         </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showPanic" name="showPanic" @(Model.ShowPanic ? "checked" : "") value="true">
+            <label class="form-check-label" for="showPanic">Server Panic</label>
+        </div>
     </div>
 </form>
 
