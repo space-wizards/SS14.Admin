@@ -6,9 +6,5 @@ riderModule.iml
 
 */appsettings.Secret.yml
 **/discord.xml
-**/appsettings.yml
-**/appsettings.Development.yml
 
 *.user
-
-.idea/

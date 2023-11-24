@@ -18,5 +18,7 @@ Serilog:
 ForwardProxies:
   - 127.0.0.1
 
+Urls: "http://127.0.0.1:5051"
+
 AuthServer: "https://central.spacestation14.io/auth"
 AllowedHosts: "*"
