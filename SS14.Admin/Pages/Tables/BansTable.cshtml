@@ -1,9 +1,13 @@
 ﻿@model SS14.Admin.Pages.Tables.BansTableModel
 
-
-<partial name="Tables/Pagination" for="Pagination"/>
-
-<table class="table table-striped mt-3">
+@{
+    var b = Model.PaginationState;
+    if (b == true)
+    {
+        <partial name="Tables/Pagination" for="Pagination"/>
+    }
+}
+    <table class="table table-striped mt-3">
     <thead>
     <tr>
         <th style="min-width: 210px">
@@ -111,4 +115,7 @@
     </tbody>
 </table>
 
+@if (b == true)
+{
 <partial name="Tables/Pagination" for="Pagination"/>
+}

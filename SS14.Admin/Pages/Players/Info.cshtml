@@ -1,6 +1,7 @@
 ﻿@page "{userId}"
 @using Content.Server.Database
 @using SS14.Admin.Helpers
+@using SS14.Admin.Pages.Tables
 @model SS14.Admin.Pages.Players.Info
 
 @{
@@ -113,4 +114,14 @@
         }
         </tbody>
     </table>
+</div>
+
+<div class="container">
+    <h2>Bans</h2>
+    <partial name="Tables/BansTable" model="@(new BansTableModel(Model.GameSortState,Model.GameBanPagination, 0 ,false))"/>
+</div>
+
+<div class="container">
+    <h2>Role Bans</h2>
+    <partial name="Tables/RoleBansTable" model="@(new RoleBansTableModel(Model.RoleSortState,Model.RoleBanPagination, 0, false))"/>
 </div>

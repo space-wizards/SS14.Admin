@@ -6,4 +6,5 @@ namespace SS14.Admin.Pages.Tables;
 public sealed record RoleBansTableModel(
     ISortState SortState,
     PaginationState<Index.RoleBan> Pagination,
-    int? HighlightBan);
+    int? HighlightBan,
+    bool PaginationState);
