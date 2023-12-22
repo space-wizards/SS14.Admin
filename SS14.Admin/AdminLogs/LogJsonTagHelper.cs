@@ -90,12 +90,13 @@ public class LogJsonTagHelper : TagHelper
     }
 
     //This will return a link to the players page in the future
+    //It now links to players pages YAY
     private async Task<string> RetrievePlayerLink(JsonProperty property)
     {
         if (!property.Value.TryGetGuid(out var playerId)) return string.Empty;
 
         var player = _dbContext.Player.FirstOrDefault(p => p.UserId.Equals(playerId));
-        return player == default ? string.Empty : $"<a class=\"log-player-link\" href=\"#\">{player.LastSeenUserName}</a>";
+        return player == default ? string.Empty : $"<a class=\"log-player-link\" href=\"/Players/Info/{player.UserId}\">{player.LastSeenUserName}</a>";
     }
 
     private string BuildEntryTitle(string name, string type, string value = "")

@@ -2,23 +2,18 @@
 const overlay = document.getElementById('side-panel-overlay');
 const entries = document.querySelectorAll('.data-log');
 
-let selecting = false;
-
-document.addEventListener('selectstart', () => selecting = true);
-entries.forEach(entry => entry.addEventListener('click', onDataGridEntryClick, true));
+entries.forEach(entry => entry.addEventListener('click', onDataGridEntryClick));
 
 function onDetailsClose() {
     sidepanel.classList.add('hidden-right');
 }
-
 function onDataGridEntryClick(e) {
-    if (selecting) {
-        selecting = false;
-        return;
-    }
-
-    const template = e.target.parentNode.querySelector('template');
+    const template = e.currentTarget.querySelector('template');
     sidepanel.innerHTML = '';
     sidepanel.appendChild(document.importNode(template.content, true));
     sidepanel.classList.remove('hidden-right');
 }
+
+overlay.addEventListener('click', () => {
+    sidepanel.classList.add('hidden-right');
+});

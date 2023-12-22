@@ -1,0 +1,344 @@
+﻿:root {
+    --background-color: white;
+
+    --text-color-dark: #50514f;
+    /*--text-color-light: white;*/
+    --header-color: #50514F;
+    --row-color: #f8f6ff;
+    --text-accent-color-dark: #848683;
+    --text-color-light: white;
+
+    --color-severity-low: var(--text-color-dark);
+    --color-severity-medium: #F8C630;
+    --color-severity-high: #FA8420;
+    --color-severity-extreme: #C21906;
+
+    /* will work on implementing this later, highlighting antag status in the more details page*/
+    --color-mark-antag: #9AC4F8;
+    --color-mark-non-antag: var(--text-color-dark);
+}
+
+.on-click-log {
+    cursor: pointer;
+}
+
+.on-click-log > * {
+    border-bottom: 1px dashed #00000000;
+    transition: border-color linear .05s;
+}
+
+.on-click-log:hover > * {
+    border-bottom: 1px dashed var(--text-color-dark);
+}
+
+.entity-link {
+    text-decoration-line: none;
+    font-weight: bold;
+}
+
+.sidepanel-overlay {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-color: #00000077;
+}
+
+.sidepanel {
+    position: absolute;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    width: 33vw;
+    background-color: var(--background-color, white);
+}
+
+.dot {
+    font-weight: bold;
+}
+
+data-grid label
+{
+    display: block;
+    margin-bottom: 4px;
+}
+
+body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    margin-bottom: 0 !important;
+}
+
+nav.mb-3 {
+    margin-bottom: 0 !important;
+}
+
+body > .container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+main.pb-3 {
+    padding-bottom: 0 !important;
+}
+
+/*Specific layout for this page, thanks julian :)*/
+.data-grid-table {
+    grid-template-columns:
+            minmax(120px, 0.1fr)
+            minmax(110px, 0.1fr)
+            minmax(180px, 0.2fr)
+            minmax(110px, 0.2fr)
+            minmax(150px, 1.5fr);
+    max-height: calc(calc(100vh - 116px) - var(--footer-height, 0));
+}
+
+data-grid-footer {
+    padding-top: 0.5rem;
+}
+
+data-grid {
+    display: block;
+    width: 100%;
+    /*--header-color-secondary: #6c7ae0;*/
+    --header-color-secondary: white;
+    --text-color-dark: #50514f;
+    /*--header-color-secondary: #463F3A;*/
+    --header-color: #50514F;
+    /*--row-color: #f8f6ff;*/
+    /*--row-color: #f2f2f2;*/
+
+    --color-filter-search: #64a3ff;
+    --color-filter-type: #F78764;
+
+    /*layout*/
+    --search-box-width: 400px;
+}
+
+data-grid-filter .flex-row {
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap if they exceed the width */
+}
+
+/* Update individual form-group elements to ensure they don't extend beyond the available width */
+.data-grid-filter .form-group {
+    flex: 1 1 20%; /* Adjust the width of each form-group as needed */
+    margin-right: 10px; /* Add space between form-groups */
+    margin-bottom: 10px; /* Add space between rows */
+    /* You can also adjust other styles like padding, etc., based on your design */
+}
+
+data-grid data-grid-filter {
+    padding: 15px;
+    width: 100%;
+    align-items: baseline;
+    background: var(--header-color-secondary);
+    color: var(--text-color-dark);
+    font-weight: normal;
+    font-size: 1.1rem;
+}
+
+data-grid-filter input {
+    height: 30px;
+    min-width: 220px;
+}
+
+data-grid-filter .grid-search{
+    width: var(--search-box-width);
+}
+
+data-grid-filter .grid-search.search-box-active {
+    border-style: none;
+    border-radius: 3px 3px 0 0;
+    border-bottom: none;
+}
+
+data-grid .search-popover {
+    z-index: 99;
+    width: var(--search-box-width);
+    background-color: white;
+    color: var(--text-color-dark);
+    border-top: solid 1px var(--text-color-dark);
+    padding: 4px;
+    font-size: 0.9rem;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+data-grid .search-result:first-of-type {
+    margin: 0;
+}
+
+data-grid .search-result {
+    margin: 4px 0;
+    cursor: pointer;
+    transition: transform linear 0.05s, background-color linear 0.05s;
+}
+
+data-grid .search-result:hover {
+    background-color: var(--row-color);
+}
+
+data-grid .search-result:focus {
+    transform: translateX(2px);
+}
+
+data-grid .search-popover .result-tag {
+    display: inline-block;
+    font-weight: bold;
+    min-width: 50px;
+}
+
+data-grid-filter button.btn:hover {
+    color: var(--header-color);
+}
+
+data-grid-filter button:active {
+    transform: scale(0.95);
+}
+data-grid .flex-row {
+    display: flex;
+    gap: 15px;
+    max-width: 100%;
+}
+
+data-grid .flex-seperator {
+    flex-grow: 1;
+}
+
+.results-table{
+    z-index: 1;
+}
+
+data-grid > table {
+    display: grid;
+    border-collapse: collapse;
+    min-width: 100%;
+    grid-template-columns:
+        minmax(120px, 0.1fr) /* Round ID */
+        minmax(120px, 0.1fr) /* Server */
+        minmax(100px, 0.1fr) /* Severity */
+        minmax(180px, 0.15fr) /* Date */
+        minmax(130px, 0.15fr) /* Type */
+        minmax(150px, 1.5fr); /* Message */
+    overflow-y: auto;
+    max-height: calc(100vh - 120px);
+    font-size: 1rem;
+}
+
+data-grid > table > tbody {
+    overflow-y: scroll;
+}
+
+data-grid > table .text-center
+{
+    text-align: center;
+}
+
+data-grid > table
+thead,
+tbody,
+tr {
+    display: contents;
+}
+
+data-grid > table
+th,
+td {
+    padding: 4px 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 1.2em;
+}
+
+data-grid > table
+th {
+    position: sticky;
+    top: 0;
+    background: var(--header-color);
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.1em;
+    color: var(--text-color-light);
+    border-bottom: solid 2px #dee2e6 !important;
+}
+
+data-grid > table
+th:last-child {
+    border: 0;
+}
+
+data-grid > table
+td {
+    color: var(--text-color-dark);
+}
+
+data-grid > table
+tr:nth-child(even) td {
+    background: var(--row-color);
+}
+
+.btn.btn-sm{
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+option.Any{
+    color: var(--color-severity-low);
+    font-weight: bold;
+}
+
+option.Low{
+    color: var(--color-severity-low);
+    font-weight: bold;
+}
+option.Medium{
+    color: var(--color-severity-medium);
+    font-weight: bold;
+}
+option.High{
+    color: var(--color-severity-high);
+    font-weight: bold;
+}
+option.Extreme{
+    color: var(--color-severity-extreme);
+    font-weight: bold;
+}
+
+#autocomplete-container {
+    position: relative;
+}
+
+#autocompleteOptions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 9999;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    max-height: fit-content;
+    overflow-y: hidden;
+    width: calc(100% - 2px); /* Adjust width */
+    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
+}
+
+#autocompleteOptions div {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    z-index: 9999;
+}
+
+#autocompleteOptions div.highlighted {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    z-index: 9999;
+}
