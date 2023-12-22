@@ -58,10 +58,10 @@ $(document).ready(function() {
     });
 });
 
-//Search key combination
-document.onkeydown = function (e) {
-    if (e.ctrlKey && e.key === 'f') {
-        e.preventDefault();
-        search.focus();
-    }
-};
+//Search key combination (removed for now to fix #10677)
+// document.onkeydown = function (e) {
+//     if (e.ctrlKey && e.key === 'f') {
+//         e.preventDefault();
+//         search.focus();
+//     }
+// };
