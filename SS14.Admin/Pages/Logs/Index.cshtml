@@ -1,96 +1,83 @@
 ﻿@page
+@model SS14.Admin.Pages.Logs.LogsIndexModel
 @using SS14.Admin.AdminLogs
 @using SS14.Admin.Helpers
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model SS14.Admin.Pages.Logs.LogsIndexModel
 
 @{
-    ViewData["Title"] = "Admin logs";
+    ViewData["Title"] = "Admin Logs";
     var prevDisabled = Model.PageIndex == 0 ? "disabled" : "";
-    var nextDisabled = Model.Items.Count == 0 ? "disabled" : "";
+    var nextDisabled = (Model.Items.Count == 0) ? "disabled" : "";
     var nextPageIdx = Model.PageIndex + 1;
     var prevPageIdx = Model.PageIndex == 1 ? null : (int?) Model.PageIndex - 1;
 }
-
-<style>
-    body {
-        margin-bottom: 0 !important;
-    }
-
-    nav.mb-3 {
-        margin-bottom: 0 !important;
-    }
-
-    body > .container-fluid {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-
-    main.pb-3 {
-        padding-bottom: 0 !important;
-    }
-
-    /*Specific layout for this page*/
-    .data-grid-table {
-            grid-template-columns:
-            minmax(120px, 0.1fr)
-            minmax(110px, 0.1fr)
-            minmax(180px, 0.2fr)
-            minmax(110px, 0.2fr)
-            minmax(150px, 1.5fr);
-            max-height: calc(calc(100vh - 116px) - var(--footer-height, 0));
-    }
-
-    data-grid-footer {
-        padding-top: 0.5rem;
-    }
-</style>
+@section Styles {
+    <link href="@Url.Content("~/css/logs.css")" rel="stylesheet" type="text/css"/>
+}
 
 <data-grid>
     <data-grid-filter class="flex-row">
-        <p>Round: </p>
-        <input type="number" placeholder="any" id="round-input" value="@Model.RoundId"/>
-        <p>Filter: </p>
-        <input class="grid-search" id="search" type="text" placeholder="search [ctrl+f]"/>
-        <div id="search-popover" class="search-popover hidden" tabindex="1">
-            @foreach (var tag in Enum.GetValues<LogFilterTags>())
-            {
-                <div class="search-result" data-search-tag="@tag.ToString()" tabindex="0">
-                    <span class="result-tag">@tag.ToString():</span> <span class="result-content"></span>
-                </div>
-            }
+        <div class="form-group" style="display: inline-block; align-items: center;">
+            <div style="display: inline-block">
+                <label for="datePicker">Date Range:<button id="litepicker-close" class="btn btn-sm"><i class="fas fa-times"></i></button></label>
+                <input class="form-control" name="daterange" id="datePicker" type="text" value="@(Model.FromDate)" placeholder="Date from - to"/>
+            </div>
         </div>
-        <p>Date Range: </p>
-        <input id="litepicker" type="text" placeholder="Date from - to"/>
-        @if (Model.FromDate != default || Model.ToDate != default)
-        {
-            <button id="litepicker-close" class="btn btn-sm"><i class="fas fa-times"></i>x</button>
-        }
-        <!-- The dropdown for sort is also temporary until my next PR -->
-        <p>Sort: </p>
-        <select id="sort-select">
-            @foreach (var sortColumn in Enum.GetValues<LogsIndexModel.OrderColumn>())
-            {
-                <option value="@sortColumn.ToString()" selected="@sortColumn.Equals(Model.Sort)">@sortColumn.ToString()</option>
-            }
-        </select>
-        <div class="applied-filters flex-row">
+        <div class="form-group">
+            <label for="search">Text Search</label>
+            <input name="search" class="form-control" id="search" type="text" placeholder="Search"/>
         </div>
+        <div class="form-group">
+            <label for="server">Server</label>
+            <input id="server" name="server" class="form-control" type="text" placeholder="Any"/>
+        </div>
+        <div class="form-group">
+            <label for="roundId">Round</label>
+            <input id="roundId" name="roundId" class="form-control" type="number" placeholder="Any"/>
+        </div>
+        <div class="form-group">
+            <label for="player">Player</label>
+            <input id="player" name="player" class="form-control" type="text" placeholder="All Players"/>
+        </div>
+        <div class="form-group" id="autocomplete-container">
+            <label for="logTypeInput">Type</label>
+            <input id="logTypeInput" name="type" class="form-control" type="text" placeholder="Any"/>
+            <div id="autocompleteOptions"></div>
+        </div>
+        <div class="form-group">
+            <label for="severitySelect">Severity</label>
+            <select class="form-control" name="severity" id="severitySelect">
+                @foreach (var option in Model.SeverityOptions)
+                {
+                    if (Model.SeveritySearch == option.Key)
+                    {
+                        <option class="@option.Value" value="@option.Key" selected>@option.Value</option>
+                    }
+                    else
+                    {
+                        <option class="@option.Value" value="@option.Key">@option.Value</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="flex-seperator"></div>
     </data-grid-filter>
-    <table class="data-grid-table">
+    <table class="results-table">
         <thead>
         <tr>
+            <th>Round Id</th>
             <th>Server</th>
-            <th>Severity</th>
+            <th class="text-center">Severity</th>
             <th>Date</th>
             <th>Type</th>
             <th>Message</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="table-body">
         @foreach (var entry in Model.Items)
         {
             <tr class="on-click data-log">
+                <td>@entry.RoundId</td>
                 <td>@entry.Round?.Server?.Name</td>
                 <td class="text-center colored" style="--cell-color: var(@entry.Impact.CssColorVarName())">@entry.Impact.ToString()</td>
                 <td>@entry.Date</td>
@@ -99,7 +86,7 @@
                 <template>
                     <div class="log-details-header flex-row" style="--cell-color: var(@entry.Impact.CssColorVarName())">
                         <h2>Details</h2>
-                        <span class="details-close fa fa-times" onclick="onDetailsClose()">x</span>
+                        <span class="details-close fa fa-times" onclick="onDetailsClose()"></span>
                     </div>
                     <div class="log-details-sub log-muted">
                         <p>Server: <a href="#">@entry.Round?.Server?.Name</a></p>
@@ -115,6 +102,8 @@
         }
         </tbody>
     </table>
+    <data-grid-footer class="flex-row">
+    </data-grid-footer>
 
     @if (Model.Items.Count == 0)
     {
@@ -123,35 +112,52 @@
         </div>
     }
 
-    <data-grid-footer class="flex-row flex-center">
-        <a asp-page="./Index"
-           asp-all-route-data="@Model.AllRouteData.ShallowClone()"
-           asp-route-pageIndex="@prevPageIdx"
-           class="btn btn-primary btn-sm @prevDisabled">
-            Previous
-        </a>
-        <div class="form-horizontal">
-            <select name="count" id="count-select" class="form-control form-control-sm" value="@Model.PerPage">
-                <option value="100">100</option>
-                <option value="250">250</option>
-                <option value="500">500</option>
-            </select>
-        </div>
-        <a asp-page="./Index"
-           asp-all-route-data="@Model.AllRouteData.ShallowClone()"
-           asp-route-pageIndex="@nextPageIdx"
-           class="btn btn-primary btn-sm @nextDisabled">
-            Next
-        </a>
-    </data-grid-footer>
+    @if (Model.Items.Count != 0)
+    {
+        <data-grid-footer class="flex-row flex-center">
+            <a asp-page="./Index"
+               asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+               asp-route-pageIndex="@prevPageIdx"
+               class="btn btn-primary btn-sm @prevDisabled">
+                Previous
+            </a>
+            <div class="form-horizontal">
+                <select name="countselect" id="countselect" class="form-control form-control-sm" value="@Model.PerPage">
+                    @foreach (var amount in Model.PaginationOptions)
+                    {
+                        if (Model.PerPage.ToString() == amount)
+                        {
+                            <option value="@amount" selected>@amount</option>
+                        }
+                        else
+                        {
+                            <option value="@amount">@amount</option>
+                        }
+                    }
+                </select>
+            </div>
+            <a asp-page="./Index"
+               asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+               asp-route-pageIndex="@nextPageIdx"
+               class="btn btn-primary btn-sm @nextDisabled">
+                Next
+            </a>
+        </data-grid-footer>
+    }
 </data-grid>
+
 <div class="side-panel-container">
     <div id="side-panel-overlay" class="side-panel-overlay hidden"></div>
     <div id="side-panel" class="side-panel transition-right hidden-right"></div>
 </div>
 
 @section scripts {
+    <script type="application/javascript">
+        // Putting the "JavaScript" in "JavaScript Object Notation"
+        const AdminLogType = @Html.Raw(AdminLogTypeHelper.AdminLogTypeJson);
+    </script>
     <script src="~/js/datepicker.js" asp-append-version="true"></script>
     <script src="~/js/logs-search.js" asp-append-version="true"></script>
     <script src="~/js/logs-grid.js" asp-append-version="true"></script>
+    <script src="~/js/log-type-autocomplete.js" asp-append-version="true"></script>
 }

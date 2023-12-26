@@ -20,6 +20,7 @@ public static class AdminLogRepository
         LogType? type,
         string? search,
         int? roundId,
+        int? severity,
         LogsIndexModel.OrderColumn sort,
         int limit = 100, int offset = 0)
     {
@@ -39,6 +40,7 @@ public static class AdminLogRepository
         if (typeInt != null) values.Add(typeInt);
         if (search != null) values.Add(search);
         if (roundId.HasValue) values.Add(roundId);
+        if (severity != null) values.Add(severity);
 
 
         values.Add(limit.ToString());
@@ -63,6 +65,7 @@ public static class AdminLogRepository
                 {(typeInt != null ? "a.type = #::integer AND" : "")}
                 {(search != null ? $"{TextSearchForContext(context)} AND" : "")}
                 {(roundId != null ? "r.round_id = #::integer AND" : "")}
+                {(severity != null ? "a.impact = #::integer AND" : "")}
                 TRUE
             ORDER BY {sortStatement} DESC
             LIMIT #::bigint OFFSET #::bigint

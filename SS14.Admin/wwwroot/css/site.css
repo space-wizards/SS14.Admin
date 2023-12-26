@@ -174,11 +174,11 @@ data-grid .search-popover .result-tag {
 }
 
 data-grid-filter button.btn {
-    color: var(--text-color-light);
+    color: var(--text-color-dark);
 }
 
 data-grid-filter button.btn:hover {
-    color: var(--header-color);
+    color: var(--text-color-dark);
 }
 
 data-grid-filter button:active {
@@ -272,7 +272,7 @@ data-grid > table td {
 
 data-grid > table th:first-of-type,
 data-grid > table td:first-of-type {
-    padding-left: 2rem;
+    text-align: center;
 }
 
 data-grid > table th {
