@@ -152,6 +152,10 @@
 </div>
 
 @section scripts {
+    <script type="application/javascript">
+        // Putting the "JavaScript" in "JavaScript Object Notation"
+        const AdminLogType = @Html.Raw(AdminLogTypeHelper.AdminLogTypeJson);
+    </script>
     <script src="~/js/datepicker.js" asp-append-version="true"></script>
     <script src="~/js/logs-search.js" asp-append-version="true"></script>
     <script src="~/js/logs-grid.js" asp-append-version="true"></script>
