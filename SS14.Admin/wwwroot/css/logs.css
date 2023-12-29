@@ -280,10 +280,6 @@ td {
     color: var(--text-color-dark);
 }
 
-data-grid > table
-tr:nth-child(even) td {
-    background: var(--row-color);
-}
 
 .btn.btn-sm{
     padding-bottom: 0;

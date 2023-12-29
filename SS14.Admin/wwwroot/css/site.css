@@ -285,22 +285,11 @@ data-grid > table th {
     color: var(--text-color-light);
 }
 
-data-grid > table th a,
-data-grid > table th a:hover {
-    color: var(--text-color-light);
-}
 
 data-grid > table th:last-child {
     border: 0;
 }
 
-data-grid > table td {
-    color: var(--text-color-dark);
-}
-
-data-grid > table tr:nth-child(even) td {
-    background: var(--row-color);
-}
 
 data-grid-footer {
     height: var(--footer-height, 0);
@@ -354,7 +343,7 @@ data-grid-footer {
     top: 0;
     right: 0;
     width: 26vw;
-    background-color: var(--background-color, white);
+    /*background-color: var(--background-color, white);*/
     pointer-events: all;
     padding: 1rem;
     color: var(--text-color-dark)

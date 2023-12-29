@@ -3,10 +3,13 @@
 
 @{
     var signIn = SignInManager.GetSignInData(User);
+    var darkMode = Context.Request.Cookies["darkMode"] == "true";
+    var darkModeClass = darkMode ? "dark" : "light";
+    var textClass = darkMode ? "text-light" : "text-dark";
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="@darkModeClass">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -18,7 +21,7 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-@darkModeClass border-bottom box-shadow mb-3">
         <div class="container">
             <a class="navbar-brand" asp-area="" asp-page="/Index">SS14.Admin</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -30,7 +33,7 @@
                 {
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Index">Login</a>
+                            <a class="nav-link @textClass" asp-area="" asp-controller="Login" asp-action="Index">Login</a>
                         </li>
                     </ul>
                 }
@@ -38,31 +41,31 @@
                 {
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <span class="nav-link text-dark">Hello @signIn.Name</span>
+                            <span class="nav-link @textClass">Hello @signIn.Name</span>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Logout">Logout</a>
+                            <a class="nav-link @textClass" asp-area="" asp-controller="Login" asp-action="Logout">Logout</a>
                         </li>
                     </ul>
                 }
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Bans/Index">Bans</a>
+                        <a class="nav-link @textClass" asp-area="" asp-page="/Bans/Index">Bans</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/RoleBans/Index">Role bans</a>
+                        <a class="nav-link @textClass" asp-area="" asp-page="/RoleBans/Index">Role bans</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Players/Index">Players</a>
+                        <a class="nav-link @textClass" asp-area="" asp-page="/Players/Index">Players</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Connections/Index">Connections</a>
+                        <a class="nav-link @textClass" asp-area="" asp-page="/Connections/Index">Connections</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Logs/Index">Logs</a>
+                        <a class="nav-link @textClass" asp-area="" asp-page="/Logs/Index">Logs</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Characters/Index">Characters</a>
+                        <a class="nav-link @textClass" asp-area="" asp-page="/Characters/Index">Characters</a>
                     </li>
                 </ul>
             </div>
