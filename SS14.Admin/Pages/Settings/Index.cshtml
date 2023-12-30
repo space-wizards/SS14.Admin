@@ -1,0 +1,21 @@
+﻿@page
+@model SS14.Admin.Pages.Settings.Index
+
+@{
+    ViewData["Title"] = "Settings";
+    var darkMode = Request.Cookies["darkMode"] == "true";
+    var darkModeClass = darkMode ? "dark" : "light";
+    var textClass = darkMode ? "text-light" : "text-dark";
+}
+
+@* TODO: Make this actually look good*@
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Settings</h1>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="toggleDarkMode()">Toggle darkmode</button>
+</div>
+
+<script src="~/js/settings.js" asp-append-version="true"></script>
