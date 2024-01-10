@@ -285,22 +285,11 @@ data-grid > table th {
     color: var(--text-color-light);
 }
 
-data-grid > table th a,
-data-grid > table th a:hover {
-    color: var(--text-color-light);
-}
 
 data-grid > table th:last-child {
     border: 0;
 }
 
-data-grid > table td {
-    color: var(--text-color-dark);
-}
-
-data-grid > table tr:nth-child(even) td {
-    background: var(--row-color);
-}
 
 data-grid-footer {
     height: var(--footer-height, 0);
@@ -354,7 +343,7 @@ data-grid-footer {
     top: 0;
     right: 0;
     width: 26vw;
-    background-color: var(--background-color, white);
+    /*background-color: var(--background-color, white);*/
     pointer-events: all;
     padding: 1rem;
     color: var(--text-color-dark)
@@ -420,4 +409,30 @@ hr.line-inset {
 
 .log-details-sub > p{
     margin: 0 0 0.5rem;
+}
+
+[data-bs-theme="dark"] h1:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h2:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h3:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h4:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h5:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h6:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] label:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] p:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] a:not(.btn):not(.nav-link):not(navbar-brand) {
+    --bs-text-opacity: 1;
+    color: rgba(var(--bs-light-rgb),var(--bs-text-opacity))!important;
+}
+
+[data-bs-theme="light"] h1:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h2:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h3:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h4:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h5:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h6:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] label:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] p:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] a:not(.btn):not(.nav-link):not(navbar-brand) {
+    --bs-text-opacity: 1;
+    color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity))!important;
 }
