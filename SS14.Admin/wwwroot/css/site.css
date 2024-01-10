@@ -410,3 +410,29 @@ hr.line-inset {
 .log-details-sub > p{
     margin: 0 0 0.5rem;
 }
+
+[data-bs-theme="dark"] h1:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h2:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h3:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h4:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h5:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] h6:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] label:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] p:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="dark"] a:not(.btn):not(.nav-link):not(navbar-brand) {
+    --bs-text-opacity: 1;
+    color: rgba(var(--bs-light-rgb),var(--bs-text-opacity))!important;
+}
+
+[data-bs-theme="light"] h1:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h2:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h3:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h4:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h5:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] h6:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] label:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] p:not(.btn):not(.nav-link):not(navbar-brand),
+[data-bs-theme="light"] a:not(.btn):not(.nav-link):not(navbar-brand) {
+    --bs-text-opacity: 1;
+    color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity))!important;
+}
