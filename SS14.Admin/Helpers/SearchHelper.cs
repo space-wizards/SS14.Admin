@@ -2,6 +2,7 @@
 using System.Net;
 using Content.Server.Database;
 using Microsoft.EntityFrameworkCore;
+using WhitelistJoin = SS14.Admin.Helpers.WhitelistHelper.WhitelistJoin;
 
 namespace SS14.Admin.Helpers;
 
@@ -113,6 +114,22 @@ public static class SearchHelper
         var hwid = new byte[Constants.HwidLength];
         if (Convert.TryFromBase64String(search, hwid, out var len) && len == Constants.HwidLength)
             CombineSearch(ref expr, u => u.LastSeenHWId == hwid);
+
+        return query.Where(expr);
+    }
+
+    public static IQueryable<WhitelistJoin> SearchWhitelist(IQueryable<WhitelistJoin> query, string? search)
+    {
+        if (string.IsNullOrWhiteSpace(search))
+            return query;
+
+        search = search.Trim();
+
+        var normalized = search.ToUpperInvariant();
+        Expression<Func<WhitelistJoin, bool>> expr = u => u.Player!.LastSeenUserName.ToUpper().Contains(normalized);
+
+        if (Guid.TryParse(search, out var guid))
+            CombineSearch(ref expr, u => u.Whitelist.UserId == guid);
 
         return query.Where(expr);
     }

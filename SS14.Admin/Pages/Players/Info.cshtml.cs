@@ -13,6 +13,7 @@ public sealed class Info : PageModel
     private readonly PostgresServerDbContext _dbContext;
     private readonly BanHelper _banHelper;
 
+    public bool Whitelisted { get; set; }
     public Player Player { get; set; } = default!;
     public AdminNote[] Notes { get; set; } = default!;
     public PlayTime[] PlayTimes { get; set; } = default!;
@@ -79,6 +80,8 @@ public sealed class Info : PageModel
             .OrderBy(t => t.Slot)
             .Include(t => t.Jobs)
             .ToArrayAsync();
+
+        Whitelisted = await _dbContext.Whitelist.AnyAsync(p => p.UserId == userId);
 
         return Page();
     }

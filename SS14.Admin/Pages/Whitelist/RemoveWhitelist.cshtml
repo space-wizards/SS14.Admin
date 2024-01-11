@@ -1,0 +1,17 @@
+﻿@page
+@model SS14.Admin.Pages.Whitelist.RemoveWhitelist
+
+@{
+    var playerName = Model.Player is { } player
+        ? $"{player.LastSeenUserName} ({Model.Whitelist.UserId})"
+        : Model.Whitelist.UserId.ToString();
+
+    ViewData["Title"] = $"Remove whitelist - {playerName}";
+}
+
+<form method="post" class="container" asp-route-userId="@Model.Whitelist.UserId">
+    <div class="mb-3 form-label">
+        Are you sure you want to remove the whitelist for <strong>@playerName</strong>?
+    </div>
+    <input type="submit" value="Remove" class="btn btn-danger">
+</form>

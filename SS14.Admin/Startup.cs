@@ -25,6 +25,7 @@ namespace SS14.Admin
             services.AddScoped<SignInManager>();
             services.AddScoped<LoginHandler>();
             services.AddScoped<BanHelper>();
+            services.AddScoped<PlayerLocator>();
             services.AddHttpContextAccessor();
 
             var connStr = Configuration.GetConnectionString("DefaultConnection");
@@ -42,6 +43,7 @@ namespace SS14.Admin
                 options.Conventions.AuthorizeFolder("/RoleBans");
                 options.Conventions.AuthorizeFolder("/Logs");
                 options.Conventions.AuthorizeFolder("/Characters");
+                options.Conventions.AuthorizeFolder("/Whitelist");
             });
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

@@ -1,0 +1,19 @@
+﻿@page
+@model SS14.Admin.Pages.Whitelist.AddWhitelist
+
+@{
+    ViewData["Title"] = "Add whitelist";
+}
+
+<partial name="Shared/StatusMessageAlert" model="@Model.StatusMessage"/>
+
+<form method="post" class="container">
+    <div class="mb-3 form-label">
+        <label asp-for="Input.NameOrUid" class="form-label">
+            Name / User ID to whitelist
+        </label>
+        <input asp-for="Input.NameOrUid" type="text" class="form-control"></input>
+    </div>
+
+    <input type="submit" value="Add" class="btn btn-primary">
+</form>

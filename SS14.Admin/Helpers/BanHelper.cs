@@ -12,17 +12,20 @@ namespace SS14.Admin.Helpers;
 public sealed class BanHelper
 {
     private readonly PostgresServerDbContext _dbContext;
+    private readonly PlayerLocator _playerLocator;
     private readonly IConfiguration _configuration;
     private readonly ILogger<BanHelper> _logger;
     private readonly IHttpContextAccessor _httpContext;
 
     public BanHelper(
         PostgresServerDbContext dbContext,
+        PlayerLocator playerLocator,
         IConfiguration configuration,
         ILogger<BanHelper> logger,
         IHttpContextAccessor httpContext)
     {
         _dbContext = dbContext;
+        _playerLocator = playerLocator;
         _configuration = configuration;
         _logger = logger;
         _httpContext = httpContext;
@@ -122,28 +125,9 @@ public sealed class BanHelper
 
         if (!string.IsNullOrWhiteSpace(nameOrUid))
         {
-            nameOrUid = nameOrUid.Trim();
-            if (Guid.TryParse(nameOrUid, out var guid))
-            {
-                ban.PlayerUserId = guid;
-            }
-            else
-            {
-                try
-                {
-                    ban.PlayerUserId = await FindPlayerGuidByNameAsync(nameOrUid);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "Unable to fetch user ID from auth server");
-                    return "Error: Unknown error occured fetching user ID from auth server.";
-                }
-
-                if (ban.PlayerUserId == null)
-                {
-                    return $"Error: Unable to find user with name {nameOrUid}";
-                }
-            }
+            ban.PlayerUserId = await _playerLocator.Resolve(nameOrUid);
+            if (ban.PlayerUserId == null)
+                return $"Error: Unable to find user with name {nameOrUid}";
         }
 
         if (!string.IsNullOrWhiteSpace(ip))
@@ -178,38 +162,4 @@ public sealed class BanHelper
         ban.BanTime = DateTime.UtcNow;
         return null;
     }
-
-    private async Task<Guid?> FindPlayerGuidByNameAsync(string name)
-    {
-        // Try our own database first, in case this is a guest or something.
-
-        var player = await _dbContext.Player
-            .Where(p => p.LastSeenUserName == name)
-            .OrderByDescending(p => p.LastSeenTime)
-            .FirstOrDefaultAsync();
-
-        if (player != null)
-            return player.UserId;
-
-        var server = _configuration["AuthServer"];
-        var client = new HttpClient();
-
-        var url = $"{server}/api/query/name?name={Uri.EscapeDataString(name)}";
-
-        var resp = await client.GetAsync(url);
-        if (resp.StatusCode == HttpStatusCode.NotFound)
-        {
-            return null;
-        }
-
-        resp.EnsureSuccessStatusCode();
-
-        return (await resp.Content.ReadFromJsonAsync<QueryUserResponse>())!.UserId;
-    }
-
-    private sealed record QueryUserResponse(
-        string UserName,
-        Guid UserId,
-        string? PatronTier,
-        DateTimeOffset CreatedTime);
 }

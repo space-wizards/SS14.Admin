@@ -24,6 +24,17 @@
         <dd class="col-sm-10 monotype">@Model.Player.LastSeenAddress</dd>
         <dt class="col-sm-2">Last seen HWID:</dt>
         <dd class="col-sm-10 monotype">@BanHelper.FormatHwid(Model.Player.LastSeenHWId)</dd>
+        <dt class="col-sm-2">Whitelisted:</dt>
+        <dd class="col-sm-10 monotype">
+            @if (Model.Whitelisted)
+            {
+                <text><strong>yes</strong> (<a asp-page="../Whitelist/RemoveWhitelist" asp-route-userId="@Model.Player.UserId">remove</a>)</text>
+            }
+            else
+            {
+                <text><strong>no</strong> (<a asp-page="../Whitelist/AddWhitelist" asp-route-name="@Model.Player.UserId">add</a>)</text>
+            }
+        </dd>
     </dl>
 </div>
 
