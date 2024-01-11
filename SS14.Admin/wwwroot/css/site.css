@@ -436,3 +436,11 @@ hr.line-inset {
     --bs-text-opacity: 1;
     color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity))!important;
 }
+
+[data-bs-theme="dark"] .table-success {
+    --bs-table-bg: var(--bs-success-bg-subtle);
+    --bs-table-striped-bg: #082B1B;
+    --bs-table-border-color: var(--bs-success-border-subtle);
+    --bs-table-color: #fff;
+    --bs-table-striped-color: #fff;
+}
