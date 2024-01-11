@@ -14,13 +14,13 @@
         <dt class="col-sm-2">Name:</dt>
         <dd class="col-sm-10">@Model.Log.UserName</dd>
         <dt class="col-sm-2">User ID:</dt>
-        <dd class="col-sm-10 monotype">@Model.Log.UserId</dd>
+        <dd class="col-sm-10 font-monospace">@Model.Log.UserId</dd>
         @if (User.IsInRole("ADMIN"))
         {
             <dt class="col-sm-2">IP:</dt>
-            <dd class="col-sm-10 monotype">@Model.Log.Address</dd>
+            <dd class="col-sm-10 font-monospace">@Model.Log.Address</dd>
             <dt class="col-sm-2">HWID:</dt>
-            <dd class="col-sm-10 monotype">@BanHelper.FormatHwid(Model.Log.HWId)</dd>
+            <dd class="col-sm-10 font-monospace">@BanHelper.FormatHwid(Model.Log.HWId)</dd>
         }
         <dt class="col-sm-2">Time:</dt>
         <dd class="col-sm-10">@Model.Log.Time.ToString("yyyy-MM-dd HH:mm:ss")</dd>

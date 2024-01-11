@@ -39,10 +39,10 @@
                 <strong>@player.LastSeenUserName</strong>
                 <br/>
             </td>
-            <td class="monotype small">@player.UserId</td>
+            <td class="font-monospace small">@player.UserId</td>
             <td>@player.LastSeenTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
-            <td class="monotype constrained-150">@player.LastSeenAddress</td>
-            <td class="monotype constrained-150">@BanHelper.FormatHwid(player.LastSeenHWId)</td>
+            <td class="font-monospace constrained-150">@player.LastSeenAddress</td>
+            <td class="font-monospace constrained-150">@BanHelper.FormatHwid(player.LastSeenHWId)</td>
             <td>@player.FirstSeenTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
             <td>
                 <a asp-page="/Players/Info" asp-route-userId="@player.UserId" class="btn btn-secondary">Player Info</a>

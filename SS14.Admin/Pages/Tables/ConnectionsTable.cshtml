@@ -32,10 +32,10 @@
                 }
                 <br/>
             </td>
-            <td class="monotype">@log.UserId</td>
+            <td class="font-monospace">@log.UserId</td>
             <td>@log.Time.ToString("yyyy-MM-dd HH:mm:ss")</td>
-            <td class="monotype constrained-150">@log.Address</td>
-            <td class="monotype constrained-150">@(log.HWId is { } hwid ? Convert.ToBase64String(hwid) : null)</td>
+            <td class="font-monospace constrained-150">@log.Address</td>
+            <td class="font-monospace constrained-150">@(log.HWId is { } hwid ? Convert.ToBase64String(hwid) : null)</td>
             <td>
                 @switch (log.Denied)
                 {
