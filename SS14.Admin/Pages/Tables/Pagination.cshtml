@@ -14,8 +14,7 @@
             var nullCount = Model.DefaultPerPage == count ? null : (int?) count;
             <a asp-all-route-data="@Model.AllRouteData.ShallowClone()"
                asp-route-perPage="@nullCount">
-                @count
-            </a>
+                @count</a>
         }
     }
 }
