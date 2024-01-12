@@ -5,7 +5,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{9EF4394B-AAD3-4D61-8D0D-ED334A1E5FF5}"
 ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
-	global.json = global.json
 	README.md = README.md
 EndProjectSection
 EndProject
