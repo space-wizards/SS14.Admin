@@ -116,10 +116,21 @@
                     @note.RoundId
                 </td>
                 <td>
-                    @note.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")<br/>by @note.CreatedBy.LastSeenUserName
+                    @note.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")<br/>
+                    by @(note.CreatedBy?.LastSeenUserName ?? "unknown")
                 </td>
                 <td>
-                    @note.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")<br/>by @note.CreatedBy.LastSeenUserName
+                    @if (note.LastEditedAt != null && note.LastEditedBy != null)
+                    {
+                        <text>
+                            @note.LastEditedAt.Value.ToString("yyyy-MM-dd HH:mm:ss")<br/>
+                            by @note.LastEditedBy.LastSeenUserName
+                        </text>
+                    }
+                    else
+                    {
+                        <text>None</text>
+                    }
                 </td>
             </tr>
         }
