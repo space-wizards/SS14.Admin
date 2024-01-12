@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using Content.Server.Database;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 
 namespace SS14.Admin.Helpers;
 
@@ -140,9 +141,9 @@ public sealed class BanHelper
             var parsedIp = parsedAddr.Item1;
             var parsedCidr = parsedAddr.Item2;
             // Ban /64 on IPv6.
-            parsedCidr ??= parsedIp.AddressFamily == AddressFamily.InterNetwork ? 32 : 64;
+            parsedCidr ??= (byte)(parsedIp.AddressFamily == AddressFamily.InterNetwork ? 32 : 64);
 
-            ban.Address = (parsedIp, parsedCidr.Value);
+            ban.Address = new NpgsqlInet(parsedIp, parsedCidr.Value);
         }
 
         if (!string.IsNullOrWhiteSpace(hwid))
