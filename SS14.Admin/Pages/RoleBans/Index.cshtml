@@ -14,7 +14,7 @@
 
 <partial name="Shared/StatusMessageAlert" />
 
-<div class="container">
+<div class="container mb-3">
     @if (User.IsInRole("BAN"))
     {
         <a class="btn btn-primary" asp-page="./Create">Create new ban</a>
@@ -22,7 +22,7 @@
 </div>
 
 
-<form asp-page="./Index" method="get" class="container">
+<form asp-page="./Index" method="get" class="container mb-3">
     @FormHiddenRoutes.Make(Model.AllRouteData, "search", "show")
     <div class="form-group row g-0">
         <label class="col-lg-3 col-form-label" for="searchBar">Search name, ID, HWID, role, IP or admin:</label>
@@ -39,10 +39,10 @@
                     </select>
                 </div>
                 <div class="col-3">
-                    <input type="submit" value="Search" class="btn btn-primary btn-block"/>
+                    <input type="submit" value="Search" class="btn btn-primary btn-block w-100"/>
                 </div>
                 <div class="col-3">
-                    <a class="btn btn-danger btn-block" asp-page="./Index">Clear</a>
+                    <a class="btn btn-danger btn-block w-100" asp-page="./Index">Clear</a>
                 </div>
             </div>
         </div>
