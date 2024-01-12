@@ -15,7 +15,6 @@ namespace SS14.Admin.Pages.Bans
         private readonly BanHelper _banHelper;
 
         [BindProperty] public InputModel Input { get; set; } = new();
-        [TempData] public string? StatusMessage { get; set; }
 
         public Create(PostgresServerDbContext dbContext, BanHelper banHelper)
         {
@@ -36,14 +35,14 @@ namespace SS14.Admin.Pages.Bans
         {
             if (string.IsNullOrWhiteSpace(Input.NameOrUid))
             {
-                StatusMessage = "Error: Must provide name/UID.";
+                TempData.SetStatusError("Must provide name/UID.");
                 return;
             }
 
             var lastInfo = await _banHelper.GetLastPlayerInfo(Input.NameOrUid);
             if (lastInfo == null)
             {
-                StatusMessage = "Unable to find player";
+                TempData.SetStatusError("Unable to find player");
                 return;
             }
 
@@ -65,7 +64,7 @@ namespace SS14.Admin.Pages.Bans
 
             if (error != null)
             {
-                StatusMessage = error;
+                TempData.SetStatusError(error);
                 return Page();
             }
 

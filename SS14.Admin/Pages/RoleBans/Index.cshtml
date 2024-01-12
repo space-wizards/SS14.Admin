@@ -12,24 +12,9 @@
     }
 }
 
+<partial name="Shared/StatusMessageAlert" />
+
 <div class="container">
-    @if (TempData.TryGetValue("StatusMessage", out var stat))
-    {
-        var status = (string)stat!;
-        var statusMessageClass = status.StartsWith("Error") ? "danger" : "success";
-
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    @status
-                </div>
-            </div>
-        </div>
-    }
-
     @if (User.IsInRole("BAN"))
     {
         <a class="btn btn-primary" asp-page="./Create">Create new ban</a>

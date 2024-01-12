@@ -1,17 +1,17 @@
-﻿@model string?
-
-@if (Model == null)
-{
-    return;
-}
-
+﻿@using SS14.Admin.Helpers
 @{
-    var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
+    var statusMsg = (string?) TempData[StatusMessageHelper.KeyMessage];
+    var statusType = (StatusMessageHelper.Type?)TempData[StatusMessageHelper.KeyType];
 }
 
-<div class="container">
-    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
-        @Model
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+@if (!string.IsNullOrWhiteSpace(statusMsg))
+{
+    var statusMessageClass = statusType == StatusMessageHelper.Type.Error ? "danger" : "success";
+
+    <div class="container">
+        <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+            @statusMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     </div>
-</div>
+}

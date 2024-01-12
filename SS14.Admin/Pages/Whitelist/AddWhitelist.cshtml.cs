@@ -2,6 +2,7 @@
 using Content.Server.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
 using WhitelistEntity = Content.Server.Database.Whitelist;
@@ -14,7 +15,6 @@ public class AddWhitelist : PageModel
     private readonly PlayerLocator _playerLocator;
 
     [BindProperty] public InputModel Input { get; set; } = new();
-    [TempData] public string? StatusMessage { get; set; }
 
     public sealed class InputModel
     {
@@ -37,7 +37,7 @@ public class AddWhitelist : PageModel
     {
         if (string.IsNullOrWhiteSpace(Input.NameOrUid))
         {
-            StatusMessage = "Error: no name given";
+            TempData.SetStatusError("No name given");
             return Page();
         }
 
@@ -45,14 +45,14 @@ public class AddWhitelist : PageModel
         var uid = await _playerLocator.Resolve(Input.NameOrUid);
         if (uid == null)
         {
-            StatusMessage = "Unable to find player";
+            TempData.SetStatusError("Unable to find player");
             return Page();
         }
 
         var whitelist = await _dbContext.Whitelist.SingleOrDefaultAsync(w => w.UserId == uid);
         if (whitelist != null)
         {
-            StatusMessage = "Player is already whitelisted";
+            TempData.SetStatusError("Player is already whitelisted");
             return Page();
         }
 
@@ -63,7 +63,7 @@ public class AddWhitelist : PageModel
         await _dbContext.SaveChangesAsync();
 
         TempData["HighlightNewWhitelist"] = uid;
-        StatusMessage = "Successfully added player to whitelist";
+        TempData.SetStatusInformation("Successfully added player to whitelist");
 
         return RedirectToPage("./Index");
     }

@@ -119,23 +119,23 @@ public sealed class BanHelper
         where TUnban : IUnbanCommon
     {
         if (string.IsNullOrWhiteSpace(nameOrUid) && string.IsNullOrWhiteSpace(ip) && string.IsNullOrWhiteSpace(hwid))
-            return "Error: Must provide at least one of name/UID, IP address or HWID.";
+            return "Must provide at least one of name/UID, IP address or HWID.";
 
         if (string.IsNullOrWhiteSpace(reason))
-            return "Error: Must provide reason.";
+            return "Must provide reason.";
 
         if (!string.IsNullOrWhiteSpace(nameOrUid))
         {
             ban.PlayerUserId = await _playerLocator.Resolve(nameOrUid);
             if (ban.PlayerUserId == null)
-                return $"Error: Unable to find user with name {nameOrUid}";
+                return $"Unable to find user with name {nameOrUid}";
         }
 
         if (!string.IsNullOrWhiteSpace(ip))
         {
             ip = ip.Trim();
             if (!IPHelper.TryParseIpOrCidr(ip, out var parsedAddr))
-                return "Error: Invalid IP address/CIDR range";
+                return "Invalid IP address/CIDR range";
 
             var parsedIp = parsedAddr.Item1;
             var parsedCidr = parsedAddr.Item2;
@@ -151,7 +151,7 @@ public sealed class BanHelper
             ban.HWId = new byte[Constants.HwidLength];
 
             if (!Convert.TryFromBase64String(hwid, ban.HWId, out _))
-                return "Error: Invalid HWID";
+                return "Invalid HWID";
         }
 
         if (lengthMinutes != 0)

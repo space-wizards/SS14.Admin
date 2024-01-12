@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using SS14.Admin.Helpers;
 using WhitelistEntity = Content.Server.Database.Whitelist;
 
 namespace SS14.Admin.Pages.Whitelist;
@@ -12,8 +13,6 @@ public class RemoveWhitelist : PageModel
 
     public WhitelistEntity Whitelist = default!;
     public Player? Player;
-
-    [TempData] public string? StatusMessage { get; set; }
 
     public RemoveWhitelist(PostgresServerDbContext dbContext)
     {
@@ -41,7 +40,7 @@ public class RemoveWhitelist : PageModel
         _dbContext.Remove(whitelist);
         await _dbContext.SaveChangesAsync();
 
-        StatusMessage = "Successfully removed whitelist";
+        TempData.SetStatusInformation("Successfully removed whitelist");
         return RedirectToPage("./Index");
     }
 }
