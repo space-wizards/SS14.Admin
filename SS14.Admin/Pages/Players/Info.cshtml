@@ -101,15 +101,15 @@
     <table class="table table-striped mt-3">
         <thead>
         <tr>
-            <th>Type</th>
+            <th style="min-width: 110px">Type</th>
             <th>Message</th>
             <th>Round</th>
-            <th>Severity</th>
+            <th style="min-width: 100px">Severity</th>
             <th>Visible/Seen</th>
             <th>Playtime (h:mm)</th>
-            <th>Expires (UTC)</th>
-            <th>Created</th>
-            <th>Edited</th>
+            <th style="min-width: 130px">Expires (UTC)</th>
+            <th>Created (UTC)</th>
+            <th>Edited (UTC)</th>
         </tr>
         </thead>
         <tbody>
@@ -141,7 +141,7 @@
                         switch (note.Severity)
                         {
                             case NoteSeverity.None:
-                                <text><i class="fas fa-check-circle"></i> None</text>
+                                <span class="text-secondary"><i class="fas fa-check-circle"></i> None</span>
                                 break;
                             case NoteSeverity.Minor:
                                 <span class="text-info"><i class="fas fa-minus-circle"></i> Minor</span>
@@ -207,7 +207,6 @@
                     {
                         <text>Permanent</text>
                     }
-
                 </td>
                 <td>
                     @remark.CreatedAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")<br/>
