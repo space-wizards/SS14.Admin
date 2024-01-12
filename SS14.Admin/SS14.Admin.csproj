@@ -6,6 +6,7 @@
     <!-- https://github.com/dotnet/aspnetcore/issues/20055 -->
     <NoWarn>CS1998</NoWarn>
     <ImplicitUsings>true</ImplicitUsings>
+    <GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
   </PropertyGroup>
 
   <ItemGroup>
