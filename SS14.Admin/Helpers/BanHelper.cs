@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
+using System.Net.Sockets;
 using Content.Server.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -136,7 +137,12 @@ public sealed class BanHelper
             if (!IPHelper.TryParseIpOrCidr(ip, out var parsedAddr))
                 return "Error: Invalid IP address/CIDR range";
 
-            ban.Address = parsedAddr;
+            var parsedIp = parsedAddr.Item1;
+            var parsedCidr = parsedAddr.Item2;
+            // Ban /64 on IPv6.
+            parsedCidr ??= parsedIp.AddressFamily == AddressFamily.InterNetwork ? 32 : 64;
+
+            ban.Address = (parsedIp, parsedCidr.Value);
         }
 
         if (!string.IsNullOrWhiteSpace(hwid))

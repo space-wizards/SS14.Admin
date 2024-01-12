@@ -5,20 +5,17 @@ namespace SS14.Admin.Helpers
 {
     public static class IPHelper
     {
-        public static bool TryParseIpOrCidr(string str, out (IPAddress, int) cidr)
+        public static bool TryParseIpOrCidr(string str, out (IPAddress, int?) cidr)
         {
             if (IPAddress.TryParse(str, out var addr))
             {
-                cidr = (addr, addr.AddressFamily switch
-                {
-                    AddressFamily.InterNetwork => 32,
-                    AddressFamily.InterNetworkV6 => 128,
-                    _ => throw new ArgumentException(nameof(str))
-                });
+                cidr = (addr, null);
                 return true;
             }
 
-            return TryParseCidr(str, out cidr);
+            var res = TryParseCidr(str, out var cidrParsed);
+            cidr = (cidrParsed.Item1, cidrParsed.Item2);
+            return res;
         }
 
         public static bool TryParseCidr(string str, out (IPAddress, int) cidr)
