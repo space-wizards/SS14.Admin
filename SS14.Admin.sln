@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{9EF4394B
 ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 	README.md = README.md
+	Dockerfile = Dockerfile
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content.Server.Database", "SS14\Content.Server.Database\Content.Server.Database.csproj", "{0DE28821-8C9F-4770-BA7C-5D38AC77F872}"
@@ -13,6 +14,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Content.Shared.Database", "SS14\Content.Shared.Database\Content.Shared.Database.csproj", "{34DBD258-BB73-4A8D-9159-C7CBECE1AB8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Robust.Analyzers", "SS14\RobustToolbox\Robust.Analyzers\Robust.Analyzers.csproj", "{F718671B-FAD0-4783-90B8-32059AB9552F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{0DA4417F-14E5-49E9-8A0D-4F76C3CDED5C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{20A0EC6E-8DE5-4587-BC4A-7EB0C5D65001}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish-ghcr.yml = .github\workflows\publish-ghcr.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +44,8 @@ Global
 		{F718671B-FAD0-4783-90B8-32059AB9552F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F718671B-FAD0-4783-90B8-32059AB9552F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F718671B-FAD0-4783-90B8-32059AB9552F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{20A0EC6E-8DE5-4587-BC4A-7EB0C5D65001} = {0DA4417F-14E5-49E9-8A0D-4F76C3CDED5C}
 	EndGlobalSection
 EndGlobal
