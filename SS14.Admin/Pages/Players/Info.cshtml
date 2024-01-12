@@ -2,6 +2,8 @@
 @using Content.Server.Database
 @using SS14.Admin.Helpers
 @using SS14.Admin.Pages.Tables
+@using System.Diagnostics
+@using Content.Shared.Database
 @model SS14.Admin.Pages.Players.Info
 
 @{
@@ -92,44 +94,134 @@
 </div>
 
 
-<div class="container">
+<div class="container-fluid">
     <h2>Notes</h2>
 
-    <span class="small">Total: @Model.Notes.Length</span>
+    <span class="small">Total: @Model.Remarks.Length</span>
     <table class="table table-striped mt-3">
         <thead>
         <tr>
+            <th>Type</th>
             <th>Message</th>
             <th>Round</th>
+            <th>Severity</th>
+            <th>Visible/Seen</th>
+            <th>Playtime (h:mm)</th>
+            <th>Expires (UTC)</th>
             <th>Created</th>
             <th>Edited</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var note in Model.Notes)
+        @foreach (var remark in Model.Remarks)
         {
             <tr>
                 <td>
-                    @note.Message
-                </td>
-                <td>
-                    @note.RoundId
-                </td>
-                <td>
-                    @note.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")<br/>
-                    by @(note.CreatedBy?.LastSeenUserName ?? "unknown")
-                </td>
-                <td>
-                    @if (note.LastEditedAt != null && note.LastEditedBy != null)
+                    @switch (remark)
                     {
-                        <text>
-                            @note.LastEditedAt.Value.ToString("yyyy-MM-dd HH:mm:ss")<br/>
-                            by @note.LastEditedBy.LastSeenUserName
-                        </text>
+                        case AdminMessage:
+                            <span class="text-success"><i class="fas fa-envelope"></i> Message</span>
+                            break;
+                        case AdminNote:
+                            <span class="text-info"><i class="fas fa-clipboard"></i> Note</span>
+                            break;
+                        case AdminWatchlist:
+                            <span class="text-warning"><i class="fas fa-eye"></i> Watchlist</span>
+
+                            break;
+                        default:
+                            throw new UnreachableException();
+                    }
+                </td>
+                <td>@remark.Message</td>
+                <td>@remark.RoundId</td>
+                <td>
+                    @if (remark is AdminNote note)
+                    {
+                        switch (note.Severity)
+                        {
+                            case NoteSeverity.None:
+                                <text><i class="fas fa-check-circle"></i> None</text>
+                                break;
+                            case NoteSeverity.Minor:
+                                <span class="text-info"><i class="fas fa-minus-circle"></i> Minor</span>
+                                break;
+                            case NoteSeverity.Medium:
+                                <span class="text-warning"><i class="fas fa-exclamation-circle"></i> Medium</span>
+                                break;
+                            case NoteSeverity.High:
+                                <span class="text-danger"><i class="fas fa-exclamation-triangle"></i> High</span>
+                                break;
+                            default:
+                                <text><i class="fas fa-question"></i> Unknown</text>
+                                break;
+                        }
                     }
                     else
                     {
-                        <text>None</text>
+                        <span class="text-secondary">N/A</span>
+                    }
+                </td>
+                <td>
+                    @switch (remark)
+                    {
+                        case AdminMessage adminMessage:
+                            if (adminMessage.Seen)
+                            {
+                                <span class="text-success"><i class="fas fa-eye"></i> Seen</span>
+                            }
+                            else
+                            {
+                                <span class="text-secondary"><i class="fas fa-eye-slash"></i> Not seen</span>
+                            }
+
+                            break;
+                        case AdminNote adminNote:
+                            if (adminNote.Secret)
+                            {
+                                <span class="text-info"><i class="fas fa-eye-slash"></i> Secret</span>
+                            }
+                            else
+                            {
+                                <span class="text-success"><i class="fas fa-eye"></i> Visible</span>
+                            }
+
+                            break;
+                        case AdminWatchlist:
+                            <span class="text-secondary">N/A</span>
+                            break;
+                        default:
+                            throw new UnreachableException();
+                    }
+                </td>
+                <td>@((int)remark.PlaytimeAtNote.TotalHours):@remark.PlaytimeAtNote.Minutes.ToString("D2")</td>
+                <td>
+                    @if (remark.ExpirationTime is { } expires)
+                    {
+                        var utc = expires.ToUniversalTime();
+                        var diff = utc - DateTime.UtcNow;
+                        @expires.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")<br/>
+                        <text>(in @diff.Days days @diff.Hours:@diff.Minutes)</text>
+                    }
+                    else
+                    {
+                        <text>Permanent</text>
+                    }
+
+                </td>
+                <td>
+                    @remark.CreatedAt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")<br/>
+                    <span class="text-secondary">by @(remark.CreatedBy?.LastSeenUserName ?? "unknown")</span>
+                </td>
+                <td>
+                    @if (remark.LastEditedAt > remark.CreatedAt)
+                    {
+                        @remark.LastEditedAt.Value.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")<br/>
+                        <span class="text-secondary">by @(remark.LastEditedBy?.LastSeenUserName ?? "unknown")</span>
+                    }
+                    else
+                    {
+                        <span class="text-secondary">No</span>
                     }
                 </td>
             </tr>
@@ -138,12 +230,12 @@
     </table>
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <h2>Bans</h2>
     <partial name="Tables/BansTable" model="@(new BansTableModel(Model.GameSortState,Model.GameBanPagination, 0 ,false))"/>
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <h2>Role Bans</h2>
     <partial name="Tables/RoleBansTable" model="@(new RoleBansTableModel(Model.RoleSortState,Model.RoleBanPagination, 0, false))"/>
 </div>
