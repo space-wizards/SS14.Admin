@@ -23,9 +23,17 @@
         <dt class="col-sm-2">Last seen time:</dt>
         <dd class="col-sm-10">@Model.Player.LastSeenTime.ToString("yyyy-MM-dd HH:mm:ss")</dd>
         <dt class="col-sm-2">Last seen address:</dt>
-        <dd class="col-sm-10 font-monospace">@Model.Player.LastSeenAddress</dd>
+        <dd class="col-sm-10 font-monospace">
+            <a asp-page="../Connections/Index" asp-route-search="@Model.Player.LastSeenAddress">
+                @Model.Player.LastSeenAddress
+            </a>
+        </dd>
         <dt class="col-sm-2">Last seen HWID:</dt>
-        <dd class="col-sm-10 font-monospace">@BanHelper.FormatHwid(Model.Player.LastSeenHWId)</dd>
+        <dd class="col-sm-10 font-monospace">
+            <a asp-page="../Connections/Index" asp-route-search="@BanHelper.FormatHwid(Model.Player.LastSeenHWId)">
+                @BanHelper.FormatHwid(Model.Player.LastSeenHWId)
+            </a>
+        </dd>
         <dt class="col-sm-2">Whitelisted:</dt>
         <dd class="col-sm-10 font-monospace">
             @if (Model.Whitelisted)
