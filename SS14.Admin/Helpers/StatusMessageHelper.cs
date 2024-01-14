@@ -66,7 +66,7 @@ public static class StatusMessageHelper
     /// Possible types of status messages displayed.
     /// </summary>
     /// <seealso cref="StatusMessageHelper.SetStatusMessage"/>
-    public enum Type : byte
+    public enum Type
     {
         /// <summary>
         /// Informational messages confirm successful actions to the user.

@@ -1,7 +1,9 @@
 ﻿@using SS14.Admin.Helpers
 @{
     var statusMsg = (string?) TempData[StatusMessageHelper.KeyMessage];
-    var statusType = (StatusMessageHelper.Type?)TempData[StatusMessageHelper.KeyType];
+    StatusMessageHelper.Type? statusType = null;
+    if (TempData.TryGetValue(StatusMessageHelper.KeyType, out var statusTypeUncast) && statusTypeUncast != null)
+        statusType = (StatusMessageHelper.Type)statusTypeUncast;
 }
 
 @if (!string.IsNullOrWhiteSpace(statusMsg))
