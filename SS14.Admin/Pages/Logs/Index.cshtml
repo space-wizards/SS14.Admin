@@ -78,7 +78,7 @@
         {
             <tr class="on-click data-log">
                 <td>@entry.RoundId</td>
-                <td>@entry.Round?.Server?.Name</td>
+                <td></td>
                 <td class="text-center colored" style="--cell-color: var(@entry.Impact.CssColorVarName())">@entry.Impact.ToString()</td>
                 <td>@entry.Date</td>
                 <td>@entry.Type</td>
@@ -89,7 +89,7 @@
                         <span class="details-close fa fa-times" onclick="onDetailsClose()"></span>
                     </div>
                     <div class="log-details-sub log-muted">
-                        <p>Server: <a href="#">@entry.Round?.Server?.Name</a></p>
+                        <p>Server: <a href="#"></a></p>
                         <p>Round: <a href="#">@entry.RoundId</a></p>
                     </div>
                     <h3>Message:</h3>
