@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using Content.Server.Database;
 using Content.Shared.Database;
@@ -15,7 +14,9 @@ public static class AdminLogRepository
 
     public class WebAdminLog : AdminLog
     {
-        public string ServerName { get; set; }
+        //Dapper hates json so we have to overwrite it with a dynamic
+        public new dynamic? Json { get; set; }
+        public string? ServerName { get; set; }
     }
     public static async Task<List<WebAdminLog>> FindAdminLogs(
         ServerDbContext context,
@@ -77,23 +78,30 @@ public static class AdminLogRepository
             LIMIT #::bigint OFFSET #::bigint
         ";
 
-        Console.Write(values.ToString());
-        Console.Write(query);
         var finalQuery = CreateSqlFromParameter(query, values);
-        Console.Write(finalQuery);
 
         using (var connection = context.Database.GetDbConnection())
         {
             connection.Open();
 
-            var result = await connection.QueryAsync<WebAdminLog, string, WebAdminLog>(
+            var result = await connection.QueryAsync<AdminLog, string, WebAdminLog>(
                 finalQuery,
-                (log, json) =>
+                (adminLog, serverName) =>
                 {
-                    log.Json = JsonDocument.Parse(json);
-                    return log;
+                    var webAdminLog = new WebAdminLog
+                    {
+                        Id = adminLog.Id,
+                        Date = adminLog.Date,
+                        Impact = adminLog.Impact,
+                        Json = adminLog.Json,
+                        Message = adminLog.Message,
+                        Type = adminLog.Type,
+                        RoundId = adminLog.RoundId,
+                        ServerName = serverName
+                    };
+                    return webAdminLog;
                 },
-                splitOn: "Json"
+                splitOn: "ServerName"
             );
 
             return result.ToList();

@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using Content.Server.Database;
+using Dapper;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -76,6 +77,8 @@ namespace SS14.Admin
                         await handler.HandleTokenValidated(ctx);
                     };
                 });
+
+            SqlMapper.AddTypeHandler(new AdminLogs.WebLogJsonHelper.JsonTypeHandler());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

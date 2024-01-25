@@ -13,7 +13,7 @@ public class LogsIndexModel : PageModel
 {
         private readonly PostgresServerDbContext _dbContext;
 
-        public List<AdminLog> Items { get; set; } = new();
+        public List<AdminLogRepository.WebAdminLog> Items { get; set; } = new();
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         [BindProperty(SupportsGet = true)]
@@ -66,7 +66,8 @@ public class LogsIndexModel : PageModel
             //Converts "any" to null in order to correctly use FindAdminLogs()
             SeveritySearch = severity != -2 ? severity : null;
 
-            var playerUserId = AdminLogRepository.FindPlayerByName(_dbContext.Player, player!).Result?.UserId.ToString();
+            //If the player box is empty dont try to find the player (saves time yay)
+            if (player != null) {player = AdminLogRepository.FindPlayerByName(_dbContext.Player, player!).Result?.UserId.ToString();}
 
             //if you you leave the type filter as "" it just defaults to uknown as the type witch fucking breaks everything
             TypeSearch = CreateTypeFromValue(type);
@@ -86,7 +87,7 @@ public class LogsIndexModel : PageModel
             Items = await AdminLogRepository.FindAdminLogs(
                 _dbContext,
                 _dbContext.AdminLog,
-                playerUserId,
+                player,
                 FromDate,
                 ToDate,
                 ServerSearch,
