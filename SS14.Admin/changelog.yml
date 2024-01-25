@@ -1,0 +1,6 @@
+Entries:
+  - author: Geekyhobo
+    changes:
+      - message: We have a change log now!
+        type: Add
+    id: 1
