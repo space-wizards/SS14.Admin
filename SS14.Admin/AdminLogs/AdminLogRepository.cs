@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Content.Server.Database;
 using Content.Shared.Database;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Pages.Logs;
 
@@ -11,7 +13,11 @@ public static class AdminLogRepository
 {
     private static readonly Regex ParameterRegex = new(Regex.Escape("#"));
 
-    public static async Task<List<AdminLog>> FindAdminLogs(
+    public class WebAdminLog : AdminLog
+    {
+        public string ServerName { get; set; }
+    }
+    public static async Task<List<WebAdminLog>> FindAdminLogs(
         ServerDbContext context,
         DbSet<AdminLog> adminLogs,
         string? playerUserId,
@@ -54,12 +60,12 @@ public static class AdminLogRepository
         };
 
         var query = $@"
-        SELECT a.admin_log_id, a.date, a.impact, a.json, a.message, a.type, r.round_id, s.server_id, s.name FROM admin_log AS a
+        SELECT a.admin_log_id, a.date, a.impact, a.json, a.message, a.type, r.round_id, s.server_id, s.name AS ServerName FROM admin_log AS a
             INNER JOIN round AS r ON a.round_id = r.round_id
             INNER JOIN server AS s ON r.server_id = s.server_id
             {(playerUserId != null ? "INNER JOIN admin_log_player AS p ON p.log_id = a.admin_log_id" : "")}
             WHERE
-                {(fromDateValue != null && toDateValue != null ? "a.date BETWEEN #::timestamp with time zone AND #::timestamp with time zone AND" : "")}
+                {(fromDateValue != null && toDateValue != null ? "a.date BETWEEN '#'::timestamp with time zone AND '#'::timestamp with time zone AND" : "")}
                 {(playerUserId != null ? "p.player_user_id = # AND" : "")}
                 {(serverName != null ? "s.name = # AND" : "")}
                 {(typeInt != null ? "a.type = #::integer AND" : "")}
@@ -71,8 +77,27 @@ public static class AdminLogRepository
             LIMIT #::bigint OFFSET #::bigint
         ";
 
-        var result = adminLogs.FromSqlRaw(EnumerateParameters(query), values.ToArray());
-        return await result.ToListAsync();
+        Console.Write(values.ToString());
+        Console.Write(query);
+        var finalQuery = CreateSqlFromParameter(query, values);
+        Console.Write(finalQuery);
+
+        using (var connection = context.Database.GetDbConnection())
+        {
+            connection.Open();
+
+            var result = await connection.QueryAsync<WebAdminLog, string, WebAdminLog>(
+                finalQuery,
+                (log, json) =>
+                {
+                    log.Json = JsonDocument.Parse(json);
+                    return log;
+                },
+                splitOn: "Json"
+            );
+
+            return result.ToList();
+        }
     }
 
     public static async Task<Player?> FindPlayerByName(DbSet<Player> players, string name)
@@ -85,6 +110,10 @@ public static class AdminLogRepository
         return context is PostgresServerDbContext ? "to_tsvector('english'::regconfig, a.message) @@ websearch_to_tsquery('english'::regconfig, #)" : " a.message LIKE %#%";
     }
 
+    private static string CreateSqlFromParameter(string query, List<object> parameters)
+    {
+        return SetParameters(EnumerateParameters(query), parameters);
+    }
     private static string EnumerateParameters(string query)
     {
         var index = 0;
@@ -94,6 +123,21 @@ public static class AdminLogRepository
             query = ParameterRegex.Replace(query, $"{{{index}}}", 1);
             index += 1;
         }
+
+        return query;
+    }
+
+    public static string SetParameters(string query, List<object> values)
+    {
+        var index = 0;
+
+            while (index < values.Count)
+            {
+                var paramValue = values[index];
+                var paramPlaceholder = $"{{{index}}}";
+                query = query.Replace(paramPlaceholder, paramValue?.ToString() ?? "NULL");
+                index += 1;
+            }
 
         return query;
     }
