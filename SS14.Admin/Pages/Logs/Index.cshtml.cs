@@ -4,6 +4,7 @@ using Content.Server.Database;
 using Content.Shared.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using SS14.Admin.AdminLogs;
 using SS14.Admin.Models;
 
@@ -12,6 +13,7 @@ namespace SS14.Admin.Pages.Logs;
 public class LogsIndexModel : PageModel
 {
         private readonly PostgresServerDbContext _dbContext;
+        private readonly DapperDBContext _dapperContext;
 
         public List<AdminLogRepository.WebAdminLog> Items { get; set; } = new();
         public Dictionary<string, string?> AllRouteData { get; } = new();
@@ -45,17 +47,17 @@ public class LogsIndexModel : PageModel
             { 1, "High" },
             { 2, "Extreme" }
         };
-        public string? ServerSearch { get; set; }
-        public string? Search { get; set; }
 
-        public LogsIndexModel(PostgresServerDbContext dbContext)
+        public LogsIndexModel(PostgresServerDbContext dbContext, DapperDBContext dapperContext)
         {
             _dbContext = dbContext;
+            _dapperContext = dapperContext;
         }
 
         public async Task OnGetAsync(
             string? daterange,
             string? search,
+            string? server,
             int? roundId,
             string? player,
             string? type,
@@ -85,12 +87,11 @@ public class LogsIndexModel : PageModel
             AllRouteData.Add("countselect", countselect.ToString());
 
             Items = await AdminLogRepository.FindAdminLogs(
-                _dbContext,
-                _dbContext.AdminLog,
+                _dapperContext,
                 player,
                 FromDate,
                 ToDate,
-                ServerSearch,
+                server,
                 TypeSearch,
                 search,
                 roundId,
@@ -98,7 +99,7 @@ public class LogsIndexModel : PageModel
                 Sort,
                 PerPage,
                 PageIndex * PerPage
-            );
+                    );
         }
 
         public LogType? CreateTypeFromValue(string? value)

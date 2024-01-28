@@ -1,4 +1,6 @@
 ﻿using YamlDotNet.Serialization;
+using System.IO;
+using System.Collections.Generic;
 
 namespace SS14.Admin.Helpers
 {
@@ -11,25 +13,21 @@ namespace SS14.Admin.Helpers
 
             using (var reader = new StreamReader(filePath))
             {
-                var yamlObject = deserializer.Deserialize(reader);
-                var entriesList = ((Dictionary<object, object>)yamlObject)["Entries"] as List<object>;
+                var yamlObject = deserializer.Deserialize<Dictionary<string, List<Dictionary<string, object>>>>(reader);
 
-                foreach (var outerEntry in entriesList)
+                foreach (var entry in yamlObject["Entries"])
                 {
-                    var entryDict = (Dictionary<object, object>)outerEntry;
-                    var changesList = (List<object>)entryDict["changes"];
+                    var entryDict = (Dictionary<string, object>)entry;
 
-                    foreach (var change in changesList)
+                    var changeEntry = new ChangeEntry
                     {
-                        var changeDict = (Dictionary<object, object>)change;
-                        var changeEntry = new ChangeEntry
-                        {
-                            Author = (string)entryDict["author"],
-                            Message = (string)changeDict["message"],
-                            Type = (string)changeDict["type"]
-                        };
-                        entries.Add(changeEntry);
-                    }
+                        Author = (string)entryDict["author"],
+                        Title = (string)entryDict["title"],
+                        Message = (string)entryDict["message"],
+                        Type = (string)entryDict["type"],
+                        Id = (string)entryDict["id"]
+                    };
+                    entries.Add(changeEntry);
                 }
             }
 
@@ -40,7 +38,9 @@ namespace SS14.Admin.Helpers
     public class ChangeEntry
     {
         public string Author { get; set; }
+        public string Title { get; set; }
         public string Message { get; set; }
         public string Type { get; set; }
+        public string Id { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 using SS14.Admin.Helpers;
+using SS14.Admin.Models;
 using SS14.Admin.SignIn;
 
 namespace SS14.Admin
@@ -35,6 +36,7 @@ namespace SS14.Admin
                 throw new InvalidOperationException("Need to specify DefaultConnection connection string");
 
             services.AddDbContext<PostgresServerDbContext>(options => options.UseNpgsql(connStr));
+            services.AddDbContext<DapperDBContext>(options => options.UseNpgsql(connStr));
 
             services.AddControllers();
             services.AddRazorPages(options =>

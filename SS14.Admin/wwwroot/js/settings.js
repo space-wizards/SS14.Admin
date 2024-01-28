@@ -31,3 +31,13 @@ function setCookie(name, value, days) {
     let cookieValue = name + "=" + value + ";expires=" + expirationDate.toUTCString() + ";path=/";
     document.cookie = cookieValue;
 }
+
+function toggleDescription(id) {
+    var description = document.getElementById('description-' + id);
+    if (description.style.height === '0px') {
+        description.style.height = description.scrollHeight + 'px';
+    } else {
+        description.style.height = '0px';
+    }
+}
+

@@ -8,6 +8,15 @@
     var textClass = darkMode ? "text-light" : "text-dark";
 }
 
+<style>
+    .description {
+        transition: height 0.5s ease-in-out;
+        overflow: hidden;
+        height: 0;
+        border-radius: 5px; /* Rounded corners */
+    }
+</style>
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -18,15 +27,20 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="mb-4">Changelog</h1>
-            <ul class="list-group">
-                @foreach(var change in Model.Changes)
+            <ul class="list-group border">
+                @foreach(var change in Model.Changes.OrderByDescending(c => c.Id))
                 {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>
-                            <i class="@Model.GetIcon(change.Type) mr-2"></i> @change.Message
-                        </span>
-                        <span>@change.Author</span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center border-bottom-0 border-left-0 border-right-0 p-2" onclick="toggleDescription(@change.Id)">
+                        <div>
+                            <h5><i class="@Model.GetIcon(change.Type) mr-2"></i> <span class="small-text">@change.Title</span></h5>
+                        </div>
+                        <div class="ml-auto">
+                            <p class="small-text">@change.Author</p>
+                        </div>
                     </li>
+                    <div class="ml-auto description" id="description-@change.Id">
+                        <p class="m-1">@change.Message</p>
+                    </div>
                 }
             </ul>
         </div>
