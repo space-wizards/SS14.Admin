@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using System.Globalization;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using Content.Server.Database;
 using Content.Shared.Database;
 using Dapper;
@@ -12,12 +12,18 @@ namespace SS14.Admin.AdminLogs;
 
 public static class AdminLogRepository
 {
-    private static readonly Regex ParameterRegex = new(Regex.Escape("#"));
 
-    public class WebAdminLog : AdminLog
+    public class WebAdminLog
     {
-        //Dapper hates json so we have to overwrite it with a dynamic
-        public new dynamic? Json { get; set; }
+        public int RoundId { get; set; }
+        public int Id { get; set; }
+        //not used but leave it incase
+        public Round Round { get; set; } = default!;
+        public LogType Type { get; set; }
+        public LogImpact Impact { get; set; }
+        public DateTime Date { get; set; }
+        public string Message { get; set; } = default!;
+        public JsonDocument Json { get; set; } = default!;
         public string? ServerName { get; set; }
     }
     public static async Task<List<WebAdminLog>> FindAdminLogs(
@@ -80,22 +86,12 @@ public static class AdminLogRepository
     {
         await connection.OpenAsync();
 
-        var result = await connection.QueryAsync<AdminLog, string, WebAdminLog>(
+        var result = await connection.QueryAsync<WebAdminLog, string, WebAdminLog>(
             query,
-            (adminLog, serverName) =>
+            (WebAdminLog, serverName) =>
             {
-                var webAdminLog = new WebAdminLog
-                {
-                    Id = adminLog.Id,
-                    Date = adminLog.Date,
-                    Impact = adminLog.Impact,
-                    Json = adminLog.Json,
-                    Message = adminLog.Message,
-                    Type = adminLog.Type,
-                    RoundId = adminLog.RoundId,
-                    ServerName = serverName
-                };
-                return webAdminLog;
+                WebAdminLog.ServerName = serverName;
+                return WebAdminLog;
             },
             splitOn: "ServerName",
             param: parameters
