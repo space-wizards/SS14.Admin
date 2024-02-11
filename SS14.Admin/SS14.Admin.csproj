@@ -30,10 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="changelog.yml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <Content Remove="changelog.yml" />
+    <EmbeddedResource Include="changelog.yml" />
   </ItemGroup>
 
 </Project>
