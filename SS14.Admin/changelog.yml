@@ -1,12 +1,13 @@
 Entries:
   - author: Geekyhobo
-    title: Added Changelog! Click Them For Descriptions.
-    message: We have a change log now! It automatically populates with an icon and description from YML while also providing drop down descriptions.
-    type: Add
+    changes:
+      - message: Added ChangeLog!
+        type: Add
     id: 1
+    time: '2024-01-29T00:25:20.0000000+00:00'
   - author: Geekyhobo
-    title: Logs now can search server, and server displays properly!
-    message: Added Dapper Micro ORM to map what the SQL query returns to a new class called WebAdminLog, thus fixing the server not being able to be displayed on the respective log. Also the server serach bar basically had no backend so I gave it the ablity to be used.
-    type: Fix
+    changes:
+      - message: Logs now can search server, and server displays properly!
+        type: Fix
     id: 2
-
+    time: '2024-01-29T00:25:20.0000000+00:00'
