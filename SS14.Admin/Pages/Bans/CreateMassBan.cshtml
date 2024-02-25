@@ -1,0 +1,91 @@
+﻿@page
+@model SS14.Admin.Pages.Bans.CreateMassBanModel
+
+@{
+    ViewData["Title"] = "Create New Mass Ban";
+}
+
+<partial name="Shared/StatusMessageAlert" />
+
+
+    <div class="container">
+        <h1>Mass Ban</h1>
+
+        <form method="post" enctype="multipart/form-data" id="uploadForm">
+            <div class="form-group">
+
+                <div class="custom-file m-1">
+                    <label for="file">Choose a .TSV file to Upload:</label>
+                    <input type="file" class="custom-file-input " id="file" name="file" required>
+                </div>
+                <button type="submit" class="btn btn-primary m-1" id="confirmBtn">Submit</button>
+            </div>
+        </form>
+
+    </div>
+
+    @if (!ModelState.IsValid)
+    {
+        <div class="alert alert-danger mt-3" role="alert">
+            <ul>
+                @foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirm Bans?</h5>
+                </div>
+                <div class="modal-body">
+                    @if (ModelState.IsValid)
+                    {
+                        <p>Do you want to proceed?</p>
+                    }
+                    else
+                    {
+                        <p>There are errors in the form. Please fix them before proceeding.</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Abort</button>
+                    <button type="submit" form="uploadForm" class="btn btn-primary" id="confirmSubmit">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["StatusMessage"] != null)
+    {
+        <div class="alert alert-success mt-3" role="alert">
+            @TempData["StatusMessage"]
+        </div>
+    }
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#confirmBtn').click(function (e) {
+                e.preventDefault(); // Prevent default form submission
+                $('#confirmModal').modal('show'); // Show the modal
+            });
+
+            $('#confirmModal .close, #confirmModal button[data-dismiss="modal"]').click(function () {
+                $('#confirmModal').modal('hide'); // Close the modal
+            });
+
+            $('#confirmSubmit').click(function() {
+                $('#uploadForm').attr('action', '@Url.Page("CreateMassBan", "OnPostAsync")');
+            });
+        });
+    </script>
+}
