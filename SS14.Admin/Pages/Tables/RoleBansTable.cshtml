@@ -99,7 +99,7 @@
                         <input type="hidden" name="Id" value="@ban.Id">
                         <button type="button" class="btn btn-secondary" onclick="showConfirmation('@ban.Id')">Unban</button>
                         <div class="confirmation-button" id="confirmation-button-@ban.Id" style="display: none;">
-                            <button type="button" class="btn btn-danger" onclick="unbanConfirmed('@ban.Id')">Are you sure?</button>
+                            <button type="submit" class="btn btn-danger">Are you sure?</button>
                         </div>
                     </form>
                 }
@@ -119,11 +119,6 @@
             confirmationButton.style.display = 'none';
             unbanButton.style.display = 'block';
         }, 3000); // Revert after 3 seconds
-    }
-
-    function unbanConfirmed(banId) {
-        var form = document.getElementById('unban-form-' + banId);
-        form.submit();
     }
 </script>
 
