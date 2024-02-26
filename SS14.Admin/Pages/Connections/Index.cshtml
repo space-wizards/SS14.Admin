@@ -8,7 +8,7 @@
 }
 
 <form asp-page="./Index" asp-all-route-data="@Model.AllRouteData.ShallowClone()" method="get" class="container mb-3">
-    @FormHiddenRoutes.Make(Model.AllRouteData, "search", "showAccepted", "showBanned", "showWhitelist", "showFull")
+    @FormHiddenRoutes.Make(Model.AllRouteData, "search", "showAccepted", "showBanned", "showWhitelist", "showFull", "showPanic")
     <div class="form-group row">
         <label class="col-md-3" for="searchBar">Search:</label>
         <div class="col-md-7">
