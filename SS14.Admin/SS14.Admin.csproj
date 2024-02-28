@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />

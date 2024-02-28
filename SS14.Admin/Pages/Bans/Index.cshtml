@@ -1,6 +1,7 @@
 ﻿@page
 @using SS14.Admin.Pages.Tables
 @using SS14.Admin.Helpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model SS14.Admin.Pages.BansModel
 
 @{
@@ -18,6 +19,10 @@
     @if (User.IsInRole("BAN"))
     {
         <a class="btn btn-primary" asp-page="./Create">Create new ban</a>
+    }
+    @if (User.IsInRole("MASSBAN"))
+    {
+        <a class="btn btn-primary" asp-page="./CreateMassBan">Create new Mass Ban</a>
     }
 </div>
 
