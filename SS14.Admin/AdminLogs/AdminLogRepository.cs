@@ -86,20 +86,28 @@ public static class AdminLogRepository
     {
         await connection.OpenAsync();
 
-        var result = await connection.QueryAsync<WebAdminLog, string, WebAdminLog>(
+        var tempResult = await connection.QueryAsync<WebAdminLog, string, JsonDocument, WebAdminLog>(
             query,
-            (WebAdminLog, serverName) =>
+            (webAdminLog, ServerName, json) =>
             {
-                WebAdminLog.ServerName = serverName;
-                return WebAdminLog;
+                webAdminLog.ServerName = ServerName;
+                using (json)
+                {
+                    webAdminLog.Message = ProcessJsonDocument(json);
+                }
+                return webAdminLog;
             },
-            splitOn: "ServerName",
+            splitOn: "ServerName,Json",
             param: parameters
         );
 
-        return result.ToList();
+        return tempResult.ToList();
     }
 }
+    private static string ProcessJsonDocument(JsonDocument json)
+    {
+        return JsonSerializer.Serialize(json);
+    }
 
 
     public static async Task<Player?> FindPlayerByName(DbSet<Player> players, string name)
