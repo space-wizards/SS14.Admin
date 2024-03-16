@@ -95,9 +95,12 @@
             <td>
                 @if (ban.Active && User.IsInRole("BAN"))
                 {
-                    <form asp-page="/RoleBans/Index" asp-page-handler="Unban">
+                    <form id="unban-form-@ban.Id" asp-page="/Bans/Index" asp-page-handler="Unban">
                         <input type="hidden" name="Id" value="@ban.Id">
-                        <input type="submit" class="btn btn-secondary" value="Unban">
+                        <button type="button" class="btn btn-secondary" onclick="showConfirmation('@ban.Id')">Unban</button>
+                        <div class="confirmation-button" id="confirmation-button-@ban.Id" style="display: none;">
+                            <button type="submit" class="btn btn-danger">Are you sure?</button>
+                        </div>
                     </form>
                 }
             </td>
@@ -105,6 +108,19 @@
     }
     </tbody>
 </table>
+
+<script>
+    function showConfirmation(banId) {
+        const confirmationButton = document.getElementById('confirmation-button-' + banId);
+        const unbanButton = document.getElementById('unban-form-' + banId).querySelector('button[type="button"]');
+        confirmationButton.style.display = 'block';
+        unbanButton.style.display = 'none';
+        setTimeout(function() {
+            confirmationButton.style.display = 'none';
+            unbanButton.style.display = 'block';
+        }, 3000); // Revert after 3 seconds
+    }
+</script>
 
 @if(b == true)
 {
