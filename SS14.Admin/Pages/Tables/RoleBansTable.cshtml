@@ -111,8 +111,8 @@
 
 <script>
     function showConfirmation(banId) {
-        var confirmationButton = document.getElementById('confirmation-button-' + banId);
-        var unbanButton = document.getElementById('unban-form-' + banId).querySelector('button[type="button"]');
+        let confirmationButton = document.getElementById('confirmation-button-' + banId);
+        let unbanButton = document.getElementById('unban-form-' + banId).querySelector('button[type="button"]');
         confirmationButton.style.display = 'block';
         unbanButton.style.display = 'none';
         setTimeout(function() {
