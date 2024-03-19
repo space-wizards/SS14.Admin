@@ -95,7 +95,7 @@
             <td>
                 @if (ban.Active && User.IsInRole("BAN"))
                 {
-                    <form id="unban-form-@ban.Id" asp-page="/Bans/Index" asp-page-handler="Unban">
+                    <form id="unban-form-@ban.Id" asp-page="/RoleBans/Index" asp-page-handler="Unban">
                         <input type="hidden" name="Id" value="@ban.Id">
                         <button type="button" class="btn btn-secondary" onclick="showConfirmation('@ban.Id')">Unban</button>
                         <div class="confirmation-button" id="confirmation-button-@ban.Id" style="display: none;">
