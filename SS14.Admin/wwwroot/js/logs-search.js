@@ -12,6 +12,17 @@ $(document).ready(function() {
     });
 });
 
+//Server search
+$(document).ready(function() {
+    let x = $('#server');
+    if (context.parameters.has("server")) x.val(context.parameters.get("server"));
+    x.change(function() {
+        var input = $(this);
+        var currentValue = input.val();
+        context.updateQuery("server",currentValue);
+    });
+});
+
 //Round
 $(document).ready(function() {
     let x = $('#roundId');
