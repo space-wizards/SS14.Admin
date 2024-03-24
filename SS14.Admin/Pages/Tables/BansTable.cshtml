@@ -23,6 +23,9 @@
         <th style="min-width: 210px">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "time", "Ban time"))"/>
         </th>
+        <th>
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "round", "Round"))"/>
+        </th>
         <th style="min-width: 210px">Expires</th>
         <th style="min-width: 140px">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "admin", "Banning admin"))"/>
@@ -75,6 +78,7 @@
             </td>
             <td>@ban.Reason</td>
             <td>@ban.BanTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+            <td>@ban.Round</td>
             <td>
                 @(ban.Expires?.ToString("yyyy-MM-dd HH:mm:ss") ?? "PERMANENT")
                 @if (ban.Unbanned is { } unbanned)

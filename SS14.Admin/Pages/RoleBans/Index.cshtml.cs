@@ -102,6 +102,7 @@ public class Index : PageModel
         sortState.AddColumn("ip", p => p.Ban.Address);
         sortState.AddColumn("uid", p => p.Ban.PlayerUserId);
         sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
+        sortState.AddColumn("round", p => p.Ban.RoundId, SortOrder.Descending);
         // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
         sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
         sortState.AddColumn("role", p => p.Ban.RoleId);
@@ -132,7 +133,8 @@ public class Index : PageModel
                 BanHelper.IsBanActive(b.Ban),
                 b.Ban.BanTime,
                 b.Admin?.LastSeenUserName,
-                b.Ban.RoleId);
+                b.Ban.RoleId,
+                b.Ban.RoundId);
         }));
 
         return sortState;
@@ -150,7 +152,8 @@ public class Index : PageModel
         bool Active,
         DateTime BanTime,
         string? Admin,
-        string Role);
+        string Role,
+        int? Round);
 
     public enum ShowFilter
     {
