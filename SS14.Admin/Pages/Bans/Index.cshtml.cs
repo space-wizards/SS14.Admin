@@ -103,7 +103,7 @@ namespace SS14.Admin.Pages
             sortState.AddColumn("ip", p => p.Ban.Address);
             sortState.AddColumn("uid", p => p.Ban.PlayerUserId);
             sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
-            sortState.AddColumn("round", p => p.Ban.RoundId, SortOrder.Descending);
+            sortState.AddColumn("round", p => p.Ban.RoundId);
             // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
             sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
             sortState.AddColumn("hits", p => p.HitCount);
