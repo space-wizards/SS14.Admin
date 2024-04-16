@@ -32,7 +32,7 @@
                 <br>
                 <text><strong>Unbanned:</strong> @unbanned.UnbanTime.ToString("yyyy-MM-dd HH:mm:ss") by @Model.Ban.UnbanAdmin?.LastSeenUserName</text>
             }
-            else if (Model.Ban.Ban.ExpirationTime < DateTime.Now)
+            else if (Model.Ban.Ban.ExpirationTime < DateTime.UtcNow)
             {
                 <br>
                 <strong>Expired</strong>

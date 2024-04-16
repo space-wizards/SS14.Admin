@@ -89,7 +89,7 @@
                     <br>
                     <text><strong>Unbanned:</strong> @time.ToString("yyyy-MM-dd HH:mm:ss") by @admin</text>
                 }
-                else if (ban.Expires < DateTime.Now)
+                else if (ban.Expires < DateTime.UtcNow)
                 {
                     <br>
                     <strong>Expired</strong>

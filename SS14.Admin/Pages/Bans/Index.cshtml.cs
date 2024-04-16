@@ -40,8 +40,8 @@ namespace SS14.Admin.Pages
             bans = show switch
             {
                 ShowFilter.Active => bans.Where(b =>
-                    b.Ban.Unban == null && (b.Ban.ExpirationTime == null || b.Ban.ExpirationTime > DateTime.Now)),
-                ShowFilter.Expired => bans.Where(b => b.Ban.Unban != null || b.Ban.ExpirationTime < DateTime.Now),
+                    b.Ban.Unban == null && (b.Ban.ExpirationTime == null || b.Ban.ExpirationTime > DateTime.UtcNow)),
+                ShowFilter.Expired => bans.Where(b => b.Ban.Unban != null || b.Ban.ExpirationTime < DateTime.UtcNow),
                 _ => bans
             };
 

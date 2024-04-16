@@ -69,7 +69,7 @@ public sealed class BanHelper
     [Pure]
     public static bool IsBanActive<TUnban>(IBanCommon<TUnban> b) where TUnban : IUnbanCommon
     {
-        return (b.ExpirationTime == null || b.ExpirationTime > DateTime.Now) && b.Unban == null;
+        return (b.ExpirationTime == null || b.ExpirationTime > DateTime.UtcNow) && b.Unban == null;
     }
 
     [Pure]
