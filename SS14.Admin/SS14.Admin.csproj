@@ -10,8 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+    <PackageReference Include="Npgsql" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="NetEscapades.Configuration.Yaml" />
@@ -20,10 +22,16 @@
     <PackageReference Include="Serilog.Settings.Configuration" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" />
+    <PackageReference Include="YamlDotNet" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SS14\Content.Server.Database\Content.Server.Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="changelog.yml" />
+    <EmbeddedResource Include="changelog.yml" />
   </ItemGroup>
 
 </Project>

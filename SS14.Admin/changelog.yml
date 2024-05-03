@@ -1,0 +1,13 @@
+Entries:
+  - author: Geekyhobo
+    changes:
+      - message: Added ChangeLog!
+        type: Add
+    id: 1
+    time: '2024-01-29T00:25:20.0000000+00:00'
+  - author: Geekyhobo
+    changes:
+      - message: Logs now can search server, and server displays properly!
+        type: Fix
+    id: 2
+    time: '2024-01-29T00:25:20.0000000+00:00'

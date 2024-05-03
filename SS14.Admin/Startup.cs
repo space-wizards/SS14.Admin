@@ -1,11 +1,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using Content.Server.Database;
+using Dapper;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 using SS14.Admin.Helpers;
+using SS14.Admin.Models;
 using SS14.Admin.SignIn;
 
 namespace SS14.Admin
@@ -27,12 +29,14 @@ namespace SS14.Admin
             services.AddScoped<BanHelper>();
             services.AddScoped<PlayerLocator>();
             services.AddHttpContextAccessor();
+            services.AddSingleton<YamlHelper>();
 
             var connStr = Configuration.GetConnectionString("DefaultConnection");
             if (connStr == null)
                 throw new InvalidOperationException("Need to specify DefaultConnection connection string");
 
             services.AddDbContext<PostgresServerDbContext>(options => options.UseNpgsql(connStr));
+            services.AddDbContext<DapperDBContext>(options => options.UseNpgsql(connStr));
 
             services.AddControllers();
             services.AddRazorPages(options =>
@@ -76,6 +80,8 @@ namespace SS14.Admin
                         await handler.HandleTokenValidated(ctx);
                     };
                 });
+
+            SqlMapper.AddTypeHandler(new AdminLogs.WebLogJsonHelper.JsonTypeHandler());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
