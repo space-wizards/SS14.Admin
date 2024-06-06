@@ -8,8 +8,9 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY . .
+COPY ["SS14.Admin/SS14.Admin.csproj", "SS14.Admin/"]
 RUN dotnet restore "SS14.Admin/SS14.Admin.csproj"
+COPY . .
 WORKDIR "/src/SS14.Admin"
 RUN dotnet build "SS14.Admin.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
