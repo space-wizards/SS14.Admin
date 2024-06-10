@@ -9,7 +9,7 @@ namespace SS14.Admin.Helpers;
 
 public static class SearchHelper
 {
-    public static IQueryable<ConnectionLog> SearchConnectionLog(IQueryable<ConnectionLog> query, string? search)
+    public static IQueryable<ConnectionLog> SearchConnectionLog(IQueryable<ConnectionLog> query, string? search, ClaimsPrincipal user)
     {
         if (string.IsNullOrEmpty(search))
             return query;
@@ -22,14 +22,14 @@ public static class SearchHelper
         if (Guid.TryParse(search, out var guid))
             CombineSearch(ref expr, u => u.UserId == guid);
 
-        if (IPHelper.TryParseCidr(search, out var cidr))
+        if (user.IsInRole(Constants.PIIRole) && IPHelper.TryParseCidr(search, out var cidr))
             CombineSearch(ref expr, u => EF.Functions.Contains(cidr, u.Address));
 
-        if (IPAddress.TryParse(search, out var ip))
+        if (user.IsInRole(Constants.PIIRole) && IPAddress.TryParse(search, out var ip))
             CombineSearch(ref expr, u => u.Address.Equals(ip));
 
         var hwid = new byte[Constants.HwidLength];
-        if (Convert.TryFromBase64String(search, hwid, out var len) && len == Constants.HwidLength)
+        if (user.IsInRole(Constants.PIIRole) && Convert.TryFromBase64String(search, hwid, out var len) && len == Constants.HwidLength)
             CombineSearch(ref expr, u => u.HWId == hwid);
 
         return query.Where(expr);

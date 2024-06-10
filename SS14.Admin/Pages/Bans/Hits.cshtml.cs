@@ -53,7 +53,7 @@ public class Hits : PageModel
             .Where(bh => bh.BanId == banEntry.Ban.Id)
             .Select(bh => bh.Connection);
 
-        logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
+        logQuery = SearchHelper.SearchConnectionLog(logQuery, search, User);
 
         SortState = await ConnectionsIndexModel.LoadSortConnectionsTableData(
             Pagination,
