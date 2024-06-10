@@ -39,8 +39,8 @@ public sealed class Info : PageModel
         GameBanPagination.Init(pageIndex, perPage, GameBanRouteData);
         RoleBanPagination.Init(pageIndex, perPage, RoleBanRouteData);
 
-        var gameBans = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), userId.ToString());
-        var roleBans = SearchHelper.SearchRoleBans(_banHelper.CreateRoleBanJoin(), userId.ToString());
+        var gameBans = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), userId.ToString(), User);
+        var roleBans = SearchHelper.SearchRoleBans(_banHelper.CreateRoleBanJoin(), userId.ToString(), User);
 
         GameBanRouteData.Add("search", userId.ToString());
         GameBanRouteData.Add("show", "all");
