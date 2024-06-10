@@ -40,7 +40,7 @@ namespace SS14.Admin.Pages.Players
             AllRouteData.Add("search", CurrentFilter);
 
             IQueryable<Player> userQuery = _dbContext.Player;
-            userQuery = SearchHelper.SearchPlayers(userQuery, search);
+            userQuery = SearchHelper.SearchPlayers(userQuery, search, User);
 
             userQuery = SortState.ApplyToQuery(userQuery);
 

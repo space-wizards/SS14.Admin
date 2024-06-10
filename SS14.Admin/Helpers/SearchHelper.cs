@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
+using System.Security.Claims;
 using Content.Server.Database;
 using Microsoft.EntityFrameworkCore;
 using WhitelistJoin = SS14.Admin.Helpers.WhitelistHelper.WhitelistJoin;
@@ -92,7 +93,7 @@ public static class SearchHelper
         return query.Where(expr);
     }
 
-    public static IQueryable<Player> SearchPlayers(IQueryable<Player> query, string? search)
+    public static IQueryable<Player> SearchPlayers(IQueryable<Player> query, string? search, ClaimsPrincipal user)
     {
         if (string.IsNullOrEmpty(search))
             return query;
@@ -105,14 +106,14 @@ public static class SearchHelper
         if (Guid.TryParse(search, out var guid))
             CombineSearch(ref expr, u => u.UserId == guid);
 
-        if (IPHelper.TryParseCidr(search, out var cidr))
+        if (user.IsInRole(Constants.PIIRole) && IPHelper.TryParseCidr(search, out var cidr))
             CombineSearch(ref expr, u => EF.Functions.Contains(cidr, u.LastSeenAddress));
 
-        if (IPAddress.TryParse(search, out var ip))
+        if (user.IsInRole(Constants.PIIRole) && IPAddress.TryParse(search, out var ip))
             CombineSearch(ref expr, u => u.LastSeenAddress.Equals(ip));
 
         var hwid = new byte[Constants.HwidLength];
-        if (Convert.TryFromBase64String(search, hwid, out var len) && len == Constants.HwidLength)
+        if (user.IsInRole(Constants.PIIRole) && Convert.TryFromBase64String(search, hwid, out var len) && len == Constants.HwidLength)
             CombineSearch(ref expr, u => u.LastSeenHWId == hwid);
 
         return query.Where(expr);
