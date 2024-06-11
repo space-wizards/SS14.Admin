@@ -27,44 +27,42 @@ namespace SS14.Admin.Pages.Bans
             public string? NameOrUid { get; set; }
             public string? IP { get; set; }
             public string? HWid { get; set; }
+            public bool UseLatest { get; set; }
             public int LengthMinutes { get; set; }
             [Required] public string Reason { get; set; } = "";
-        }
-
-        public async Task OnPostFillAsync()
-        {
-            if (!User.IsInRole(Constants.PIIRole))
-            {
-                TempData.SetStatusError("You cannot do that.");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(Input.NameOrUid))
-            {
-                TempData.SetStatusError("Must provide name/UID.");
-                return;
-            }
-
-            var lastInfo = await _banHelper.GetLastPlayerInfo(Input.NameOrUid);
-            if (lastInfo == null)
-            {
-                TempData.SetStatusError("Unable to find player");
-                return;
-            }
-
-            Input.IP = lastInfo.Value.address.ToString();
-            Input.HWid = lastInfo.Value.hwid is { } h ? Convert.ToBase64String(h) : null;
         }
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
             var ban = new ServerBan();
 
+            var ipAddr = Input.IP;
+            var hwid = Input.HWid;
+
+            if (Input.UseLatest)
+            {
+                if (string.IsNullOrWhiteSpace(Input.NameOrUid))
+                {
+                    TempData.SetStatusError("Must provide name/UID.");
+                    return Page();
+                }
+
+                var lastInfo = await _banHelper.GetLastPlayerInfo(Input.NameOrUid);
+                if (lastInfo == null)
+                {
+                    TempData.SetStatusError("Unable to find player");
+                    return Page();
+                }
+
+                ipAddr = lastInfo.Value.address.ToString();
+                hwid = lastInfo.Value.hwid is { } h ? Convert.ToBase64String(h) : null;
+            }
+
             var error = await _banHelper.FillBanCommon(
                 ban,
                 Input.NameOrUid,
-                Input.IP,
-                Input.HWid,
+                ipAddr,
+                hwid,
                 Input.LengthMinutes,
                 Input.Reason);
 
