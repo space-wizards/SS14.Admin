@@ -33,6 +33,12 @@ namespace SS14.Admin.Pages.Bans
 
         public async Task OnPostFillAsync()
         {
+            if (!User.IsInRole(Constants.PIIRole))
+            {
+                TempData.SetStatusError("You cannot do that.");
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(Input.NameOrUid))
             {
                 TempData.SetStatusError("Must provide name/UID.");
