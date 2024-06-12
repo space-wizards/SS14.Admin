@@ -27,7 +27,8 @@ namespace SS14.Admin.Pages.Bans
             public string? NameOrUid { get; set; }
             public string? IP { get; set; }
             public string? HWid { get; set; }
-            public bool UseLatest { get; set; }
+            public bool UseLatestIp {get; set; }
+            public bool UseLatestHwid { get; set; }
             public int LengthMinutes { get; set; }
             [Required] public string Reason { get; set; } = "";
         }
@@ -39,7 +40,7 @@ namespace SS14.Admin.Pages.Bans
             var ipAddr = Input.IP;
             var hwid = Input.HWid;
 
-            if (Input.UseLatest)
+            if (Input.UseLatestHwid || Input.UseLatestIp)
             {
                 if (string.IsNullOrWhiteSpace(Input.NameOrUid))
                 {
@@ -54,8 +55,8 @@ namespace SS14.Admin.Pages.Bans
                     return Page();
                 }
 
-                ipAddr = lastInfo.Value.address.ToString();
-                hwid = lastInfo.Value.hwid is { } h ? Convert.ToBase64String(h) : null;
+                ipAddr = Input.UseLatestIp ? lastInfo.Value.address.ToString() : Input.IP;
+                hwid = Input.UseLatestHwid ? (lastInfo.Value.hwid is { } h ? Convert.ToBase64String(h) : null) : Input.HWid;
             }
 
             var error = await _banHelper.FillBanCommon(
