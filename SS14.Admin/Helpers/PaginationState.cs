@@ -10,16 +10,17 @@ namespace SS14.Admin.Helpers
         bool HasPrevPage { get; }
         int PageIndex { get; }
         int PerPage { get; }
-        int TotalCount { get; }
+        int? TotalCount { get; }
         int DefaultPerPage { get; }
     }
 
     public class PaginationState<T> : IPaginationState
     {
+        public bool ShowTotal { get; }
         public int DefaultPerPage { get; }
         public int PageIndex { get; private set; }
         public int PerPage { get; private set; }
-        public int TotalCount => List.TotalCount;
+        public int? TotalCount => List.TotalCount;
         public PaginatedList<T> List = default!;
         public bool HasPrevPage => List.HasPrevPage;
         public bool HasNextPage => List.HasNextPage;
@@ -27,8 +28,9 @@ namespace SS14.Admin.Helpers
         public IDictionary<string, string?> AllRouteData { get; private set; } =
             ImmutableDictionary<string, string?>.Empty;
 
-        public PaginationState(int defaultPerPage)
+        public PaginationState(int defaultPerPage, bool showTotal = true)
         {
+            ShowTotal = showTotal;
             PerPage = DefaultPerPage = defaultPerPage;
         }
 
@@ -54,7 +56,7 @@ namespace SS14.Admin.Helpers
             IQueryable<TQuery> query,
             Func<IEnumerable<TQuery>, IEnumerable<T>> convert)
         {
-            List = await PaginatedList<T>.CreateLinqAsync(query, convert, PageIndex, PerPage);
+            List = await PaginatedList<T>.CreateLinqAsync(query, convert, PageIndex, PerPage, showTotal: ShowTotal);
         }
     }
 }

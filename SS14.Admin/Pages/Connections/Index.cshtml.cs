@@ -10,7 +10,7 @@ namespace SS14.Admin.Pages.Connections
         private readonly PostgresServerDbContext _dbContext;
 
         public ISortState SortState { get; private set; } = default!;
-        public PaginationState<Connection> Pagination { get; } = new(100);
+        public PaginationState<Connection> Pagination { get; } = new(100, showTotal: false);
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         public string? CurrentFilter { get; set; }
