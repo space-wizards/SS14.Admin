@@ -50,6 +50,7 @@ public class Hits : PageModel
 
         var logQuery = _dbContext.ServerBanHit
             .Include(b => b.Connection)
+            .ThenInclude(c => c.Server)
             .Where(bh => bh.BanId == banEntry.Ban.Id)
             .Select(bh => bh.Connection);
 

@@ -72,7 +72,7 @@ namespace SS14.Admin.Pages.Connections
             AllRouteData.Add("showPanic", showPanic.ToString());
             AllRouteData.Add("showSet", "true");
 
-            IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog;
+            IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog.Include(c => c.Server);
             logQuery = SearchHelper.SearchConnectionLog(logQuery, search, User);
 
             var acceptableDenies = new List<ConnectionDenyReason?>();
@@ -101,7 +101,6 @@ namespace SS14.Admin.Pages.Connections
             Dictionary<string, string?> allRouteData)
         {
             var logs = query
-                .Include(c => c.Server)
                 .LeftJoin(
                     dbContext.Player,
                     c => c.UserId, p => p.UserId,
