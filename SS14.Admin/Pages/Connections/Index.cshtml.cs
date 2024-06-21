@@ -72,7 +72,7 @@ namespace SS14.Admin.Pages.Connections
             AllRouteData.Add("showSet", "true");
 
             IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog;
-            logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
+            logQuery = SearchHelper.SearchConnectionLog(logQuery, search, User);
 
             var acceptableDenies = new List<ConnectionDenyReason?>();
             if (showAccepted)

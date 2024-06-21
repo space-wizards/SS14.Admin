@@ -35,7 +35,7 @@ public class Index : PageModel
     {
         Pagination.Init(pageIndex, perPage, AllRouteData);
 
-        var bans = SearchHelper.SearchRoleBans(_banHelper.CreateRoleBanJoin(), search);
+        var bans = SearchHelper.SearchRoleBans(_banHelper.CreateRoleBanJoin(), search, User);
 
         bans = show switch
         {

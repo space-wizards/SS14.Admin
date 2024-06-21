@@ -21,8 +21,9 @@
                 <div class="col-sm">
                     <input asp-for="Input.IP" value="@Model.Input.IP" class="form-control">
                 </div>
-                <div class="col-sm-auto">
-                    <input asp-page-handler="Fill" type="submit" value="Find last Info" class="btn btn-secondary btn-block">
+                <div class="col-sm-auto align-items-center d-flex">
+                    <input asp-for="Input.UseLatestIp" class="form-check-input" style="margin-right: 5px;">
+                    <label class="form-check-label">Use latest</label>
                 </div>
             </div>
         </div>
@@ -34,8 +35,9 @@
                 <div class="col-sm">
                     <input asp-for="Input.HWid" value="@Model.Input.HWid" class="form-control">
                 </div>
-                <div class="col-sm-auto">
-                    <input asp-page-handler="Fill" type="submit" value="Find last Info" class="btn btn-secondary btn-block">
+                <div class="col-sm-auto align-items-center d-flex">
+                    <input asp-for="Input.UseLatestHwid" class="form-check-input" style="margin-right: 5px;">
+                    <label class="form-check-label">Use latest</label>
                 </div>
             </div>
         </div>

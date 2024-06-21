@@ -35,7 +35,7 @@ namespace SS14.Admin.Pages
         {
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
-            var bans = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search);
+            var bans = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search, User);
 
             bans = show switch
             {
