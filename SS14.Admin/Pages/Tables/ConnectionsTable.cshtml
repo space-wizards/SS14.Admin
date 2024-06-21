@@ -12,6 +12,9 @@
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "addr", "IP Address"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "hwid", "HWID"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "denied", "Status"))"/>
+        <th>
+            Server
+        </th>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "hits", "Bans Hit"))"/>
     </tr>
     </thead>
@@ -63,6 +66,9 @@
                         <span>Accepted</span>
                         break;
                 }
+            </td>
+            <td>
+                @log.Server.Name
             </td>
             <td>
                 @if (banHits != 0)

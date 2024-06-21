@@ -1,6 +1,7 @@
 ﻿using Content.Server.Database;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages.Connections
@@ -99,10 +100,12 @@ namespace SS14.Admin.Pages.Connections
             string? sort,
             Dictionary<string, string?> allRouteData)
         {
-            var logs = query.LeftJoin(
-                dbContext.Player,
-                c => c.UserId, p => p.UserId,
-                (c, p) => new { c, HitCount = c.BanHits.Count, Player = p });
+            var logs = query
+                .Include(c => c.Server)
+                .LeftJoin(
+                    dbContext.Player,
+                    c => c.UserId, p => p.UserId,
+                    (c, p) => new { c, HitCount = c.BanHits.Count, Player = p });
 
             var sortState = Helpers.SortState.Build(logs);
 
