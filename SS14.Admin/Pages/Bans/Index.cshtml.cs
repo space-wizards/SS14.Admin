@@ -7,6 +7,7 @@ using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages
 {
+    [ValidateAntiForgeryToken]
     public class BansModel : PageModel
     {
         private readonly PostgresServerDbContext _dbContext;
