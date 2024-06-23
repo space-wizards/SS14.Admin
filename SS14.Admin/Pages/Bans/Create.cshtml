@@ -1,4 +1,6 @@
 ﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SS14.Admin.Helpers
 @model SS14.Admin.Pages.Bans.Create
 
 @{
@@ -7,97 +9,137 @@
 
 <partial name="Shared/StatusMessageAlert" />
 
-<form method="post" asp-page-handler="Create" class="container">
-    <div class="form-group row">
-        <label asp-for="Input.NameOrUid" class="col-sm-3 col-form-label">Name or user ID</label>
-        <div class="col-sm-9">
-            <input asp-for="Input.NameOrUid" class="form-control">
-        </div>
-    </div>
-    <div class="form-group row">
-        <label asp-for="Input.IP" class="col-sm-3 col-form-label">IP address/CIDR</label>
-        <div class="col-sm-9">
-            <div class="row">
-                <div class="col-sm">
-                    <input asp-for="Input.IP" value="@Model.Input.IP" class="form-control">
-                </div>
-                <div class="col-sm-auto align-items-center d-flex">
-                    <input asp-for="Input.UseLatestIp" class="form-check-input" style="margin-right: 5px;">
-                    <label class="form-check-label">Use latest</label>
-                </div>
+<form method="post" asp-page-handler="Create">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+
+        <div class="form-group row">
+            <label asp-for="Input.NameOrUid" class="col-sm-3 col-form-label">Name or user ID</label>
+            <div class="col-sm-9">
+                <input asp-for="Input.NameOrUid" class="form-control">
             </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label asp-for="Input.HWid" class="col-sm-3 col-form-label">HWID</label>
-        <div class="col-sm-9">
-            <div class="row">
-                <div class="col-sm">
-                    <input asp-for="Input.HWid" value="@Model.Input.HWid" class="form-control">
-                </div>
-                <div class="col-sm-auto align-items-center d-flex">
-                    <input asp-for="Input.UseLatestHwid" class="form-check-input" style="margin-right: 5px;">
-                    <label class="form-check-label">Use latest</label>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label asp-for="Input.LengthMinutes" class="col-sm-3 col-form-label">Minutes (0: permanent)</label>
-        <div class="col-sm-9">
-            <div class="row">
-                <div class="col-lg-6">
-                    <input asp-for="Input.LengthMinutes" id="durationInput" class="form-control">
-                </div>
-                <div class="col-lg-6">
-                    <div class="row g-0">
-                        <button data-duration="60" data-suffix="h" class="durationButton btn btn-secondary col"></button>
-                        <button data-duration="1440" data-suffix="d" class="durationButton btn btn-secondary col"></button>
-                        <button data-duration="10080" data-suffix="w" class="durationButton btn btn-secondary col"></button>
-                        <button data-duration="43200" data-suffix="M" class="durationButton btn btn-secondary col"></button>
+        <div class="form-group row">
+            <label asp-for="Input.IP" class="col-sm-3 col-form-label">IP address/CIDR</label>
+            <div class="col-sm-9">
+                <div class="row">
+                    <div class="col-sm">
+                        <input asp-for="Input.IP" value="@Model.Input.IP" class="form-control">
+                    </div>
+                    <div class="col-sm-auto align-items-center d-flex">
+                        <input asp-for="Input.UseLatestIp" class="form-check-input" style="margin-right: 5px;">
+                        <label class="form-check-label">Use latest</label>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="form-group row">
-        <label asp-for="Input.Reason" class="col-sm-3 col-form-label">Reason</label>
-        <div class="col-sm-9">
-            <textarea asp-for="Input.Reason" class="form-control"></textarea>
+        <div class="form-group row">
+            <label asp-for="Input.HWid" class="col-sm-3 col-form-label">HWID</label>
+            <div class="col-sm-9">
+                <div class="row">
+                    <div class="col-sm">
+                        <input asp-for="Input.HWid" value="@Model.Input.HWid" class="form-control">
+                    </div>
+                    <div class="col-sm-auto align-items-center d-flex">
+                        <input asp-for="Input.UseLatestHwid" class="form-check-input" style="margin-right: 5px;">
+                        <label class="form-check-label">Use latest</label>
+                    </div>
+                </div>
+            </div>
         </div>
+        <div class="form-group row">
+            <label asp-for="Input.LengthMinutes" class="col-sm-3 col-form-label">Minutes (0: permanent)</label>
+            <div class="col-sm-9">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input asp-for="Input.LengthMinutes" id="durationInput" class="form-control">
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row g-0">
+                            <button data-duration="60" data-suffix="h" class="durationButton btn btn-secondary col"></button>
+                            <button data-duration="1440" data-suffix="d" class="durationButton btn btn-secondary col"></button>
+                            <button data-duration="10080" data-suffix="w" class="durationButton btn btn-secondary col"></button>
+                            <button data-duration="43200" data-suffix="M" class="durationButton btn btn-secondary col"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="Input.Reason" class="col-sm-3 col-form-label">Reason</label>
+            <div class="col-sm-9">
+                <textarea asp-for="Input.Reason" class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label asp-for="Input.Reason" class="col-sm-3 col-form-label">Severity</label>
+            <div class="col-sm-9">
+                <select asp-for="Input.Severity" class="form-control" asp-items="@NoteSeverityHelper.SeverityItems">
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <legend class="col-form-label col-sm-3 float-sm-left pt-0">Settings</legend>
+            <div class="col-sm-9 mb-3">
+                <div class="form-check">
+                    <input asp-for="Input.AutoDelete" class="form-check-input"/>
+                    <label asp-for="Input.AutoDelete" class="form-check-label"></label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="Input.Hidden" class="form-check-input"/>
+                    <label asp-for="Input.Hidden" class="form-check-label"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <legend class="col-form-label col-sm-3 float-sm-left pt-0">Exemption flags</legend>
+            <div class="col-sm-9 mb-3">
+                @foreach (var (value, display) in BanExemptions.GetExemptions())
+                {
+                <div class="form-check">
+                    <input id="exemption_@value" name="exemption_@value" class="form-check-input" type="checkbox" checked="@((Model.ExemptFlags & value) != 0)" />
+                    <label for="exemption_@value" class="form-check-label">@display</label>
+                </div>
+                }
+            </div>
+        </div>
+
+        <input type="submit" asp-page-handler="Create" value="Create" class="btn btn-primary">
     </div>
-    <input type="submit" asp-page-handler="Create" value="Create" class="btn btn-primary">
+
+    <div class="container mt-3">
+        <h2>Ban Templates</h2>
+        <a asp-page="./BanTemplates/Create" class="btn btn-primary">Create new template</a>
+
+        <table class="table table-striped mt-3">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Reason</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var template in Model.Templates)
+            {
+            <tr>
+                <td>@template.Title</td>
+                <td>@template.Reason</td>
+                <td>
+                    <button type="submit" asp-page-handler="UseTemplate" asp-route-templateId="@template.Id" class="btn btn-primary">Use</button>
+                    <a asp-page="BanTemplates/View" asp-route-id="@template.Id" class="btn btn-secondary">
+                        Edit
+                    </a>
+                </td>
+            </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
 </form>
 
-
-<script>
-{
-    let durationInput = document.getElementById("durationInput");
-    let updateButtons = function() {
-        for (const btn of document.querySelectorAll(".durationButton")) {
-            let dur = Number(btn.dataset.duration);
-            let suffix = btn.dataset.suffix;
-
-            let val = Number(durationInput.value);
-            val /= dur;
-            btn.innerText = `+1${suffix} (${Math.round(val)})`;
-        }
-    };
-
-    durationInput.addEventListener("change", () => {
-        updateButtons();
-    });
-
-    for (const btn of document.querySelectorAll(".durationButton")) {
-        let dur = Number(btn.dataset.duration);
-        btn.addEventListener("click", e => {
-            durationInput.value = (Number(durationInput.value) + dur).toString();
-            updateButtons();
-            e.preventDefault();
-        });
-    }
-
-    updateButtons();
-}
-
-</script>
+<partial name="Shared/BanTimeButtonScript" />

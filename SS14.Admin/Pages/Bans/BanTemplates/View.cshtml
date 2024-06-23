@@ -1,0 +1,87 @@
+﻿@page
+@using SS14.Admin.Helpers
+@model SS14.Admin.Pages.Bans.BanTemplates.View
+
+@{
+    ViewData["Title"] = $"Ban template: {Model.Template.Title}";
+}
+
+<partial name="Shared/StatusMessageAlert" />
+
+<form method="post" asp-page-handler="Edit" class="container">
+    <h1>@ViewData["Title"]</h1>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group row">
+        <label asp-for="Input.Title" class="col-sm-3 col-form-label">Name</label>
+        <div class="col-sm-9">
+            <input asp-for="Input.Title" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="Input.LengthMinutes" class="col-sm-3 col-form-label">Minutes (0: permanent)</label>
+        <div class="col-sm-9">
+            <div class="row">
+                <div class="col-lg-6">
+                    <input asp-for="Input.LengthMinutes" id="durationInput" class="form-control">
+                </div>
+                <div class="col-lg-6">
+                    <div class="row g-0">
+                        <button data-duration="60" data-suffix="h" class="durationButton btn btn-secondary col"></button>
+                        <button data-duration="1440" data-suffix="d" class="durationButton btn btn-secondary col"></button>
+                        <button data-duration="10080" data-suffix="w" class="durationButton btn btn-secondary col"></button>
+                        <button data-duration="43200" data-suffix="M" class="durationButton btn btn-secondary col"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="Input.Reason" class="col-sm-3 col-form-label">Reason</label>
+        <div class="col-sm-9">
+            <textarea asp-for="Input.Reason" class="form-control"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="Input.Reason" class="col-sm-3 col-form-label">Severity</label>
+        <div class="col-sm-9">
+            <select asp-for="Input.Severity" class="form-control" asp-items="@NoteSeverityHelper.SeverityItems">
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <legend class="col-form-label col-sm-3 float-sm-left pt-0">Settings</legend>
+        <div class="col-sm-9 mb-3">
+            <div class="form-check">
+                <input asp-for="Input.AutoDelete" class="form-check-input"/>
+                <label asp-for="Input.AutoDelete" class="form-check-label"></label>
+            </div>
+            <div class="form-check">
+                <input asp-for="Input.Hidden" class="form-check-input"/>
+                <label asp-for="Input.Hidden" class="form-check-label"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <legend class="col-form-label col-sm-3 float-sm-left pt-0">Exemption flags</legend>
+        <div class="col-sm-9 mb-3">
+            @foreach (var (value, display) in BanExemptions.GetExemptions())
+            {
+                <div class="form-check">
+                    <input id="exemption_@value" name="exemption_@value" class="form-check-input" type="checkbox" checked="@((Model.Template.ExemptFlags & value) != 0)" />
+                    <label for="exemption_@value" class="form-check-label">@display</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <input type="submit" asp-route-id="@Model.Template.Id" asp-page-handler="Edit" value="Save" class="btn btn-primary">
+</form>
+
+<partial name="Shared/BanTimeButtonScript" />
