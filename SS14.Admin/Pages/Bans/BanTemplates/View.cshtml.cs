@@ -83,6 +83,8 @@ public class View(PostgresServerDbContext dbContext) : PageModel
 
         await dbContext.SaveChangesAsync();
 
+        TempData.SetStatusInformation("Changes saved");
+
         return RedirectToPage(new { id });
     }
 }
