@@ -9,7 +9,7 @@ public static class BanExemptions
         return
         [
             (ServerBanExemptFlags.Datacenter, "Datacenter"),
-            (ServerBanExemptFlags.IP, "Only matches IP"),
+            // (ServerBanExemptFlags.IP, "Only matches IP"),
             (ServerBanExemptFlags.BlacklistedRange, "Blacklisted range"),
         ];
     }

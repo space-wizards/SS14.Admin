@@ -37,8 +37,8 @@ namespace SS14.Admin.Pages.Bans
             public bool UseLatestHwid { get; set; }
             public int LengthMinutes { get; set; }
             [Required] public string Reason { get; set; } = "";
-            [Display(Name = "Delete ban when expired")]
-            public bool AutoDelete { get; set; }
+            // [Display(Name = "Delete ban when expired")]
+            // public bool AutoDelete { get; set; }
 
             [Display(Name = "Hidden from player")] public bool Hidden { get; set; }
             public NoteSeverity Severity { get; set; }
@@ -61,7 +61,7 @@ namespace SS14.Admin.Pages.Bans
             var hwid = Input.HWid;
 
             ban.ExemptFlags = ExemptFlags;
-            ban.AutoDelete = Input.AutoDelete;
+            // ban.AutoDelete = Input.AutoDelete;
             ban.Hidden = Input.Hidden;
             ban.Severity = Input.Severity;
 
@@ -122,7 +122,7 @@ namespace SS14.Admin.Pages.Bans
             Input.Reason = template.Reason;
             Input.LengthMinutes = (int)template.Length.TotalMinutes;
             Input.Severity = template.Severity;
-            Input.AutoDelete = template.AutoDelete;
+            // Input.AutoDelete = template.AutoDelete;
             Input.Hidden = template.Hidden;
             ExemptFlags = template.ExemptFlags;
 

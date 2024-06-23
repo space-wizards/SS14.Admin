@@ -24,8 +24,8 @@ public class View(PostgresServerDbContext dbContext) : PageModel
         public int LengthMinutes { get; set; }
         public string? Reason { get; set; }
 
-        [Display(Name = "Delete ban when expired")]
-        public bool AutoDelete { get; set; }
+        // [Display(Name = "Delete ban when expired")]
+        // public bool AutoDelete { get; set; }
 
         [Display(Name = "Hidden from player")] public bool Hidden { get; set; }
         public NoteSeverity Severity { get; set; }
@@ -42,7 +42,7 @@ public class View(PostgresServerDbContext dbContext) : PageModel
         Input.Reason = template.Reason;
         Input.Title = template.Title;
         Input.LengthMinutes = (int)template.Length.TotalMinutes;
-        Input.AutoDelete = template.AutoDelete;
+        // Input.AutoDelete = template.AutoDelete;
 
         Template = template;
         return Page();
@@ -66,7 +66,7 @@ public class View(PostgresServerDbContext dbContext) : PageModel
         template.Title = Input.Title;
         template.Length = TimeSpan.FromMinutes(Input.LengthMinutes);
         template.Reason = Input.Reason ?? "";
-        template.AutoDelete = Input.AutoDelete;
+        // template.AutoDelete = Input.AutoDelete;
         template.Hidden = Input.Hidden;
         template.Severity = Input.Severity;
 
