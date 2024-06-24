@@ -53,7 +53,7 @@
                     </a>
                     <br/>
                 }
-                @if (User.IsInRole("ADMIN"))
+                @if (User.IsInRole(Constants.PIIRole))
                 {
                     if (ban.Address != null)
                     {

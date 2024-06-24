@@ -15,7 +15,7 @@
         <dd class="col-sm-10">@Model.Ban.Player?.LastSeenUserName</dd>
         <dt class="col-sm-2">User ID:</dt>
         <dd class="col-sm-10 font-monospace">@Model.Ban.Ban.PlayerUserId</dd>
-        @if (User.IsInRole("ADMIN"))
+        @if (User.IsInRole(Constants.PIIRole))
         {
             <dt class="col-sm-2">IP:</dt>
             <dd class="col-sm-10 font-monospace">@Model.Ban.Ban.Address?.FormatCidr()</dd>
