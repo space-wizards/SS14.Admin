@@ -1,0 +1,23 @@
+﻿@page
+@model SS14.Admin.Pages.PersonalData.Index
+
+@{
+    ViewData["Title"] = "Connection log";
+}
+
+<partial name="Shared/StatusMessageAlert" />
+
+@if (!Model.IsMigrationCompatible)
+{
+    <div class="container">
+        <div class="alert alert-danger" role="alert">
+            Personal data management system has not been updated to latest database version;
+            functions here may not be 100% compatible.
+        </div>
+    </div>
+}
+
+<form method="post" asp-page-handler="DownloadPersonalData">
+    <input type="text" name="Name" id="Name" />
+    <button type="submit">Download</button>
+</form>

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 using SS14.Admin.Helpers;
+using SS14.Admin.PersonalData;
 using SS14.Admin.SignIn;
 
 namespace SS14.Admin
@@ -44,7 +45,13 @@ namespace SS14.Admin
                 options.Conventions.AuthorizeFolder("/Logs");
                 options.Conventions.AuthorizeFolder("/Characters");
                 options.Conventions.AuthorizeFolder("/Whitelist");
+                options.Conventions.AuthorizeFolder("/PersonalData", Constants.PolicyPersonalDataManagement);
             });
+
+            services.AddScoped<PersonalDataDownloader>();
+
+            services.AddAuthorizationBuilder()
+                .AddPolicy(Constants.PolicyPersonalDataManagement, policy => policy.RequireRole(Constants.HostRole));
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
