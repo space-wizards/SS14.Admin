@@ -7,7 +7,7 @@ namespace SS14.Admin.PersonalData;
 
 public sealed class PersonalDataDownloader(PostgresServerDbContext dbContext)
 {
-    private const string SupportedDbMigration = "20230725193102_AdminNotesImprovementsForeignKeys";
+    private const string SupportedDbMigration = "20240623005121_BanTemplate";
 
     public async Task<bool> GetIsMigrationCompatible(CancellationToken cancel = default)
     {
@@ -33,6 +33,7 @@ public sealed class PersonalDataDownloader(PostgresServerDbContext dbContext)
         await CollectServerRoleBan(userId, zip, cancel);
         await CollectUploadedResourceLog(userId, zip, cancel);
         await CollectWhitelist(userId, zip, cancel);
+        await CollectRoleWhitelist(userId, zip, cancel);
     }
 
     private async Task CollectAdmin(Guid userId, ZipArchive into, CancellationToken cancel)
@@ -173,7 +174,25 @@ public sealed class PersonalDataDownloader(PostgresServerDbContext dbContext)
                         (SELECT COALESCE(json_agg(to_jsonb(trait_subq) - 'profile_id'), '[]') FROM (
                             SELECT * FROM trait WHERE trait.profile_id = profile.profile_id
                         ) trait_subq)
-                        as traits
+                        as traits,
+                        (SELECT COALESCE(json_agg(to_jsonb(role_loadout_subq) - 'profile_id'), '[]') FROM (
+                            SELECT
+                                *,
+                                (SELECT COALESCE(json_agg(to_jsonb(loadout_group_subq) - 'profile_role_loadout_id'), '[]') FROM (
+                                    SELECT
+                                        *,
+                                        (SELECT COALESCE(json_agg(to_jsonb(loadout_subq) - 'profile_loadout_group_id'), '[]') FROM (
+                                            SELECT * FROM profile_loadout pl WHERE pl.profile_loadout_group_id = plg.profile_loadout_group_id
+                                        ) loadout_subq)
+                                        as loadouts
+                                    FROM profile_loadout_group plg
+                                    WHERE plg.profile_role_loadout_id = prl.profile_role_loadout_id
+                                ) loadout_group_subq)
+                                as loadout_groups
+                            FROM profile_role_loadout prl
+                            WHERE prl.profile_id = profile.profile_id
+                        ) role_loadout_subq)
+                        as role_loadouts
                     FROM
                         profile
                     WHERE
@@ -302,6 +321,22 @@ public sealed class PersonalDataDownloader(PostgresServerDbContext dbContext)
                 *
             FROM
                 admin_watchlists
+            WHERE
+                player_user_id = @UserId
+        ) as data
+        """, cancel);
+    }
+
+    private async Task CollectRoleWhitelist(Guid userId, ZipArchive into, CancellationToken cancel)
+    {
+        await CollectJson(userId, into, "role_whitelist", """
+        SELECT
+            COALESCE(json_agg(to_json(data)), '[]') #>> '{}'
+        FROM (
+            SELECT
+                *
+            FROM
+                role_whitelists
             WHERE
                 player_user_id = @UserId
         ) as data
