@@ -1,5 +1,4 @@
 ﻿@page
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model SS14.Admin.Pages.Bans.Create
 
 @{
@@ -7,6 +6,9 @@
 }
 
 <partial name="Shared/StatusMessageAlert" />
+<div>
+    Formatting for tsv goes here....
+</div>
 
 <form method="post" asp-page-handler="Create" class="container">
     <div class="form-group row">
@@ -70,33 +72,5 @@
 
 
 <script>
-{
-    let durationInput = document.getElementById("durationInput");
-    let updateButtons = function() {
-        for (const btn of document.querySelectorAll(".durationButton")) {
-            let dur = Number(btn.dataset.duration);
-            let suffix = btn.dataset.suffix;
-
-            let val = Number(durationInput.value);
-            val /= dur;
-            btn.innerText = `+1${suffix} (${Math.round(val)})`;
-        }
-    };
-
-    durationInput.addEventListener("change", () => {
-        updateButtons();
-    });
-
-    for (const btn of document.querySelectorAll(".durationButton")) {
-        let dur = Number(btn.dataset.duration);
-        btn.addEventListener("click", e => {
-            durationInput.value = (Number(durationInput.value) + dur).toString();
-            updateButtons();
-            e.preventDefault();
-        });
-    }
-
-    updateButtons();
-}
-
+//will write the new conformation here
 </script>
