@@ -27,6 +27,9 @@
         <th style="min-width: 210px">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "time", "Ban time"))"/>
         </th>
+        <th>
+            <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "round", "Round"))"/>
+        </th>
         <th style="min-width: 210px">Expires</th>
         <th style="min-width: 140px">
             <partial name="Tables/SortTabHeaderCore" model="@(new SortTabHeaderModel(Model.SortState, "admin", "Banning admin"))"/>
@@ -50,7 +53,7 @@
                     </a>
                     <br/>
                 }
-                @if (User.IsInRole("ADMIN"))
+                @if (User.IsInRole(Constants.PIIRole))
                 {
                     if (ban.Address != null)
                     {
@@ -77,6 +80,7 @@
             <td>@ban.Reason</td>
             <td>@ban.Role</td>
             <td>@ban.BanTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+            <td>@ban.Round</td>
             <td>
                 @(ban.Expires?.ToString("yyyy-MM-dd HH:mm:ss") ?? "PERMANENT")
                 @if (ban.Unbanned is { } unbanned)
@@ -85,7 +89,7 @@
                     <br>
                     <text><strong>Unbanned:</strong> @time.ToString("yyyy-MM-dd HH:mm:ss") by @admin</text>
                 }
-                else if (ban.Expires < DateTime.Now)
+                else if (ban.Expires < DateTime.UtcNow)
                 {
                     <br>
                     <strong>Expired</strong>
@@ -95,9 +99,12 @@
             <td>
                 @if (ban.Active && User.IsInRole("BAN"))
                 {
-                    <form asp-page="/RoleBans/Index" asp-page-handler="Unban">
+                    <form id="unban-form-@ban.Id" asp-page="/RoleBans/Index" asp-page-handler="Unban">
                         <input type="hidden" name="Id" value="@ban.Id">
-                        <input type="submit" class="btn btn-secondary" value="Unban">
+                        <button type="button" class="btn btn-secondary" onclick="showConfirmation('@ban.Id')">Unban</button>
+                        <div class="confirmation-button" id="confirmation-button-@ban.Id" style="display: none;">
+                            <button type="submit" class="btn btn-danger">Are you sure?</button>
+                        </div>
                     </form>
                 }
             </td>
@@ -105,6 +112,19 @@
     }
     </tbody>
 </table>
+
+<script>
+    function showConfirmation(banId) {
+        const confirmationButton = document.getElementById('confirmation-button-' + banId);
+        const unbanButton = document.getElementById('unban-form-' + banId).querySelector('button[type="button"]');
+        confirmationButton.style.display = 'block';
+        unbanButton.style.display = 'none';
+        setTimeout(function() {
+            confirmationButton.style.display = 'none';
+            unbanButton.style.display = 'block';
+        }, 3000); // Revert after 3 seconds
+    }
+</script>
 
 @if(b == true)
 {

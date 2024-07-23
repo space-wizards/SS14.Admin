@@ -12,6 +12,9 @@
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "addr", "IP Address"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "hwid", "HWID"))"/>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "denied", "Status"))"/>
+        <th>
+            Server
+        </th>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "hits", "Bans Hit"))"/>
     </tr>
     </thead>
@@ -34,8 +37,16 @@
             </td>
             <td class="font-monospace">@log.UserId</td>
             <td>@log.Time.ToString("yyyy-MM-dd HH:mm:ss")</td>
-            <td class="font-monospace constrained-150">@log.Address</td>
-            <td class="font-monospace constrained-150">@(log.HWId is { } hwid ? Convert.ToBase64String(hwid) : null)</td>
+            @if (User.IsInRole(Constants.PIIRole))
+            {
+                <td class="font-monospace constrained-150">@log.Address</td>
+                <td class="font-monospace constrained-150">@(log.HWId is { } hwid ? Convert.ToBase64String(hwid) : null)</td>
+            }
+            else
+            {
+                <td class="font-monospace constrained-150">Hidden</td>
+                <td class="font-monospace constrained-150">Hidden</td>
+            }
             <td>
                 @switch (log.Denied)
                 {
@@ -55,6 +66,9 @@
                         <span>Accepted</span>
                         break;
                 }
+            </td>
+            <td>
+                @log.Server.Name
             </td>
             <td>
                 @if (banHits != 0)

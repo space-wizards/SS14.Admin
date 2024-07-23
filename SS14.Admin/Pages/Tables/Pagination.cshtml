@@ -43,7 +43,10 @@
 
     <span class="small">
         Page: @(Model.PageIndex + 1)
-        Total: @Model.TotalCount
+        @if (Model.TotalCount is { } total)
+        {
+            @:Total: @total
+        }
         Shown:
         @{ await ShownCountButton(100); }
         |

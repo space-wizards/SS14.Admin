@@ -1,6 +1,7 @@
 ﻿using Content.Server.Database;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages.Connections
@@ -10,7 +11,7 @@ namespace SS14.Admin.Pages.Connections
         private readonly PostgresServerDbContext _dbContext;
 
         public ISortState SortState { get; private set; } = default!;
-        public PaginationState<Connection> Pagination { get; } = new(100);
+        public PaginationState<Connection> Pagination { get; } = new(100, showTotal: false);
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         public string? CurrentFilter { get; set; }
@@ -71,8 +72,8 @@ namespace SS14.Admin.Pages.Connections
             AllRouteData.Add("showPanic", showPanic.ToString());
             AllRouteData.Add("showSet", "true");
 
-            IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog;
-            logQuery = SearchHelper.SearchConnectionLog(logQuery, search);
+            IQueryable<ConnectionLog> logQuery = _dbContext.ConnectionLog.Include(c => c.Server);
+            logQuery = SearchHelper.SearchConnectionLog(logQuery, search, User);
 
             var acceptableDenies = new List<ConnectionDenyReason?>();
             if (showAccepted)
@@ -99,10 +100,11 @@ namespace SS14.Admin.Pages.Connections
             string? sort,
             Dictionary<string, string?> allRouteData)
         {
-            var logs = query.LeftJoin(
-                dbContext.Player,
-                c => c.UserId, p => p.UserId,
-                (c, p) => new { c, HitCount = c.BanHits.Count, Player = p });
+            var logs = query
+                .LeftJoin(
+                    dbContext.Player,
+                    c => c.UserId, p => p.UserId,
+                    (c, p) => new { c, HitCount = c.BanHits.Count, Player = p });
 
             var sortState = Helpers.SortState.Build(logs);
 

@@ -17,10 +17,10 @@ public class LogsIndexModel : PageModel
         public Dictionary<string, string?> AllRouteData { get; } = new();
 
         [BindProperty(SupportsGet = true)]
-        public DateTime FromDate { get; set; } = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+        public DateTime FromDate { get; set; } = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
 
         [BindProperty(SupportsGet = true)]
-        public DateTime ToDate { get; set; } = DateTime.Now;
+        public DateTime ToDate { get; set; } = DateTime.UtcNow;
 
         [BindProperty(SupportsGet = true)]
         public OrderColumn Sort { get; set; } = OrderColumn.Date;

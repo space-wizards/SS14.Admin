@@ -7,6 +7,7 @@ using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages.RoleBans;
 
+[ValidateAntiForgeryToken]
 public class Index : PageModel
 {
     private readonly PostgresServerDbContext _dbContext;
@@ -35,13 +36,13 @@ public class Index : PageModel
     {
         Pagination.Init(pageIndex, perPage, AllRouteData);
 
-        var bans = SearchHelper.SearchRoleBans(_banHelper.CreateRoleBanJoin(), search);
+        var bans = SearchHelper.SearchRoleBans(_banHelper.CreateRoleBanJoin(), search, User);
 
         bans = show switch
         {
             ShowFilter.Active => bans.Where(b =>
-                b.Ban.Unban == null && (b.Ban.ExpirationTime == null || b.Ban.ExpirationTime > DateTime.Now)),
-            ShowFilter.Expired => bans.Where(b => b.Ban.Unban != null || b.Ban.ExpirationTime < DateTime.Now),
+                b.Ban.Unban == null && (b.Ban.ExpirationTime == null || b.Ban.ExpirationTime > DateTime.UtcNow)),
+            ShowFilter.Expired => bans.Where(b => b.Ban.Unban != null || b.Ban.ExpirationTime < DateTime.UtcNow),
             _ => bans
         };
 
@@ -102,6 +103,7 @@ public class Index : PageModel
         sortState.AddColumn("ip", p => p.Ban.Address);
         sortState.AddColumn("uid", p => p.Ban.PlayerUserId);
         sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
+        sortState.AddColumn("round", p => p.Ban.RoundId);
         // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
         sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
         sortState.AddColumn("role", p => p.Ban.RoleId);
@@ -132,7 +134,8 @@ public class Index : PageModel
                 BanHelper.IsBanActive(b.Ban),
                 b.Ban.BanTime,
                 b.Admin?.LastSeenUserName,
-                b.Ban.RoleId);
+                b.Ban.RoleId,
+                b.Ban.RoundId);
         }));
 
         return sortState;
@@ -150,7 +153,8 @@ public class Index : PageModel
         bool Active,
         DateTime BanTime,
         string? Admin,
-        string Role);
+        string Role,
+        int? Round);
 
     public enum ShowFilter
     {

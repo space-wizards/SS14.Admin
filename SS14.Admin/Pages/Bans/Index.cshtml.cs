@@ -7,6 +7,7 @@ using SS14.Admin.Helpers;
 
 namespace SS14.Admin.Pages
 {
+    [ValidateAntiForgeryToken]
     public class BansModel : PageModel
     {
         private readonly PostgresServerDbContext _dbContext;
@@ -35,13 +36,13 @@ namespace SS14.Admin.Pages
         {
             Pagination.Init(pageIndex, perPage, AllRouteData);
 
-            var bans = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search);
+            var bans = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search, User);
 
             bans = show switch
             {
                 ShowFilter.Active => bans.Where(b =>
-                    b.Ban.Unban == null && (b.Ban.ExpirationTime == null || b.Ban.ExpirationTime > DateTime.Now)),
-                ShowFilter.Expired => bans.Where(b => b.Ban.Unban != null || b.Ban.ExpirationTime < DateTime.Now),
+                    b.Ban.Unban == null && (b.Ban.ExpirationTime == null || b.Ban.ExpirationTime > DateTime.UtcNow)),
+                ShowFilter.Expired => bans.Where(b => b.Ban.Unban != null || b.Ban.ExpirationTime < DateTime.UtcNow),
                 _ => bans
             };
 
@@ -103,6 +104,7 @@ namespace SS14.Admin.Pages
             sortState.AddColumn("ip", p => p.Ban.Address);
             sortState.AddColumn("uid", p => p.Ban.PlayerUserId);
             sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
+            sortState.AddColumn("round", p => p.Ban.RoundId);
             // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
             sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
             sortState.AddColumn("hits", p => p.HitCount);
@@ -133,7 +135,8 @@ namespace SS14.Admin.Pages
                     BanHelper.IsBanActive(b.Ban),
                     b.Ban.BanTime,
                     b.Admin?.LastSeenUserName,
-                    b.HitCount);
+                    b.HitCount,
+                    b.Ban.RoundId);
             }));
 
             return sortState;
@@ -151,7 +154,8 @@ namespace SS14.Admin.Pages
             bool Active,
             DateTime BanTime,
             string? Admin,
-            int hitCount);
+            int hitCount,
+            int? Round);
 
         public enum ShowFilter
         {

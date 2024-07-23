@@ -47,7 +47,7 @@ public sealed class Hits : PageModel
 
         Pagination.Init(pageIndex, perPage, AllRouteData);
 
-        var banQuery = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search)
+        var banQuery = SearchHelper.SearchServerBans(_banHelper.CreateServerBanJoin(), search, User)
             .Join(_dbContext.ServerBanHit, bj => bj.Ban.Id, bh => bh.BanId, (join, hit) => new
             {
                 join, hit
