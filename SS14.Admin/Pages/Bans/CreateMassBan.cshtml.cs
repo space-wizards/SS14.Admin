@@ -14,7 +14,6 @@ namespace SS14.Admin.Pages.Bans
     {
         private readonly PostgresServerDbContext _dbContext;
         private readonly BanHelper _banHelper;
-        public ServerBanExemptFlags ExemptFlags;
 
         public CreateMassBanModel(PostgresServerDbContext dbContext, BanHelper banHelper, IWebHostEnvironment environment)
         {
@@ -63,7 +62,7 @@ namespace SS14.Admin.Pages.Bans
                     var hwid = entry.Hwid;
 
                     ban.ExemptFlags = ExemptFlags;
-                    // ban.AutoDelete = Input.AutoDelete; // Could be added later
+                    // ban.AutoDelete = Input.AutoDelete; // Uncomment and use if necessary
                     //ban.Hidden = Input.Hidden;
                     //ban.Severity = Input.Severity;
 
@@ -109,11 +108,11 @@ namespace SS14.Admin.Pages.Bans
 
             using (var csvReader = new CsvReader(reader, config))
             {
-                // Read the header
-                csvReader.Read();
-                csvReader.ReadHeader();
+                if (!csvReader.Read() || !csvReader.ReadHeader())
+                {
+                    throw new InvalidDataException("The TSV file is missing a header.");
+                }
 
-                // Read the records
                 while (csvReader.Read())
                 {
                     var record = new TsvEntry
