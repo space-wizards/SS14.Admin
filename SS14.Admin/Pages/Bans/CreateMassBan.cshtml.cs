@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SS14.Admin.Helpers;
+using CsvHelper;
 
 namespace SS14.Admin.Pages.Bans
 {
@@ -13,13 +14,12 @@ namespace SS14.Admin.Pages.Bans
     {
         private readonly PostgresServerDbContext _dbContext;
         private readonly BanHelper _banHelper;
-        private readonly IWebHostEnvironment _environment;
+        public ServerBanExemptFlags ExemptFlags;
 
         public CreateMassBanModel(PostgresServerDbContext dbContext, BanHelper banHelper, IWebHostEnvironment environment)
         {
             _dbContext = dbContext;
             _banHelper = banHelper;
-            _environment = environment;
         }
 
         public int BanCount { get; private set; }
@@ -30,6 +30,8 @@ namespace SS14.Admin.Pages.Bans
             public string Address { get; set; }
             public string Hwid { get; set; }
             public string Reason { get; set; }
+            public bool Datacenter { get; set; }
+            public bool BlacklistedRange { get; set; }
         }
 
         public async Task<IActionResult> OnPostAsync(IFormFile file)
@@ -53,13 +55,23 @@ namespace SS14.Admin.Pages.Bans
 
                 foreach (var entry in entries)
                 {
+                    var ExemptFlags = BanExemptions.GetExemptionFromForm(Request.Form);
+
                     var ban = new ServerBan();
+
+                    var ipAddr = entry.Address;
+                    var hwid = entry.Hwid;
+
+                    ban.ExemptFlags = ExemptFlags;
+                    // ban.AutoDelete = Input.AutoDelete; // Could be added later
+                    //ban.Hidden = Input.Hidden;
+                    //ban.Severity = Input.Severity;
 
                     var error = await _banHelper.FillBanCommon(
                         ban,
                         entry.UserId,
-                        entry.Address,
-                        entry.Hwid,
+                        ipAddr,
+                        hwid,
                         0, // Assuming lengthMinutes is always 0 for mass bans for now
                         entry.Reason);
 
@@ -84,7 +96,6 @@ namespace SS14.Admin.Pages.Bans
             }
         }
 
-
         private List<TsvEntry> ParseTsv(StreamReader reader)
         {
             var records = new List<TsvEntry>();
@@ -96,7 +107,7 @@ namespace SS14.Admin.Pages.Bans
                 MissingFieldFound = null // Ignore missing fields
             };
 
-            using (var csvReader = new CsvHelper.CsvReader(reader, config))
+            using (var csvReader = new CsvReader(reader, config))
             {
                 // Read the header
                 csvReader.Read();
@@ -107,19 +118,19 @@ namespace SS14.Admin.Pages.Bans
                 {
                     var record = new TsvEntry
                     {
-                        UserId = csvReader.GetField<string>(0), // Assuming UserId is in the first column APPARENTLY ITS THE ONLY FUCKINKING COULM JASJDAJSDJASDJASJD
-                        Address = csvReader.GetField<string>(1),
-                        Hwid = csvReader.GetField<string>(2),
-                        Reason = csvReader.GetField<string>(3)
+                        UserId = csvReader.GetField<string>("user_id"),
+                        Address = csvReader.GetField<string>("address"),
+                        Hwid = csvReader.GetField<string>("hwid"),
+                        Reason = csvReader.GetField<string>("reason"),
+                        Datacenter = csvReader.GetField<bool>("datacenter"),
+                        BlacklistedRange = csvReader.GetField<bool>("blacklisted_range")
                     };
                     records.Add(record);
-                    //Assuming that the parse is vaid this sound return the correct amout of bans
                     BanCount += 1;
                 }
             }
 
             return records;
         }
-
     }
 }
