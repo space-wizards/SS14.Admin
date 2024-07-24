@@ -15,7 +15,7 @@ namespace SS14.Admin.Pages.Bans
         private readonly PostgresServerDbContext _dbContext;
         private readonly BanHelper _banHelper;
 
-        public CreateMassBanModel(PostgresServerDbContext dbContext, BanHelper banHelper, IWebHostEnvironment environment)
+        public CreateMassBanModel(PostgresServerDbContext dbContext, BanHelper banHelper)
         {
             _dbContext = dbContext;
             _banHelper = banHelper;
@@ -23,15 +23,14 @@ namespace SS14.Admin.Pages.Bans
 
         public int BanCount { get; private set; }
 
-        public class TsvEntry
-        {
-            public string UserId { get; set; }
-            public string Address { get; set; }
-            public string Hwid { get; set; }
-            public string Reason { get; set; }
-            public bool Datacenter { get; set; }
-            public bool BlacklistedRange { get; set; }
-        }
+        public record TsvEntry(
+            string UserId,
+            string Address,
+            string Hwid,
+            string Reason,
+            bool Datacenter,
+            bool BlacklistedRange
+        );
 
         public async Task<IActionResult> OnPostAsync(IFormFile file)
         {
@@ -115,15 +114,14 @@ namespace SS14.Admin.Pages.Bans
 
                 while (csvReader.Read())
                 {
-                    var record = new TsvEntry
-                    {
-                        UserId = csvReader.GetField<string>("user_id"),
-                        Address = csvReader.GetField<string>("address"),
-                        Hwid = csvReader.GetField<string>("hwid"),
-                        Reason = csvReader.GetField<string>("reason"),
-                        Datacenter = csvReader.GetField<bool>("datacenter"),
-                        BlacklistedRange = csvReader.GetField<bool>("blacklisted_range")
-                    };
+                    var record = new TsvEntry(
+                        csvReader.GetField<string>("user_id"),
+                        csvReader.GetField<string>("address"),
+                        csvReader.GetField<string>("hwid"),
+                        csvReader.GetField<string>("reason"),
+                        csvReader.GetField<bool>("datacenter"),
+                        csvReader.GetField<bool>("blacklisted_range")
+                    );
                     records.Add(record);
                     BanCount += 1;
                 }
