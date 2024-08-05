@@ -12,6 +12,13 @@ namespace SS14.Admin.Pages.Bans
     [ValidateAntiForgeryToken]
     public class CreateMassBanModel : PageModel
     {
+        private static readonly CsvHelper.Configuration.CsvConfiguration CsvConfig = new(CultureInfo.InvariantCulture)
+        {
+            Delimiter = "\t", // Specify tab as the delimiter
+            HasHeaderRecord = true, // TSV files have a header row
+            MissingFieldFound = null // Ignore missing fields
+        };
+
         private readonly PostgresServerDbContext _dbContext;
         private readonly BanHelper _banHelper;
 
@@ -24,9 +31,9 @@ namespace SS14.Admin.Pages.Bans
         public int BanCount { get; private set; }
 
         public record TsvEntry(
-            string UserId,
-            string Address,
-            string Hwid,
+            string? UserId,
+            string? Address,
+            string? Hwid,
             string Reason,
             bool Datacenter,
             bool BlacklistedRange
@@ -53,17 +60,15 @@ namespace SS14.Admin.Pages.Bans
 
                 foreach (var entry in entries)
                 {
-                    var ExemptFlags = BanExemptions.GetExemptionFromForm(Request.Form);
-
                     var ban = new ServerBan();
 
                     var ipAddr = entry.Address;
                     var hwid = entry.Hwid;
 
-                    ban.ExemptFlags = ExemptFlags;
-                    // ban.AutoDelete = Input.AutoDelete; // Uncomment and use if necessary
-                    //ban.Hidden = Input.Hidden;
-                    //ban.Severity = Input.Severity;
+                    if (entry.Datacenter)
+                        ban.ExemptFlags |= ServerBanExemptFlags.Datacenter;
+                    if (entry.BlacklistedRange)
+                        ban.ExemptFlags |= ServerBanExemptFlags.BlacklistedRange;
 
                     var error = await _banHelper.FillBanCommon(
                         ban,
@@ -98,33 +103,25 @@ namespace SS14.Admin.Pages.Bans
         {
             var records = new List<TsvEntry>();
 
-            var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = "\t", // Specify tab as the delimiter
-                HasHeaderRecord = true, // TSV files have a header row
-                MissingFieldFound = null // Ignore missing fields
-            };
+            using var csvReader = new CsvReader(reader, CsvConfig);
 
-            using (var csvReader = new CsvReader(reader, config))
+            if (!csvReader.Read() || !csvReader.ReadHeader())
             {
-                if (!csvReader.Read() || !csvReader.ReadHeader())
-                {
-                    throw new InvalidDataException("The TSV file is missing a header.");
-                }
+                throw new InvalidDataException("The TSV file is missing a header.");
+            }
 
-                while (csvReader.Read())
-                {
-                    var record = new TsvEntry(
-                        csvReader.GetField<string>("user_id"),
-                        csvReader.GetField<string>("address"),
-                        csvReader.GetField<string>("hwid"),
-                        csvReader.GetField<string>("reason"),
-                        csvReader.GetField<bool>("datacenter"),
-                        csvReader.GetField<bool>("blacklisted_range")
-                    );
-                    records.Add(record);
-                    BanCount += 1;
-                }
+            while (csvReader.Read())
+            {
+                var record = new TsvEntry(
+                    csvReader.GetField<string>("user_id"),
+                    csvReader.GetField<string>("address"),
+                    csvReader.GetField<string>("hwid"),
+                    csvReader.GetField<string>("reason") ?? "",
+                    csvReader.GetField<bool>("datacenter"),
+                    csvReader.GetField<bool>("blacklisted_range")
+                );
+                records.Add(record);
+                BanCount += 1;
             }
 
             return records;
