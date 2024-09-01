@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Content.Server.Database;
 using Content.Shared.Database;
 using Microsoft.EntityFrameworkCore;
-using SS14.Admin.Pages.Logs;
+using SS14.Admin.Pages.AdminLogs;
 
 namespace SS14.Admin.AdminLogs;
 
@@ -21,7 +21,7 @@ public static class AdminLogRepository
         string? search,
         int? roundId,
         int? severity,
-        LogsIndexModel.OrderColumn sort,
+        AdminLogsIndexModel.OrderColumn sort,
         int limit = 100, int offset = 0)
     {
         var fromDateValue = fromDate?.ToString("o", CultureInfo.InvariantCulture);
@@ -48,8 +48,8 @@ public static class AdminLogRepository
 
         var sortStatement = sort switch
         {
-            LogsIndexModel.OrderColumn.Date => "a.date",
-            LogsIndexModel.OrderColumn.Impact => "a.impact",
+            AdminLogsIndexModel.OrderColumn.Date => "a.date",
+            AdminLogsIndexModel.OrderColumn.Impact => "a.impact",
             _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, "Unknown admin log sort column")
         };
 

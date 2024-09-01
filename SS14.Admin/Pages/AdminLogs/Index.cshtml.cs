@@ -1,15 +1,12 @@
-﻿using System.Runtime.InteropServices.JavaScript;
-using System.Text.Json;
-using Content.Server.Database;
+﻿using Content.Server.Database;
 using Content.Shared.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SS14.Admin.AdminLogs;
-using SS14.Admin.Models;
 
-namespace SS14.Admin.Pages.Logs;
+namespace SS14.Admin.Pages.AdminLogs;
 
-public class LogsIndexModel : PageModel
+public class AdminLogsIndexModel : PageModel
 {
         private readonly PostgresServerDbContext _dbContext;
 
@@ -48,7 +45,7 @@ public class LogsIndexModel : PageModel
         public string? ServerSearch { get; set; }
         public string? Search { get; set; }
 
-        public LogsIndexModel(PostgresServerDbContext dbContext)
+        public AdminLogsIndexModel(PostgresServerDbContext dbContext)
         {
             _dbContext = dbContext;
         }
