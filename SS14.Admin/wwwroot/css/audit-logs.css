@@ -221,12 +221,11 @@ data-grid > table {
     border-collapse: collapse;
     min-width: 100%;
     grid-template-columns:
-        minmax(120px, 0.1fr) /* Round ID */
-        minmax(120px, 0.1fr) /* Server */
         minmax(100px, 0.1fr) /* Severity */
         minmax(180px, 0.15fr) /* Date */
         minmax(130px, 0.15fr) /* Type */
         minmax(150px, 1.5fr); /* Message */
+        /* minmax(130px, 0.15fr); /* Players */
     overflow-y: auto;
     max-height: calc(100vh - 120px);
     font-size: 1rem;

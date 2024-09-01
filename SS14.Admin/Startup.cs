@@ -44,6 +44,7 @@ namespace SS14.Admin
                 options.Conventions.AuthorizeFolder("/AdminLogs");
                 options.Conventions.AuthorizeFolder("/Characters");
                 options.Conventions.AuthorizeFolder("/Whitelist");
+                options.Conventions.AuthorizeFolder("/AuditLogs");
             });
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

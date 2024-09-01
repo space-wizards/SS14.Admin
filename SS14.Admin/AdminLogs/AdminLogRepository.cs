@@ -3,14 +3,13 @@ using System.Text.RegularExpressions;
 using Content.Server.Database;
 using Content.Shared.Database;
 using Microsoft.EntityFrameworkCore;
+using SS14.Admin.Helpers;
 using SS14.Admin.Pages.AdminLogs;
 
 namespace SS14.Admin.AdminLogs;
 
 public static class AdminLogRepository
 {
-    private static readonly Regex ParameterRegex = new(Regex.Escape("#"));
-
     public static async Task<List<AdminLog>> FindAdminLogs(
         ServerDbContext context,
         DbSet<AdminLog> adminLogs,
@@ -63,7 +62,7 @@ public static class AdminLogRepository
                 {(playerUserId != null ? "p.player_user_id = # AND" : "")}
                 {(serverName != null ? "s.name = # AND" : "")}
                 {(typeInt != null ? "a.type = #::integer AND" : "")}
-                {(search != null ? $"{TextSearchForContext(context)} AND" : "")}
+                {(search != null ? $"{RawSqlHelper.TextSearchForContext(context)} AND" : "")}
                 {(roundId != null ? "r.round_id = #::integer AND" : "")}
                 {(severity != null ? "a.impact = #::integer AND" : "")}
                 TRUE
@@ -71,30 +70,12 @@ public static class AdminLogRepository
             LIMIT #::bigint OFFSET #::bigint
         ";
 
-        var result = adminLogs.FromSqlRaw(EnumerateParameters(query), values.ToArray());
+        var result = adminLogs.FromSqlRaw(RawSqlHelper.EnumerateParameters(query), values.ToArray());
         return await result.ToListAsync();
     }
 
     public static async Task<Player?> FindPlayerByName(DbSet<Player> players, string name)
     {
         return await players.FromSqlRaw("SELECT * FROM player WHERE last_seen_user_name = {0}", name).SingleOrDefaultAsync();
-    }
-
-    private static string TextSearchForContext(ServerDbContext context)
-    {
-        return context is PostgresServerDbContext ? "to_tsvector('english'::regconfig, a.message) @@ websearch_to_tsquery('english'::regconfig, #)" : " a.message LIKE %#%";
-    }
-
-    private static string EnumerateParameters(string query)
-    {
-        var index = 0;
-
-        while (ParameterRegex.IsMatch(query))
-        {
-            query = ParameterRegex.Replace(query, $"{{{index}}}", 1);
-            index += 1;
-        }
-
-        return query;
     }
 }

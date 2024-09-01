@@ -1,0 +1,153 @@
+﻿@page
+@model SS14.Admin.Pages.AuditLogs.AuditLogsIndexModel
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SS14.Admin.AdminLogs
+@using SS14.Admin.Helpers
+
+@{
+    ViewData["Title"] = "Audit Logs";
+    var prevDisabled = Model.PageIndex == 0 ? "disabled" : "";
+    var nextDisabled = (Model.Items.Count == 0) ? "disabled" : "";
+    var nextPageIdx = Model.PageIndex + 1;
+    var prevPageIdx = Model.PageIndex == 1 ? null : (int?) Model.PageIndex - 1;
+}
+@section Styles {
+    <link href="@Url.Content("~/css/audit-logs.css")" rel="stylesheet" type="text/css"/>
+}
+
+<data-grid>
+    <data-grid-filter class="flex-row">
+        <div class="form-group" style="display: inline-block; align-items: center;">
+            <div style="display: inline-block">
+                <label for="datePicker">Date Range:<button id="litepicker-close" class="btn btn-sm"><i class="fas fa-times"></i></button></label>
+                <input class="form-control" name="daterange" id="datePicker" type="text" value="@(Model.FromDate)" placeholder="Date from - to"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="messageSearch">Text Search</label>
+            <input name="messageSearch" class="form-control" id="messageSearch" type="text" placeholder="Text Search"/>
+        </div>
+        <div class="form-group">
+            <label for="author">Author</label>
+            <input id="author" name="author" class="form-control" type="text" placeholder="All Admins"/>
+        </div>
+        <div class="form-group">
+            <label for="effected">Effected Player</label>
+            <input id="effected" name="effected" class="form-control" type="text" placeholder="All Players"/>
+        </div>
+        <div class="form-group" id="autocomplete-container">
+            <label for="logTypeInput">Type</label>
+            <input id="logTypeInput" name="type" class="form-control" type="text" placeholder="Any"/>
+            <div id="autocompleteOptions"></div>
+        </div>
+        <div class="form-group">
+            <label for="severitySelect">Severity</label>
+            <select class="form-control" name="severity" id="severitySelect">
+                @foreach (var option in Model.SeverityOptions)
+                {
+                    if (Model.SeveritySearch == option.Key)
+                    {
+                        <option class="@option.Value" value="@option.Key" selected>@option.Value</option>
+                    }
+                    else
+                    {
+                        <option class="@option.Value" value="@option.Key">@option.Value</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="flex-seperator"></div>
+    </data-grid-filter>
+    <table class="results-table table table-striped table-hover">
+        <thead>
+        <tr>
+            <th class="text-center">Severity</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Message</th>
+            @* <th>Effected Players</th> *@
+        </tr>
+        </thead>
+        <tbody id="table-body">
+        @foreach (var entry in Model.Items)
+        {
+            <tr class="on-click data-log">
+                <td class="text-center colored" style="--cell-color: var(@entry.Impact.CssColorVarName())">@entry.Impact.ToString()</td>
+                <td>@entry.Date</td>
+                <td>@entry.Type</td>
+                <td>@entry.Message</td>
+                @* <td>@entry.Effected.Aggregate("", (acc, next) => $"{acc}, {next}")</td> *@
+                <template>
+                    <div class="log-details-header flex-row" style="--cell-color: var(@entry.Impact.CssColorVarName())">
+                        <h2>Details</h2>
+                        <span class="details-close fa fa-times" onclick="onDetailsClose()"></span>
+                    </div>
+                    <h3>Message:</h3>
+                    <p>@entry.Message</p>
+                    <hr class="line-inset">
+                    @* TODO *@
+                    <h4>Effected Players: (TODO)</h4>
+                </template>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <data-grid-footer class="flex-row">
+    </data-grid-footer>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="flex-row flex-center">
+            <p class="m-4">No log entries found.</p>
+        </div>
+    }
+
+    @if (Model.Items.Count != 0)
+    {
+        <data-grid-footer class="flex-row flex-center">
+            <a asp-page="./Index"
+               asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+               asp-route-pageIndex="@prevPageIdx"
+               class="btn btn-primary btn-sm @prevDisabled">
+                Previous
+            </a>
+            <div class="form-horizontal">
+                <select name="countselect" id="countselect" class="form-control form-control-sm" value="@Model.PerPage">
+                    @foreach (var amount in Model.PaginationOptions)
+                    {
+                        if (Model.PerPage.ToString() == amount)
+                        {
+                            <option value="@amount" selected>@amount</option>
+                        }
+                        else
+                        {
+                            <option value="@amount">@amount</option>
+                        }
+                    }
+                </select>
+            </div>
+            <a asp-page="./Index"
+               asp-all-route-data="@Model.AllRouteData.ShallowClone()"
+               asp-route-pageIndex="@nextPageIdx"
+               class="btn btn-primary btn-sm @nextDisabled">
+                Next
+            </a>
+        </data-grid-footer>
+    }
+</data-grid>
+
+<div class="side-panel-container">
+    <div id="side-panel-overlay" class="side-panel-overlay hidden"></div>
+    <div id="side-panel" class="side-panel transition-right hidden-right"></div>
+</div>
+
+@section scripts {
+    <script type="application/javascript">
+        // Putting the "JavaScript" in "JavaScript Object Notation"
+        const AdminLogType = @Html.Raw(AuditLogTypeHelper.AuditLogTypeJson);
+    </script>
+    <script src="~/js/datepicker.js" asp-append-version="true"></script>
+    <script src="~/js/logs-grid.js" asp-append-version="true"></script>
+    <script src="~/js/log-type-autocomplete.js" asp-append-version="true"></script>
+<script src="~/js/audit-logs-search.js" asp-append-version="true"></script>
+}
