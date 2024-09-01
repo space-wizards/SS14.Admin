@@ -72,7 +72,6 @@ public class AuditLogsIndexModel(PostgresServerDbContext dbContext) : PageModel
 
             Items = await AuditLogRepository.FindAuditLogs(
                 context: dbContext,
-                auditLogs: dbContext.AuditLog,
                 authorUserId: authorUid,
                 effectedUserId: effectedUid,
                 fromDate: FromDate, toDate: ToDate,
@@ -92,14 +91,10 @@ public class AuditLogsIndexModel(PostgresServerDbContext dbContext) : PageModel
             return null;
         }
 
-        //private static IQueryable<AuditLog> ApplyDateFilter(IQueryable<AuditLog> query, DateTime date, bool isEndDate = false)
-        //{
-        //    if (date == default) return query;
-
-        //    if (isEndDate)
-        //        return query.Where(e => e.Date.CompareTo(date.AddHours(23)) <= 0);
-
-        //    return query.Where(e => e.Date.CompareTo(date) >= 0);
-        //}
+        public async Task<string> RetrievePlayerLink(Guid uid)
+        {
+            var player = dbContext.Player.FirstOrDefault(p => p.UserId.Equals(uid));
+            return player == default ? string.Empty : $"<a class=\"log-player-link\" href=\"/Players/Info/{player.UserId}\">{player.LastSeenUserName}</a>";
+        }
     }
 

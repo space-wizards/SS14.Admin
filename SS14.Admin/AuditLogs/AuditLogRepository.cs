@@ -10,7 +10,6 @@ public static class AuditLogRepository
 {
     public static async Task<List<AuditLog>> FindAuditLogs(
         ServerDbContext context,
-        DbSet<AuditLog> auditLogs,
         Guid? authorUserId,
         Guid? effectedUserId,
         DateTime? fromDate, DateTime? toDate,
@@ -54,7 +53,13 @@ public static class AuditLogRepository
             LIMIT #::bigint OFFSET #::bigint
         ";
 
-        var result = auditLogs.FromSqlRaw(RawSqlHelper.EnumerateParameters(query), values.ToArray());
-        return await result.ToListAsync();
+        var result = context.AuditLog.FromSqlRaw(RawSqlHelper.EnumerateParameters(query), values.ToArray());
+        var logs =  await result.ToListAsync();
+        foreach (var log in logs)
+        {
+            //log.Effected = await context.AuditLogEffectedPlayer.FromSqlRaw($"SELECT a.audit_log_effected_players_id, a.audit_log_id, a.effected_user_id FROM audit_log_effected_player AS a WHERE a.audit_log_id = {{0}}", log.Id).ToListAsync();
+            log.Effected = await context.AuditLogEffectedPlayer.Where(p => p.AuditLogId == log.Id).ToListAsync();
+        }
+        return logs;
     }
 }

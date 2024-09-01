@@ -65,7 +65,6 @@
             <th>Date</th>
             <th>Type</th>
             <th>Message</th>
-            @* <th>Effected Players</th> *@
         </tr>
         </thead>
         <tbody id="table-body">
@@ -76,7 +75,6 @@
                 <td>@entry.Date</td>
                 <td>@entry.Type</td>
                 <td>@entry.Message</td>
-                @* <td>@entry.Effected.Aggregate("", (acc, next) => $"{acc}, {next}")</td> *@
                 <template>
                     <div class="log-details-header flex-row" style="--cell-color: var(@entry.Impact.CssColorVarName())">
                         <h2>Details</h2>
@@ -85,8 +83,14 @@
                     <h3>Message:</h3>
                     <p>@entry.Message</p>
                     <hr class="line-inset">
-                    @* TODO *@
-                    <h4>Effected Players: (TODO)</h4>
+                    <h4>Effected Players:</h4>
+                    <ul>
+                        @foreach(var player in entry.Effected)
+                        {
+                            var html = await Model.RetrievePlayerLink(player.EffectedUserId);
+                            <li>@Html.Raw(html)</li>
+                        }
+                    </ul>
                 </template>
             </tr>
         }
