@@ -73,9 +73,12 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-page="/Whitelist/Index">Whitelist</a>
                     </li>
-                    <li class="nav-fill">
-                        <a class="nav-link" asp-area="" asp-page="/AuditLogs/Index">Audit Logs</a>
-                    </li>
+                    @if (User.IsInRole("AUDIT"))
+                    {
+                        <li class="nav-fill">
+                            <a class="nav-link" asp-area="" asp-page="/AuditLogs/Index">Audit Logs</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

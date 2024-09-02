@@ -1,5 +1,6 @@
 ﻿using Content.Server.Database;
 using Content.Shared.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SS14.Admin.AdminLogs;
@@ -7,6 +8,8 @@ using SS14.Admin.AuditLogs;
 
 namespace SS14.Admin.Pages.AuditLogs;
 
+[Authorize(Roles = "AUDIT")]
+[ValidateAntiForgeryToken]
 public class AuditLogsIndexModel(PostgresServerDbContext dbContext) : PageModel
 {
         public List<AuditLog> Items { get; set; } = new();
