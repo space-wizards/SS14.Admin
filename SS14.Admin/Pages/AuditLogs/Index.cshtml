@@ -64,6 +64,7 @@
             <th class="text-center">Severity</th>
             <th>Date</th>
             <th>Type</th>
+            <th>Author</th>
             <th>Message</th>
         </tr>
         </thead>
@@ -74,6 +75,7 @@
                 <td class="text-center colored" style="--cell-color: var(@entry.Impact.CssColorVarName())">@entry.Impact.ToString()</td>
                 <td>@entry.Date</td>
                 <td>@entry.Type</td>
+                <td>@Html.Raw(await Model.RetrievePlayerLink(entry.AuthorUserId))</td>
                 <td>@entry.Message</td>
                 <template>
                     <div class="log-details-header flex-row" style="--cell-color: var(@entry.Impact.CssColorVarName())">

@@ -224,8 +224,8 @@ data-grid > table {
         minmax(100px, 0.1fr) /* Severity */
         minmax(180px, 0.15fr) /* Date */
         minmax(130px, 0.15fr) /* Type */
+        minmax(150px, 0.25fr) /* Author */
         minmax(150px, 1.5fr); /* Message */
-        /* minmax(130px, 0.15fr); /* Players */
     overflow-y: auto;
     max-height: calc(100vh - 120px);
     font-size: 1rem;
