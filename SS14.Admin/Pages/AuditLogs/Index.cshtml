@@ -75,7 +75,7 @@
                 <td class="text-center colored" style="--cell-color: var(@entry.Impact.CssColorVarName())">@entry.Impact.ToString()</td>
                 <td>@entry.Date</td>
                 <td>@entry.Type</td>
-                <td>@Html.Raw(await Model.RetrievePlayerLink(entry.AuthorUserId))</td>
+                <td>@Html.Raw(entry.AuthorUserId != null ? await Model.RetrievePlayerLink(entry.AuthorUserId.Value) : "Server")</td>
                 <td>@entry.Message</td>
                 <template>
                     <div class="log-details-header flex-row" style="--cell-color: var(@entry.Impact.CssColorVarName())">

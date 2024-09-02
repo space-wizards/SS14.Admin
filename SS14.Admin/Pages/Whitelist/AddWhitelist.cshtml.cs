@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Content.Server.Database;
+using Content.Shared.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -60,10 +61,14 @@ public class AddWhitelist : PageModel
         {
             UserId = uid.Value
         });
+        var whitelisterUid = User.Claims.GetUserId();
+        var playerName = await AuditHelper.GetNameFromUidOrDefault(_dbContext, uid);
+        await AuditHelper.AddUnsavedLogAsync(_dbContext, AuditLogType.Whitelist, LogImpact.Medium, whitelisterUid,
+            $"{playerName} was whitelisted", [uid.Value]);
         await _dbContext.SaveChangesAsync();
 
         TempData["HighlightNewWhitelist"] = uid;
-        TempData.SetStatusInformation("Successfully added player to whitelist");
+        TempData.SetStatusInformation($"Successfully added {playerName} to the whitelist");
 
         return RedirectToPage("./Index");
     }

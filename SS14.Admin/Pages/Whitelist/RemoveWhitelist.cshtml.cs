@@ -1,4 +1,5 @@
 ﻿using Content.Server.Database;
+using Content.Shared.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -38,9 +39,13 @@ public class RemoveWhitelist : PageModel
             return NotFound();
 
         _dbContext.Remove(whitelist);
+        var removedPlayerName = await AuditHelper.GetNameFromUidOrDefault(_dbContext, userId);
+        await AuditHelper.AddUnsavedLogAsync(_dbContext, AuditLogType.Whitelist, LogImpact.Medium,
+            User.Claims.GetUserId(),
+            $"{removedPlayerName} was removed from the whitelist", [userId]);
         await _dbContext.SaveChangesAsync();
 
-        TempData.SetStatusInformation("Successfully removed whitelist");
+        TempData.SetStatusInformation($"Successfully removed whitelist from {removedPlayerName}.");
         return RedirectToPage("./Index");
     }
 }

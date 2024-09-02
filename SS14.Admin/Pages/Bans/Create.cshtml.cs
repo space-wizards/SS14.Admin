@@ -98,7 +98,9 @@ namespace SS14.Admin.Pages.Bans
                 return Page();
             }
 
-            _dbContext.Ban.Add(ban);
+            var dbBan = _dbContext.Ban.Add(ban);
+            await AuditHelper.UnsavedLogForAddRemarkAsync(_dbContext, NoteType.ServerBan, dbBan.Entity.Id, false,
+                ban.BanningAdmin, ban.Reason, ban.ExpirationTime, ban.PlayerUserId);
             await _dbContext.SaveChangesAsync();
             TempData["HighlightNewBan"] = ban.Id;
             TempData["StatusMessage"] = "Ban created";
