@@ -1,4 +1,5 @@
 ﻿using Content.Server.Database;
+using Content.Shared.Database;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -84,6 +85,8 @@ namespace SS14.Admin.Pages
                 UnbanTime = DateTime.UtcNow
             };
 
+            await AuditHelper.UnsavedLogForRemoveRemakAsync(_dbContext, NoteType.ServerBan, ban.Id, ban.Unban.UnbanningAdmin,
+                ban.PlayerUserId);
             await _dbContext.SaveChangesAsync();
             TempData.Add("StatusMessage", "Unban done");
             return RedirectToPage("./Index");

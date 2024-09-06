@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Content.Server.Database;
+using Content.Shared.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -84,7 +85,8 @@ namespace SS14.Admin.Pages.Bans
                         return Page();
                     }
 
-                    _dbContext.Ban.Add(ban);
+                    var dbBan = _dbContext.Ban.Add(ban);
+                    await AuditHelper.UnsavedLogForAddRemarkAsync(_dbContext, NoteType.ServerBan, dbBan.Entity.Id, false, ban.BanningAdmin, ban.Reason, ban.ExpirationTime, ban.PlayerUserId);
                 }
 
                 await _dbContext.SaveChangesAsync();

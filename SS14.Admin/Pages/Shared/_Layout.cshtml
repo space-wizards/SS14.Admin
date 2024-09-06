@@ -65,7 +65,7 @@
                         <a class="nav-link" asp-area="" asp-page="/Connections/Index">Connections</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-page="/Logs/Index">Logs</a>
+                        <a class="nav-link" asp-area="" asp-page="/AdminLogs/Index">Admin Logs</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-page="/Characters/Index">Characters</a>
@@ -73,6 +73,12 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-page="/Whitelist/Index">Whitelist</a>
                     </li>
+                    @if (User.IsInRole("AUDIT"))
+                    {
+                        <li class="nav-fill">
+                            <a class="nav-link" asp-area="" asp-page="/AuditLogs/Index">Audit Logs</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

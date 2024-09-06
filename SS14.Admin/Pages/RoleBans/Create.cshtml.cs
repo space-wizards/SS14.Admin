@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Content.Server.Database;
+using Content.Shared.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -78,7 +79,9 @@ namespace SS14.Admin.Pages.RoleBans
                 return Page();
             }
 
-            _dbContext.RoleBan.Add(roleBan);
+            var insertedBan = _dbContext.RoleBan.Add(roleBan);
+            await AuditHelper.UnsavedLogForAddRemarkAsync(_dbContext, NoteType.RoleBan, insertedBan.Entity.Id, false,
+                roleBan.BanningAdmin, roleBan.Reason, DateTime.Now, roleBan.PlayerUserId);
             await _dbContext.SaveChangesAsync();
             TempData["HighlightNewBan"] = roleBan.Id;
             TempData["StatusMessage"] = "Role ban created";
