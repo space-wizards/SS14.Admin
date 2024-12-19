@@ -3,8 +3,11 @@
 @using SS14.Admin.Helpers
 @using SS14.Admin.Pages.Tables
 @using System.Diagnostics
+@using System.Security.Claims
 @using Content.Shared.Database
+@using Microsoft.AspNetCore.Authorization
 @model SS14.Admin.Pages.Players.Info
+@inject IAuthorizationService AuthorizationService;
 
 @{
     ViewData["Title"] = $"Player Info for {Model.Player.LastSeenUserName}";
@@ -249,3 +252,15 @@
     <h2>Role Bans</h2>
     <partial name="Tables/RoleBansTable" model="@(new RoleBansTableModel(Model.RoleSortState,Model.RoleBanPagination, 0, false))"/>
 </div>
+
+@if (await AuthorizationService.IsAuthorizedForAsync(User, Constants.PolicyPersonalDataManagement))
+{
+    <div class="container">
+        <h2>Personal Data</h2>
+        <form method="post" asp-page-handler="CollectPersonalData">
+            <div class="form-group">
+                <button type="submit">Collect personal data for download</button>
+            </div>
+        </form>
+    </div>
+}

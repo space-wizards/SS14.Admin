@@ -1,17 +1,23 @@
 ﻿using Content.Server.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using SS14.Admin.Helpers;
+using SS14.Admin.JobSystem;
+using SS14.Admin.PersonalData;
 using static SS14.Admin.Pages.BansModel;
 using static SS14.Admin.Pages.RoleBans.Index;
 
 namespace SS14.Admin.Pages.Players;
 
+[ValidateAntiForgeryToken]
 public sealed class Info : PageModel
 {
     private readonly PostgresServerDbContext _dbContext;
     private readonly BanHelper _banHelper;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IJobScheduler _jobScheduler;
 
     public bool Whitelisted { get; set; }
     public Player Player { get; set; } = default!;
@@ -24,10 +30,12 @@ public sealed class Info : PageModel
     public PaginationState<RoleBan> RoleBanPagination { get; } = new(100);
     public Dictionary<string, string?> GameBanRouteData { get; } = new();
     public Dictionary<string, string?> RoleBanRouteData { get; } = new();
-    public Info(PostgresServerDbContext dbContext, BanHelper banHelper)
+    public Info(PostgresServerDbContext dbContext, BanHelper banHelper, IAuthorizationService authorizationService, IJobScheduler jobScheduler)
     {
         _dbContext = dbContext;
         _banHelper = banHelper;
+        _authorizationService = authorizationService;
+        _jobScheduler = jobScheduler;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -97,5 +105,17 @@ public sealed class Info : PageModel
                 .Cast<IAdminRemarksCommon>()
                 .ToArrayAsync();
         }
+    }
+
+    public async Task<IActionResult> OnPostCollectPersonalDataAsync(Guid userId)
+    {
+        if (!await _authorizationService.IsAuthorizedForAsync(User, Constants.PolicyPersonalDataManagement))
+            return Unauthorized();
+
+        await _jobScheduler.QueueJobAsync<CollectPersonalDataJob, CollectPersonalDataJob.Data>(
+            new CollectPersonalDataJob.Data(userId));
+
+        TempData.SetStatusInformation("Data collection started");
+        return RedirectToPage();
     }
 }

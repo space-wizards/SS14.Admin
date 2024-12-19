@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
+using SS14.Admin.Data;
 using SS14.Admin.Helpers;
+using SS14.Admin.JobSystem;
 using SS14.Admin.PersonalData;
 using SS14.Admin.SignIn;
+using SS14.Admin.Storage;
 
 namespace SS14.Admin
 {
@@ -33,7 +36,12 @@ namespace SS14.Admin
             if (connStr == null)
                 throw new InvalidOperationException("Need to specify DefaultConnection connection string");
 
+            var adminConnStr = Configuration.GetConnectionString("AdminConnection");
+            if (adminConnStr == null)
+                throw new InvalidOperationException("Need to specify AdminConnection connection string");
+
             services.AddDbContext<PostgresServerDbContext>(options => options.UseNpgsql(connStr));
+            services.AddDbContext<AdminDbContext>(options => options.UseNpgsql(adminConnStr));
 
             services.AddControllers();
             services.AddRazorPages(options =>
@@ -45,7 +53,6 @@ namespace SS14.Admin
                 options.Conventions.AuthorizeFolder("/Logs");
                 options.Conventions.AuthorizeFolder("/Characters");
                 options.Conventions.AuthorizeFolder("/Whitelist");
-                options.Conventions.AuthorizeFolder("/PersonalData", Constants.PolicyPersonalDataManagement);
             });
 
             services.AddScoped<PersonalDataDownloader>();
@@ -83,11 +90,26 @@ namespace SS14.Admin
                         await handler.HandleTokenValidated(ctx);
                     };
                 });
+
+            services.Configure<JobSystemConfiguration>(cfg =>
+            {
+                cfg.RegisterIntervalJob<DeleteCollectedPersonalDataJob>(TimeSpan.FromHours(1));
+                cfg.RegisterJob<CollectPersonalDataJob>();
+            });
+
+            services.AddHostedService<IntervalJobService>();
+            services.AddSingleton<JobSchedulerService>();
+            services.AddSingleton<IJobScheduler>(p => p.GetRequiredService<JobSchedulerService>());
+
+            services.Configure<TempStorageOptions>(Configuration.GetSection(TempStorageOptions.Position));
+            services.AddSingleton<ITempStorageManager, TempStorageManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.ApplicationServices.GetRequiredService<ITempStorageManager>().Initialize();
+
             app.UseSerilogRequestLogging();
 
             if (env.IsDevelopment())

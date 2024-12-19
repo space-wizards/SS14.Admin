@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="NetEscapades.Configuration.Yaml" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.AspNetCore" />
@@ -25,6 +26,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SS14\Content.Server.Database\Content.Server.Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\AdminDbContextModelSnapshot.cs" />
+    <Compile Remove="Data\Migrations\20241116034630_CollectedPersonalData.cs" />
+    <Compile Remove="Data\Migrations\20241116034630_CollectedPersonalData.Designer.cs" />
+    <Compile Remove="Data\Migrations\20241114220202_Quartz.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
 </Project>
