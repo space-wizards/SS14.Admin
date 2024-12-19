@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Serilog;
+using SS14.Admin.Data;
 
 namespace SS14.Admin
 {
@@ -6,7 +8,15 @@ namespace SS14.Admin
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var app = CreateHostBuilder(args).Build();
+
+            using (var serviceScope = app.Services.CreateScope())
+            {
+                using var db = serviceScope.ServiceProvider.GetRequiredService<AdminDbContext>();
+                db.Database.Migrate();
+            }
+
+            app.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
