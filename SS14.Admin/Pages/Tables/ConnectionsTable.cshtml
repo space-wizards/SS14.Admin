@@ -1,4 +1,6 @@
 ﻿@using Content.Server.Database
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SS14.Admin.Helpers
 @model SS14.Admin.Pages.Tables.ConnectionsTableModel
 
 <partial name="Tables/Pagination" for="Pagination"/>
@@ -14,6 +16,9 @@
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "denied", "Status"))"/>
         <th>
             Server
+        </th>
+        <th>
+            Trust Score
         </th>
         <partial name="Tables/SortTabHeader" model="@(new SortTabHeaderModel(Model.SortState, "hits", "Bans Hit"))"/>
     </tr>
@@ -40,7 +45,7 @@
             @if (User.IsInRole(Constants.PIIRole))
             {
                 <td class="font-monospace constrained-150">@log.Address</td>
-                <td class="font-monospace constrained-150">@(log.HWId is { } hwid ? Convert.ToBase64String(hwid) : null)</td>
+                <td class="font-monospace constrained-150">@(log.HWId?.ToImmutable())</td>
             }
             else
             {
@@ -70,6 +75,7 @@
             <td>
                 @log.Server.Name
             </td>
+            <td>@log.Trust</td>
             <td>
                 @if (banHits != 0)
                 {

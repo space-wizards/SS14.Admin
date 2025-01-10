@@ -81,7 +81,7 @@ namespace SS14.Admin.Pages.Bans
                 }
 
                 ipAddr = Input.UseLatestIp ? lastInfo.Value.address.ToString() : Input.IP;
-                hwid = Input.UseLatestHwid ? (lastInfo.Value.hwid is { } h ? Convert.ToBase64String(h) : null) : Input.HWid;
+                hwid = Input.UseLatestHwid ? lastInfo.Value.hwid?.ToString() : Input.HWid;
             }
 
             var error = await _banHelper.FillBanCommon(

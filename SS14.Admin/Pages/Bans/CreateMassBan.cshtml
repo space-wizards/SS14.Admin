@@ -1,0 +1,79 @@
+﻿@page
+@model SS14.Admin.Pages.Bans.CreateMassBanModel
+
+@{
+    ViewData["Title"] = "Create New Mass Ban";
+}
+
+<partial name="Shared/StatusMessageAlert" />
+
+<div class="container mt-4">
+    <h1 class="text-center">Create New Mass Ban</h1>
+
+    <div class="alert alert-info">
+        <strong>TSV Format Explanation:</strong>
+        <p>TSV is a CSV using tabs instead of commas. The fields are:</p>
+        <ul>
+            <li><strong>user_id</strong> (user guid)</li>
+            <li><strong>address</strong> (ip address/CIDR)</li>
+            <li><strong>hwid</strong> (base64 encoded hwid)</li>
+            <li><strong>reason</strong> (string to use as ban reason)</li>
+            <li><strong>datacenter</strong> (bool to set DC ban exemption flag)</li>
+            <li><strong>blacklisted_range</strong> (bool to set blacklisted range ban exemption flag)</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
+                <div class="form-group">
+                    <label for="file" class="form-label">Choose a .TSV file to Upload:</label>
+                    <input type="file" class="form-control" id="file" name="file" required>
+                </div>
+                <div class="mt-2">
+                    <button type="button" class="btn btn-primary" id="unbanButton" onclick="showConfirmation()">Ban</button>
+                </div>
+                <div class="mt-2" id="confirmationButton" style="display: none;">
+                    <button type="submit" class="btn btn-danger">Are you sure?</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if (!ModelState.IsValid)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        <ul>
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["StatusMessage"]
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function showConfirmation() {
+            const confirmationButton = document.getElementById('confirmationButton');
+            const unbanButton = document.getElementById('unbanButton');
+            confirmationButton.style.display = 'block';
+            unbanButton.style.display = 'none';
+            setTimeout(function() {
+                confirmationButton.style.display = 'none';
+                unbanButton.style.display = 'block';
+            }, 3000); // Revert after 3 seconds
+        }
+    </script>
+}

@@ -21,9 +21,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{20A0EC6E-8DE5-4587-BC4A-7EB0C5D65001}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\publish-ghcr.yml = .github\workflows\publish-ghcr.yml
+		.github\workflows\build-test.yml = .github\workflows\build-test.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Robust.Serialization.Generator", "SS14\RobustToolbox\Robust.Serialization.Generator\Robust.Serialization.Generator.csproj", "{B30D497E-2240-4968-9FAD-D2967F04DEEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SS14", "SS14", "{10571C53-F24E-4130-8ED1-7FC497169049}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,5 +57,9 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{20A0EC6E-8DE5-4587-BC4A-7EB0C5D65001} = {0DA4417F-14E5-49E9-8A0D-4F76C3CDED5C}
+		{0DE28821-8C9F-4770-BA7C-5D38AC77F872} = {10571C53-F24E-4130-8ED1-7FC497169049}
+		{34DBD258-BB73-4A8D-9159-C7CBECE1AB8B} = {10571C53-F24E-4130-8ED1-7FC497169049}
+		{F718671B-FAD0-4783-90B8-32059AB9552F} = {10571C53-F24E-4130-8ED1-7FC497169049}
+		{B30D497E-2240-4968-9FAD-D2967F04DEEC} = {10571C53-F24E-4130-8ED1-7FC497169049}
 	EndGlobalSection
 EndGlobal

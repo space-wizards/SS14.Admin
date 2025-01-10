@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 using Content.Server.Database;
+using Content.Shared.Database;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 
@@ -74,9 +75,9 @@ public sealed class BanHelper
 
     [Pure]
     [return: NotNullIfNotNull("hwid")]
-    public static string? FormatHwid(byte[]? hwid)
+    public static string? FormatHwid(ImmutableTypedHwid? hwid)
     {
-        return hwid is { } h ? Convert.ToBase64String(h) : null;
+        return hwid?.ToString();
     }
 
     public sealed class BanJoin<TBan, TUnban> where TBan: IBanCommon<TUnban> where TUnban : IUnbanCommon
@@ -87,7 +88,7 @@ public sealed class BanHelper
         public Player? UnbanAdmin { get; set; }
     }
 
-    public async Task<(IPAddress address, byte[]? hwid)?> GetLastPlayerInfo(string nameOrUid)
+    public async Task<(IPAddress address, ImmutableTypedHwid? hwid)?> GetLastPlayerInfo(string nameOrUid)
     {
         nameOrUid = nameOrUid.Trim();
 
@@ -149,10 +150,10 @@ public sealed class BanHelper
         if (!string.IsNullOrWhiteSpace(hwid))
         {
             hwid = hwid.Trim();
-            ban.HWId = new byte[Constants.HwidLength];
-
-            if (!Convert.TryFromBase64String(hwid, ban.HWId, out _))
+            if (!ImmutableTypedHwid.TryParse(hwid, out var parsedHwid))
                 return "Invalid HWID";
+
+            ban.HWId = parsedHwid;
         }
 
         if (lengthMinutes != 0)

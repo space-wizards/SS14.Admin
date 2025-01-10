@@ -128,7 +128,7 @@ namespace SS14.Admin.Pages
                     b.Player,
                     b.Ban.PlayerUserId?.ToString(),
                     b.Ban.Address?.FormatCidr(),
-                    b.Ban.HWId is { } h ? Convert.ToBase64String(h) : null,
+                    b.Ban.HWId?.ToImmutable().ToString(),
                     b.Ban.Reason,
                     b.Ban.ExpirationTime,
                     unbanned,

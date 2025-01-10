@@ -48,7 +48,7 @@ namespace SS14.Admin.Pages.RoleBans
             }
 
             Input.IP = lastInfo.Value.address.ToString();
-            Input.HWid = lastInfo.Value.hwid is { } h ? Convert.ToBase64String(h) : null;
+            Input.HWid = lastInfo.Value.hwid?.ToString();
         }
 
         public async Task<IActionResult> OnPostCreateAsync()
