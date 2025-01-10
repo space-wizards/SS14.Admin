@@ -30,13 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\Migrations\AdminDbContextModelSnapshot.cs" />
-    <Compile Remove="Data\Migrations\20241116034630_CollectedPersonalData.cs" />
-    <Compile Remove="Data\Migrations\20241116034630_CollectedPersonalData.Designer.cs" />
-    <Compile Remove="Data\Migrations\20241114220202_Quartz.Designer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
