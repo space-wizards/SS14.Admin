@@ -1,11 +1,14 @@
-﻿using Content.Server.Database;
+﻿using System.Net.Mime;
+using Content.Server.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using SS14.Admin.Data;
 using SS14.Admin.Helpers;
 using SS14.Admin.JobSystem;
 using SS14.Admin.PersonalData;
+using SS14.Admin.Storage;
 using static SS14.Admin.Pages.BansModel;
 using static SS14.Admin.Pages.RoleBans.Index;
 
@@ -18,6 +21,8 @@ public sealed class Info : PageModel
     private readonly BanHelper _banHelper;
     private readonly IAuthorizationService _authorizationService;
     private readonly IJobScheduler _jobScheduler;
+    private readonly AdminDbContext _adminDbContext;
+    private readonly ITempStorageManager _tempStorageManager;
 
     public bool Whitelisted { get; set; }
     public Player Player { get; set; } = default!;
@@ -30,12 +35,16 @@ public sealed class Info : PageModel
     public PaginationState<RoleBan> RoleBanPagination { get; } = new(100);
     public Dictionary<string, string?> GameBanRouteData { get; } = new();
     public Dictionary<string, string?> RoleBanRouteData { get; } = new();
-    public Info(PostgresServerDbContext dbContext, BanHelper banHelper, IAuthorizationService authorizationService, IJobScheduler jobScheduler)
+    public CollectedPersonalData[] CollectedPersonalData { get; set; } = [];
+
+    public Info(PostgresServerDbContext dbContext, BanHelper banHelper, IAuthorizationService authorizationService, IJobScheduler jobScheduler, AdminDbContext adminDbContext, ITempStorageManager tempStorageManager)
     {
         _dbContext = dbContext;
         _banHelper = banHelper;
         _authorizationService = authorizationService;
         _jobScheduler = jobScheduler;
+        _adminDbContext = adminDbContext;
+        _tempStorageManager = tempStorageManager;
     }
 
     public async Task<IActionResult> OnGetAsync(
@@ -92,6 +101,13 @@ public sealed class Info : PageModel
 
         Whitelisted = await _dbContext.Whitelist.AnyAsync(p => p.UserId == userId);
 
+        if (await _authorizationService.IsAuthorizedForAsync(User, Constants.PolicyPersonalDataManagement))
+        {
+            CollectedPersonalData = await _adminDbContext.CollectedPersonalData
+                .Where(d => d.UserId == userId)
+                .ToArrayAsync();
+        }
+
         return Page();
 
         async Task<IAdminRemarksCommon[]> RemarksCommonQuery<T>(IQueryable<T> query) where T : class, IAdminRemarksCommon
@@ -117,5 +133,20 @@ public sealed class Info : PageModel
 
         TempData.SetStatusInformation("Data collection started");
         return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnGetDownloadPersonalDataAsync(Guid userId, int id)
+    {
+        if (!await _authorizationService.IsAuthorizedForAsync(User, Constants.PolicyPersonalDataManagement))
+            return Unauthorized();
+
+        var entity = await _adminDbContext.CollectedPersonalData
+            .SingleOrDefaultAsync(u => u.Id == id && u.UserId == userId);
+
+        if (entity == null)
+            return NotFound();
+
+        var file = _tempStorageManager.GetFilePath(entity.FileName);
+        return PhysicalFile(file, MediaTypeNames.Application.Zip, entity.FileName);
     }
 }

@@ -3,15 +3,23 @@
 @using SS14.Admin.Helpers
 @using SS14.Admin.Pages.Tables
 @using System.Diagnostics
-@using System.Security.Claims
 @using Content.Shared.Database
 @using Microsoft.AspNetCore.Authorization
+@using SS14.Admin.PersonalData
 @model SS14.Admin.Pages.Players.Info
 @inject IAuthorizationService AuthorizationService;
+@inject PersonalDataDownloader PersonalDataDownloader;
 
 @{
     ViewData["Title"] = $"Player Info for {Model.Player.LastSeenUserName}";
+
+    static string FormatTime(TimeSpan timeSpan)
+    {
+        return $"{(int)timeSpan.TotalHours}:{timeSpan.Minutes:D2}";
+    }
 }
+
+<partial name="Shared/StatusMessageAlert" />
 
 <div class="container">
     <h1>Player information for @Model.Player.LastSeenUserName</h1>
@@ -69,7 +77,7 @@
         {
             <tr>
                 <td class="font-weight-bold">@tracker.Tracker</td>
-                <td>@((int)tracker.TimeSpent.TotalHours):@tracker.TimeSpent.Minutes.ToString("D2")</td>
+                <td>@FormatTime(tracker.TimeSpent)</td>
             </tr>
         }
         </tbody>
@@ -257,10 +265,44 @@
 {
     <div class="container">
         <h2>Personal Data</h2>
+        @if (!await PersonalDataDownloader.GetIsMigrationCompatible())
+        {
+            <div class="container">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    This version of SS14.Admin is not up-to-date with the database model.
+                    Personal data management features may not be up to date and may not work correctly.
+                </div>
+            </div>
+        }
         <form method="post" asp-page-handler="CollectPersonalData">
             <div class="form-group">
-                <button type="submit">Collect personal data for download</button>
+                <button class="btn btn-primary" type="submit">Collect personal data for download</button>
             </div>
         </form>
+        <table class="table table-striped mt-3">
+            <thead>
+            <tr>
+                <th>Created on (UTC)</th>
+                <th>Expires on (UTC)</th>
+                <th>Collection time (h:mm)</th>
+                <th>Size</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var collected in Model.CollectedPersonalData)
+            {
+                <tr>
+                    <td>@collected.FinishedOn.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@collected.ExpiresOn.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@FormatTime(collected.FinishedOn - collected.StartedOn)</td>
+                    <td>@((collected.Size / 1024f / 1024).ToString("N2")) MiB</td>
+                    <td>
+                        <a asp-page-handler="DownloadPersonalData" asp-route-id="@collected.Id" class="btn btn-primary">Download</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
     </div>
 }

@@ -34,6 +34,6 @@ public sealed class TempStorageManager(IOptions<TempStorageOptions> options, ILo
         if (fileName.AsSpan().ContainsAny(InvalidFilenameChars))
             throw new ArgumentException("Filename contains invalid characters!");
 
-        return Path.Combine(_options.RootPath, fileName);
+        return Path.Combine(Environment.CurrentDirectory, Path.Combine(_options.RootPath, fileName));
     }
 }
