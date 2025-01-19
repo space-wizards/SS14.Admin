@@ -6,7 +6,7 @@ namespace SS14.Admin.Helpers
     {
         public static Guid GetUserId(this IEnumerable<Claim> claims)
         {
-            return new Guid(claims.First(c => c.Type == "sub").Value);
+            return new Guid(claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value);
         }
     }
 }
