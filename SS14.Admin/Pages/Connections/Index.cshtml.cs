@@ -103,7 +103,7 @@ namespace SS14.Admin.Pages.Connections
             if (showIPChecks)
                 acceptableDenies.Add(ConnectionDenyReason.IPChecks);
             if (showNoHwid)
-                acceptableDenies.Add(ConnectionDenyReason.NoHwId);
+                acceptableDenies.Add(ConnectionDenyReason.NoHwid);
 
             logQuery = logQuery.Where(c => acceptableDenies.Contains(c.Denied));
 
