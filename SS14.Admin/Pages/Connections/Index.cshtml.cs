@@ -22,6 +22,7 @@ namespace SS14.Admin.Pages.Connections
         public bool ShowPanic { get; set; }
         public bool ShowBabyJail { get; set; }
         public bool ShowIPChecks { get; set; }
+        public bool ShowNoHwid { get; set; }
 
         public ConnectionsIndexModel(PostgresServerDbContext dbContext)
         {
@@ -40,7 +41,8 @@ namespace SS14.Admin.Pages.Connections
             bool showFull,
             bool showPanic,
             bool showBabyJail,
-            bool showIPChecks)
+            bool showIPChecks,
+            bool showNoHwid)
         {
 
             Pagination.Init(pageIndex, perPage, AllRouteData);
@@ -61,6 +63,7 @@ namespace SS14.Admin.Pages.Connections
                 showPanic = true;
                 showBabyJail = true;
                 showIPChecks = true;
+                showNoHwid = true;
             }
 
             CurrentFilter = search;
@@ -71,6 +74,7 @@ namespace SS14.Admin.Pages.Connections
             ShowPanic = showPanic;
             ShowBabyJail = showBabyJail;
             ShowIPChecks = showIPChecks;
+            ShowNoHwid = showNoHwid;
 
             AllRouteData.Add("search", CurrentFilter);
             AllRouteData.Add("showAccepted", showAccepted.ToString());
@@ -98,6 +102,8 @@ namespace SS14.Admin.Pages.Connections
                 acceptableDenies.Add(ConnectionDenyReason.BabyJail);
             if (showIPChecks)
                 acceptableDenies.Add(ConnectionDenyReason.IPChecks);
+            if (showNoHwid)
+                acceptableDenies.Add(ConnectionDenyReason.NoHwid);
 
             logQuery = logQuery.Where(c => acceptableDenies.Contains(c.Denied));
 
