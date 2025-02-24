@@ -37,7 +37,19 @@
         </div>
         <div class="form-check col">
             <input type="checkbox" class="form-check-input" id="showPanic" name="showPanic" @(Model.ShowPanic ? "checked" : "") value="true">
-            <label class="form-check-label" for="showPanic">Server Panic</label>
+            <label class="form-check-label" for="showPanic">Panic Bunker</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showBabyJail" name="showBabyJail" @(Model.ShowBabyJail ? "checked" : "") value="true">
+            <label class="form-check-label" for="showBabyJail">Baby Jail</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showIPChecks" name="showIPChecks" @(Model.ShowIPChecks ? "checked" : "") value="true">
+            <label class="form-check-label" for="showIPChecks">IP Checks</label>
+        </div>
+        <div class="form-check col">
+            <input type="checkbox" class="form-check-input" id="showNoHwId" name="showNoHwId" @(Model.ShowNoHwid ? "checked" : "") value="true">
+            <label class="form-check-label" for="showNoHwId">No HWID</label>
         </div>
     </div>
 </form>
