@@ -22,7 +22,7 @@ public sealed class Info : PageModel
     private readonly IAuthorizationService _authorizationService;
     private readonly IJobScheduler _jobScheduler;
     private readonly AdminDbContext _adminDbContext;
-    private readonly ITempStorageManager _tempStorageManager;
+    private readonly IStorageManager<StorageTemp> _tempStorageManager;
 
     public bool Whitelisted { get; set; }
     public Player Player { get; set; } = default!;
@@ -37,7 +37,7 @@ public sealed class Info : PageModel
     public Dictionary<string, string?> RoleBanRouteData { get; } = new();
     public CollectedPersonalData[] CollectedPersonalData { get; set; } = [];
 
-    public Info(PostgresServerDbContext dbContext, BanHelper banHelper, IAuthorizationService authorizationService, IJobScheduler jobScheduler, AdminDbContext adminDbContext, ITempStorageManager tempStorageManager)
+    public Info(PostgresServerDbContext dbContext, BanHelper banHelper, IAuthorizationService authorizationService, IJobScheduler jobScheduler, AdminDbContext adminDbContext, IStorageManager<StorageTemp> tempStorageManager)
     {
         _dbContext = dbContext;
         _banHelper = banHelper;
@@ -146,7 +146,6 @@ public sealed class Info : PageModel
         if (entity == null)
             return NotFound();
 
-        var file = _tempStorageManager.GetFilePath(entity.FileName);
-        return PhysicalFile(file, MediaTypeNames.Application.Zip, entity.FileName);
+        return await _tempStorageManager.MakeDownloadResult(entity.FileName, MediaTypeNames.Application.Zip);
     }
 }

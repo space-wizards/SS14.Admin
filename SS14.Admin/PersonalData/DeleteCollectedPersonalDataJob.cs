@@ -9,7 +9,7 @@ namespace SS14.Admin.PersonalData;
 [Job("PersonalData.DeleteCollected")]
 public sealed class DeleteCollectedPersonalDataJob(
     AdminDbContext dbContext,
-    ITempStorageManager tempStorage,
+    IStorageManager<StorageTemp> tempStorage,
     ILogger<DeleteCollectedPersonalDataJob> logger) : Job
 {
     protected override async Task ExecuteAsync(CancellationToken cancel)
@@ -22,15 +22,14 @@ public sealed class DeleteCollectedPersonalDataJob(
 
         foreach (var item in toDelete)
         {
-            var path = tempStorage.GetFilePath(item.FileName);
-            logger.LogTrace("Deleting {File}", path);
+            logger.LogTrace("Deleting {File}", item.FileName);
 
-            File.Delete(path);
+            await tempStorage.DeleteFileAsync(item.FileName, cancel: CancellationToken.None);
 
             dbContext.CollectedPersonalData.Remove(item);
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken: CancellationToken.None);
 
         logger.LogDebug("Deleted {DeletedCount} personal data collections", toDelete.Count);
     }

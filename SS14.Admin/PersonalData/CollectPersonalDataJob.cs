@@ -9,7 +9,7 @@ namespace SS14.Admin.PersonalData;
 public sealed class CollectPersonalDataJob(
     PersonalDataDownloader downloader,
     AdminDbContext dbContext,
-    ITempStorageManager tempStorage,
+    IStorageManager<StorageTemp> tempStorage,
     ILogger<CollectPersonalDataJob> logger)
     : Job<CollectPersonalDataJob.Data>
 {
@@ -28,9 +28,8 @@ public sealed class CollectPersonalDataJob(
         var fileName = GenerateDumpFileName(user);
         logger.LogDebug("Writing personal data to temp file {TempFileName}", fileName);
 
-        using var finalFile = File.Create(tempStorage.GetFilePath(fileName), 4096, FileOptions.Asynchronous);
-        writeInto.Position = 0;
-        await writeInto.CopyToAsync(finalFile);
+        // If we got this far, don't cancel.
+        await tempStorage.CreateFileAsync(fileName, writeInto, cancel: CancellationToken.None);
 
         var timeNow = DateTime.UtcNow;
         var duration = timeNow - timeStart;
@@ -42,11 +41,11 @@ public sealed class CollectPersonalDataJob(
             FinishedOn = timeNow,
             ExpiresOn = timeNow + DumpPersistenceTime,
             FileName = fileName,
-            Size = finalFile.Length,
+            Size = writeInto.Length,
             UserId = user,
         });
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken: CancellationToken.None);
     }
 
     private static string GenerateDumpFileName(Guid user)

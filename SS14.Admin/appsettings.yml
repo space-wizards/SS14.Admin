@@ -22,4 +22,6 @@ ForwardProxies:
 AuthServer: "https://central.spacestation14.io/auth"
 AllowedHosts: "*"
 TempStorage:
-  RootPath: "temp"
+  Type: Local
+  Local:
+    RootPath: "temp"

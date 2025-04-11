@@ -1,5 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using Amazon.Runtime;
+using Amazon.S3;
 using Content.Server.Database;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -67,10 +69,7 @@ namespace SS14.Admin
                     options.DefaultScheme = "Cookies";
                     options.DefaultChallengeScheme = "oidc";
                 })
-                .AddCookie("Cookies", options =>
-                {
-                    options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                })
+                .AddCookie("Cookies", options => { options.ExpireTimeSpan = TimeSpan.FromHours(1); })
                 .AddOpenIdConnect("oidc", options =>
                 {
                     options.SignInScheme = "Cookies";
@@ -101,15 +100,12 @@ namespace SS14.Admin
             services.AddSingleton<JobSchedulerService>();
             services.AddSingleton<IJobScheduler>(p => p.GetRequiredService<JobSchedulerService>());
 
-            services.Configure<TempStorageOptions>(Configuration.GetSection(TempStorageOptions.Position));
-            services.AddSingleton<ITempStorageManager, TempStorageManager>();
+            SetupStorage<StorageTemp>(services, StorageTemp.Position);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.ApplicationServices.GetRequiredService<ITempStorageManager>().Initialize();
-
             app.UseSerilogRequestLogging();
 
             if (env.IsDevelopment())
@@ -154,6 +150,45 @@ namespace SS14.Admin
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
+        }
+
+        private void SetupStorage<TStorageType>(IServiceCollection serviceCollection, string position)
+            where TStorageType : StorageType
+        {
+            var section = Configuration.GetSection(position);
+            var options = section.Get<StorageOptions>();
+            if (options == null)
+                throw new Exception($"Missing {position} storage configuration");
+
+            switch (options.Type)
+            {
+                case StorageBackendType.Local:
+                    if (options.Local is not { } local)
+                        throw new Exception("No valid local storage config!");
+
+                    // Can you believe this is real code?
+                    serviceCollection.AddSingleton<IStorageManager<TStorageType>>(services =>
+                        new LocalStorageManager<TStorageType>(local,
+                            services.GetRequiredService<ILogger<LocalStorageManager<TStorageType>>>()));
+                    break;
+                case StorageBackendType.S3:
+                    if (options.S3 is not { } s3)
+                        throw new Exception("No valid S3 storage config!");
+
+                    var clientConfig = Configuration.GetAWSOptions<AmazonS3Config>(
+                        $"{position}:{nameof(StorageOptions.S3)}:{StorageOptionsS3.LocationS3Config}");
+                    var credentials = new BasicAWSCredentials(s3.AccessKey, s3.SecretKey);
+
+                    var client = new AmazonS3Client(credentials, (AmazonS3Config) clientConfig.DefaultClientConfig);
+
+                    serviceCollection.AddSingleton<IStorageManager<TStorageType>>(services =>
+                        new S3StorageManager<TStorageType>(client,
+                            s3.BucketName,
+                            services.GetRequiredService<ILogger<S3StorageManager<TStorageType>>>()));
+                    break;
+                default:
+                    throw new Exception($"Missing {position} storage backend type");
+            }
         }
     }
 }
