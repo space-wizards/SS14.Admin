@@ -40,7 +40,7 @@ public static class LogExportExtension
             if (mimetype == null)
                 return Results.NotFound();
             var basePath = Path.Combine(Directory.GetCurrentDirectory(), config.Value.ExportDirectory);
-            var path = Path.Combine(basePath, filename);
+            var path = Path.Combine(basePath, Path.GetFileName(filename));
             return !File.Exists(path) ? Results.NotFound() : Results.File(path, contentType: mimetype);
         }).RequireAuthorization();
     }
