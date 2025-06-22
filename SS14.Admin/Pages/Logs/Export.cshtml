@@ -1,0 +1,115 @@
+﻿@page
+@model SS14.Admin.Pages.Logs.Export
+
+@{
+    ViewData["Title"] = "Admin Logs";
+}
+
+<div class="container">
+    <form id="export-form" method="post">
+        <p>Export admin logs as CSV. A maximum of @Export.MaxDays days can be exported at once.</p>
+        <p>Check use round id to use the round id instead of the date</p>
+        <div class="form-group py-2 d-flex align-items-center gap-2">
+            <label asp-for="FromDate" class="sr-only">Date from:</label>
+            <input asp-for="FromDate" class="form-control flex-grow-1" id="from-date" placeholder="Date from" max="@(DateTime.Now.ToString("O"))"/>
+            <label asp-for="ToDate" class="sr-only">Date to:</label>
+            <input asp-for="ToDate" class="form-control flex-grow-1" id="to-date" placeholder="Date to" max="@(DateTime.Now.ToString("O"))"/>
+            @*<button id="date-clear" class="btn btn-sm"><i class="fas fa-times"></i></button>*@
+        </div>
+        <div class="form-group d-flex py-2">
+            <label asp-for="RoundId" class="sr-only">Round id</label>
+            <input type="number" id="round-id" asp-for="RoundId" placeholder="Round id" class="form-control flex-grow-1"/>
+        </div>
+        <div class="form-group d-flex py-2">
+            <label asp-for="SearchText" style="width: 120px">Search text</label>
+            <input asp-for="SearchText" type="text" class="form-control flex-grow-1 mx-2"/>
+        </div>
+        <div class="form-group d-flex align-items-center justify-content-end py-2">
+            <span id="validation-errors" class="mx-2 mb-0 text-danger d-block">@Model.ErrorMessage</span>
+            <label asp-for="UseRoundId" style="width: 95px">Use round id</label>
+            <input type="checkbox" id="use-round-id" asp-for="UseRoundId" class="mx-2">
+            <label asp-for="UseCompression" style="width: 220px">Export as compressed gzip file</label>
+            <input asp-for="UseCompression" class="mx-2" type="checkbox"/>
+            <input class="btn btn-primary" type="submit" value="Export">
+        </div>
+    </form>
+</div>
+
+<div class="container">
+<ul>
+@foreach (var filename in Model.ListExportedFiles())
+{
+    <li><a href="export/download/@filename">@filename</a></li>
+}
+@if (Model.Processing)
+{
+    <li>
+    <div id="spinner">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <a hidden id="download-link"></a>
+    </li>
+}
+</ul>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            document.getElementById('export-form').addEventListener('submit', function(e) {
+                const errorOutput = document.querySelector('#validation-errors');
+                const roundIdField = document.querySelector("#round-id");
+                if (document.querySelector('#use-round-id').checked)
+                {
+                    if (roundIdField.value === '')
+                    {
+                        e.preventDefault();
+                        errorOutput.innerText = '@Export.RoundIdMissingError';
+                    }
+
+                    return;
+                }
+
+                const fromField = document.querySelector('#from-date');
+                const toField = document.querySelector('#to-date');
+                const from = DateTime.fromISO(fromField.value);
+                const to = DateTime.fromISO(toField.value);
+                const diff = to.diff(from, 'days');
+                if (diff.days < 0 || diff.days > @(Export.MaxDays))
+                {
+                    e.preventDefault()
+                    errorOutput.innerText = diff.days < 0 ? '@Export.FromAfterToError' : '@Export.DateRangeToLargeError';
+
+                    return;
+                }
+                errorOutput.innerText = '';
+            })
+        });
+    </script>
+    @if (Model.Processing)
+    {
+        <script>
+            $(document).ready(async function() {
+                let fetched = false;
+                let filename = "";
+                while (!fetched)
+                {
+                    const result = await fetch("export/poll")
+                    fetched = result.ok;
+                    filename = (await result.text()).replaceAll('"', '');
+                }
+                document.querySelector('#spinner').hidden = true;
+                const link = document.querySelector('#download-link');
+                link.hidden = false;
+                const url = "export/download/" + filename;
+
+                link.href = url;
+                link.innerText = filename;
+            })
+        </script>
+    }
+
+}
+
