@@ -8,7 +8,6 @@ namespace SS14.Admin.AdminLogs.Export;
 public sealed class LogExporter
 {
     private const char ColumnSeparator = ',';
-    private const char RowSeparator = ';';
     private const char Quote = '"';
     private const string EscapedQuote = "\"\"";
 
@@ -66,11 +65,13 @@ public sealed class LogExporter
 
         await foreach (var log in query.AsAsyncEnumerable().WithCancellation(ct))
         {
+            await writer.WriteAsync(log.Date.ToString("O"));
+            await writer.WriteAsync(ColumnSeparator);
             await writer.WriteAsync(log.Id.ToString());
             await writer.WriteAsync(ColumnSeparator);
             await writer.WriteAsync(log.RoundId.ToString());
             await writer.WriteAsync(ColumnSeparator);
-            await writer.WriteAsync(log.Date.ToString("O"));
+            await writer.WriteAsync(log.Impact.ToString());
             await writer.WriteAsync(ColumnSeparator);
             await writer.WriteAsync(log.Type.ToString());
             await writer.WriteAsync(ColumnSeparator);
@@ -81,27 +82,23 @@ public sealed class LogExporter
             await writer.WriteAsync(Quote);
             await writer.WriteAsync(log.Json.RootElement.GetRawText().Replace(Quote.ToString(), EscapedQuote));
             await writer.WriteAsync(Quote);
-            await writer.WriteAsync(ColumnSeparator);
-            await writer.WriteAsync(log.Impact.ToString());
-            await writer.WriteLineAsync(RowSeparator);
         }
     }
 
     private async Task WriteCsvHeader(StreamWriter writer)
     {
-        await writer.WriteAsync("id");
+        await writer.WriteAsync("timestamp");
         await writer.WriteAsync(ColumnSeparator);
         await writer.WriteAsync("round_id");
         await writer.WriteAsync(ColumnSeparator);
-        await writer.WriteAsync("timestamp");
+        await writer.WriteAsync("id");
+        await writer.WriteAsync(ColumnSeparator);
+        await writer.WriteAsync("impact");
         await writer.WriteAsync(ColumnSeparator);
         await writer.WriteAsync("type");
         await writer.WriteAsync(ColumnSeparator);
         await writer.WriteAsync("message");
         await writer.WriteAsync(ColumnSeparator);
         await writer.WriteAsync("json");
-        await writer.WriteAsync(ColumnSeparator);
-        await writer.WriteAsync("impact");
-        await writer.WriteLineAsync(RowSeparator);
     }
 }
