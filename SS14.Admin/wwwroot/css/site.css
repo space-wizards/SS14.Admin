@@ -25,6 +25,10 @@ a.navbar-brand {
   word-break: break-all;
 }
 
+img.header-logo {
+    max-height: 3.5rem;
+}
+
 /* Provide sufficient contrast against white background */
 a {
   color: #0366d6;
