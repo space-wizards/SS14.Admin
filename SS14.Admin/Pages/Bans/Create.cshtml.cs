@@ -55,7 +55,10 @@ namespace SS14.Admin.Pages.Bans
 
             ExemptFlags = BanExemptions.GetExemptionFromForm(Request.Form);
 
-            var ban = new ServerBan();
+            var ban = new Ban
+            {
+                Type = BanType.Server,
+            };
 
             var ipAddr = Input.IP;
             var hwid = Input.HWid;

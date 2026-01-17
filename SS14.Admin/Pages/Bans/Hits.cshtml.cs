@@ -13,7 +13,7 @@ public class Hits : PageModel
     private readonly PostgresServerDbContext _dbContext;
     private readonly BanHelper _banHelper;
 
-    public BanHelper.BanJoin<ServerBan, ServerUnban> Ban { get; set; } = default!;
+    public BanHelper.BanJoin Ban { get; set; } = default!;
 
     public ISortState SortState { get; private set; } = default!;
     public PaginationState<ConnectionsIndexModel.Connection> Pagination { get; } = new(100);

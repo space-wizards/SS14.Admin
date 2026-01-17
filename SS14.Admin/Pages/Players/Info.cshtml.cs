@@ -20,7 +20,7 @@ public sealed class Info : PageModel
     public Profile[] Profiles { get; set; } = default!;
     public ISortState RoleSortState { get; private set; } = default!;
     public ISortState GameSortState { get; private set; } = default!;
-    public PaginationState<Ban> GameBanPagination { get; } = new(100);
+    public PaginationState<BansModel.Ban> GameBanPagination { get; } = new(100);
     public PaginationState<RoleBan> RoleBanPagination { get; } = new(100);
     public Dictionary<string, string?> GameBanRouteData { get; } = new();
     public Dictionary<string, string?> RoleBanRouteData { get; } = new();

@@ -46,41 +46,45 @@
         var className = ban.Id == Model.HighlightBan ? "table-success" : "";
         <tr class="@className">
             <td>
-                @if (ban.Player != null)
+                @foreach (var player in ban.Players)
                 {
-                    <a asp-page="/Players/Info" asp-route-userId="@ban.Player.UserId">
-                        <strong>@ban.Player.LastSeenUserName</strong>
+                    <a asp-page="/Players/Info" asp-route-userId="@player.UserId">
+                        <strong>@player.LastSeenUserName</strong>
                     </a>
                     <br/>
                 }
+
                 @if (User.IsInRole(Constants.PIIRole))
                 {
-                    if (ban.Address != null)
+                    @foreach (var address in ban.Addresses)
                     {
                         <small>
-                            <strong>IP:</strong> <span class="font-monospace">@ban.Address</span>
+                            <strong>IP:</strong> <span class="font-monospace">@address</span>
                         </small>
                         <br/>
                     }
-                    if (ban.Hwid != null)
+
+                    @foreach (var hwid in ban.Hwids)
                     {
                         <small>
-                            <strong>HWID:</strong> <span class="font-monospace">@ban.Hwid</span>
+                            <strong>HWID:</strong> <span class="font-monospace">@hwid</span>
                         </small>
                         <br/>
                     }
                 }
-                @if (ban.UserId != null)
+
+                @foreach (var userId in ban.UserIds)
                 {
                     <small>
-                        <strong>GUID:</strong> <span class="font-monospace">@ban.UserId</span>
+                        <strong>GUID:</strong> <span class="font-monospace">@userId</span>
                     </small>
+                    <br/>
                 }
             </td>
             <td>@ban.Reason</td>
-            <td>@ban.Role</td>
+            <td>@(string.Join(", ", ban.Roles))</td>
             <td>@ban.BanTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
-            <td>@ban.Round</td>
+            <td>@(string.Join(", ", ban.Rounds))</td>
             <td>
                 @(ban.Expires?.ToString("yyyy-MM-dd HH:mm:ss") ?? "PERMANENT")
                 @if (ban.Unbanned is { } unbanned)
