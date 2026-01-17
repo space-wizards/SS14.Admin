@@ -4,5 +4,10 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/SS14" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/SS14/RobustToolbox" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SS14/RobustToolbox/Lidgren.Network/Lidgren.Network" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SS14/RobustToolbox/NetSerializer" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SS14/RobustToolbox/Robust.LoaderApi" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SS14/RobustToolbox/XamlX" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SS14/RobustToolbox/cefglue" vcs="Git" />
   </component>
 </project>
