@@ -99,9 +99,28 @@ namespace SS14.Admin
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
             };
 
-            foreach (var ip in Configuration.GetSection("ForwardProxies").Get<string[]>() ?? Array.Empty<string>())
+            foreach (var entry in Configuration.GetSection("ForwardProxies").Get<string[]>() ?? Array.Empty<string>())
             {
-                forwardedHeadersOptions.KnownProxies.Add(IPAddress.Parse(ip));
+                // Try to parse as CIDR notation first (e.g., 192.168.1.0/24)
+                if (IPHelper.TryParseIpOrCidr(entry, out var parsed))
+                {
+                    var (ipAddress, prefixLength) = parsed;
+                    if (prefixLength.HasValue)
+                    {
+                        // It's a CIDR subnet, add to KnownNetworks
+                        var network = new Microsoft.AspNetCore.HttpOverrides.IPNetwork(ipAddress, prefixLength.Value);
+                        forwardedHeadersOptions.KnownNetworks.Add(network);
+                    }
+                    else
+                    {
+                        // It's a single IP address, add to KnownProxies
+                        forwardedHeadersOptions.KnownProxies.Add(ipAddress);
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Invalid IP address or CIDR notation in ForwardProxies: {entry}");
+                }
             }
 
             app.UseForwardedHeaders(forwardedHeadersOptions);
