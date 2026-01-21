@@ -42,6 +42,7 @@ WebRootPath: "/opt/ss14_admin/bin/wwwroot"
 
 ForwardProxies:
     - 127.0.0.1
+    - 172.16.0.0/12  # Supports CIDR notation for subnets  (Docker)
 
 Auth:
     Authority: "https://central.spacestation14.io/web/"
