@@ -13,15 +13,15 @@
 
     <dl class="row">
         <dt class="col-sm-2">Name:</dt>
-        <dd class="col-sm-10">@Model.Ban.Player?.LastSeenUserName</dd>
+        <dd class="col-sm-10">@(string.Join(", ", Model.Ban.Players.Select(p => p.LastSeenUserName)))</dd>
         <dt class="col-sm-2">User ID:</dt>
-        <dd class="col-sm-10 font-monospace">@Model.Ban.Ban.PlayerUserId</dd>
+        <dd class="col-sm-10 font-monospace">@(string.Join(", ", Model.Ban.Ban.Id))</dd>
         @if (User.IsInRole(Constants.PIIRole))
         {
             <dt class="col-sm-2">IP:</dt>
-            <dd class="col-sm-10 font-monospace">@Model.Ban.Ban.Address?.FormatCidr()</dd>
+            <dd class="col-sm-10 font-monospace">@(string.Join(", ", Model.Ban.Ban.Addresses!.Select(ba => ba.Address.FormatCidr())))</dd>
             <dt class="col-sm-2">HWID:</dt>
-            <dd class="col-sm-10 font-monospace">@BanHelper.FormatHwid(Model.Ban.Ban.HWId)</dd>
+            <dd class="col-sm-10 font-monospace">@(string.Join(", ", Model.Ban.Ban.Hwids!.Select(ba => ba.HWId.ToImmutable().ToString())))</dd>
         }
         <dt class="col-sm-2">Time:</dt>
         <dd class="col-sm-10">@Model.Ban.Ban.BanTime.ToString("yyyy-MM-dd HH:mm:ss")</dd>

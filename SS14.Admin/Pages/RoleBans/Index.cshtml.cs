@@ -61,7 +61,7 @@ public class Index : PageModel
 
         var id = model.Id;
 
-        var ban = await _dbContext.RoleBan
+        var ban = await _dbContext.Ban
             .Include(b => b.Unban)
             .SingleOrDefaultAsync(b => b.Id == id);
 
@@ -77,7 +77,7 @@ public class Index : PageModel
             return RedirectToPage("./Index");
         }
 
-        ban.Unban = new ServerRoleUnban
+        ban.Unban = new Unban
         {
             Ban = ban,
             UnbanningAdmin = User.Claims.GetUserId(),
@@ -92,21 +92,21 @@ public class Index : PageModel
     [MustUseReturnValue]
     public static async Task<ISortState> LoadSortBanTableData(
         PaginationState<RoleBan> pagination,
-        IQueryable<BanHelper.BanJoin<ServerRoleBan, ServerRoleUnban>> query,
+        IQueryable<BanHelper.BanJoin> query,
         string? sort,
         Dictionary<string, string?> allRouteData)
     {
-        var bans = query.Select(b => new { b.Ban, b.Player, b.Admin, b.UnbanAdmin });
+        var bans = query.Select(b => new { b.Ban, b.Players, b.Admin, b.UnbanAdmin });
 
         var sortState = Helpers.SortState.Build(bans);
-        sortState.AddColumn("name", p => p.Player!.LastSeenUserName);
-        sortState.AddColumn("ip", p => p.Ban.Address);
-        sortState.AddColumn("uid", p => p.Ban.PlayerUserId);
+        sortState.AddColumnMultiple("name", b => b.Players.Select(p => p.LastSeenUserName));
+        sortState.AddColumnMultiple("ip", b => b.Ban.Addresses!.Select(a => a.Address));
+        sortState.AddColumnMultiple("uid", b => b.Ban.Players!.Select(p => p.UserId));
         sortState.AddColumn("time", p => p.Ban.BanTime, SortOrder.Descending);
-        sortState.AddColumn("round", p => p.Ban.RoundId);
+        sortState.AddColumnMultiple("round", p => p.Ban.Rounds!.Select(r => r.RoundId));
         // sortState.AddColumn("expire_time", p => p.ban.Unban == null ? p.ban.ExpirationTime : p.ban.Unban!.UnbanTime);
         sortState.AddColumn("admin", p => p.Admin!.LastSeenUserName);
-        sortState.AddColumn("role", p => p.Ban.RoleId);
+        sortState.AddColumnMultiple("role", p => p.Ban.Roles!.Select(br => string.Concat(br.RoleType, ":", br.RoleId)));
         sortState.Init(sort, allRouteData);
 
         bans = sortState.ApplyToQuery(bans);
@@ -124,18 +124,18 @@ public class Index : PageModel
 
             return new RoleBan(
                 b.Ban.Id,
-                b.Player,
-                b.Ban.PlayerUserId?.ToString(),
-                b.Ban.Address?.FormatCidr(),
-                b.Ban.HWId?.ToImmutable().ToString(),
+                b.Players,
+                b.Ban.Players!.Select(p => p.UserId.ToString()).ToArray(),
+                b.Ban.Addresses!.Select(a => a.Address.FormatCidr().ToString()).ToArray(),
+                b.Ban.Hwids!.Select(h => h.HWId.ToImmutable().ToString()).ToArray(),
                 b.Ban.Reason,
                 b.Ban.ExpirationTime,
                 unbanned,
                 BanHelper.IsBanActive(b.Ban),
                 b.Ban.BanTime,
                 b.Admin?.LastSeenUserName,
-                b.Ban.RoleId,
-                b.Ban.RoundId);
+                b.Ban.Roles!.Select(br => string.Concat(br.RoleType, ":", br.RoleId)).ToArray(),
+                b.Ban.Rounds!.Select(r => r.RoundId).ToArray());
         }));
 
         return sortState;
@@ -143,18 +143,18 @@ public class Index : PageModel
 
     public sealed record RoleBan(
         int Id,
-        Player? Player,
-        string? UserId,
-        string? Address,
-        string? Hwid,
+        Player[] Players,
+        string[] UserIds,
+        string[] Addresses,
+        string[] Hwids,
         string Reason,
         DateTime? Expires,
         (DateTime Time, string Admin)? Unbanned,
         bool Active,
         DateTime BanTime,
         string? Admin,
-        string Role,
-        int? Round);
+        string[] Roles,
+        int[] Rounds);
 
     public enum ShowFilter
     {

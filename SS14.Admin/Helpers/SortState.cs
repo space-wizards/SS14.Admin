@@ -87,10 +87,57 @@ namespace SS14.Admin.Helpers
 
         public void AddColumn<TKey>(string name, Expression<Func<T, TKey>> expr, SortOrder? sortDefault = null)
         {
-            _columns.Add(name, new ColumnReg<TKey>(expr, sortDefault));
+             AddColumn(name, expr, expr, sortDefault);
+        }
+
+        /// <summary>
+        /// Add a column that can be sorted.
+        /// </summary>
+        /// <param name="name">The ID of the column, used in the HTML.</param>
+        /// <param name="exprDesc">Expression to use as sort key when sorting descending.</param>
+        /// <param name="exprAsc">Expression to use as sort key when sorting ascending.</param>
+        /// <param name="sortDefault">If given, this column is the default sort column, with the given order.</param>
+        /// <typeparam name="TKey">The type of items to use as sort key.</typeparam>
+        public void AddColumn<TKey>(
+            string name,
+            Expression<Func<T, TKey>> exprDesc,
+            Expression<Func<T, TKey>> exprAsc,
+            SortOrder? sortDefault = null)
+        {
+            _columns.Add(name, new ColumnReg<TKey>(exprAsc, exprDesc, sortDefault));
 
             if (sortDefault != null)
                 DefaultColumn = name;
+        }
+
+        /// <summary>
+        /// Add a column that can be sorted, containing multiple values.
+        /// </summary>
+        /// <remarks>
+        /// The values in the column are used as a sort key by their min/max,
+        /// depending on how the column is being sorted.
+        /// </remarks>
+        /// <param name="name">The ID of the column, used in the HTML.</param>
+        /// <param name="expr">Expression to use as sort key.</param>
+        /// <param name="sortDefault">If given, this column is the default sort column, with the given order.</param>
+        /// <typeparam name="TKey">The type of items to use as sort key.</typeparam>
+        public void AddColumnMultiple<TKey>(
+            string name,
+            Expression<Func<T, IEnumerable<TKey>>> expr,
+            SortOrder? sortDefault = null)
+        {
+            var param = Expression.Parameter(typeof(T));
+            var invokeExpr = Expression.Invoke(expr, param);
+
+            AddColumn(
+                name,
+                Expression.Lambda<Func<T, TKey>>(
+                    Expression.Call(typeof(Enumerable), "Max", [typeof(TKey)], invokeExpr),
+                    param),
+                Expression.Lambda<Func<T, TKey>>(
+                    Expression.Call(typeof(Enumerable), "Min", [typeof(TKey)], invokeExpr),
+                    param),
+                sortDefault);
         }
 
         public IOrderedQueryable<T> ApplyToQuery(IQueryable<T> query)
@@ -104,14 +151,18 @@ namespace SS14.Admin.Helpers
             public abstract IOrderedQueryable<T> ApplyToQuery(IQueryable<T> query, SortOrder order);
         }
 
-        private sealed record ColumnReg<TKey>(Expression<Func<T, TKey>> Expr, SortOrder? SortDefault) : ColumnReg(SortDefault)
+        private sealed record ColumnReg<TKey>(
+            Expression<Func<T, TKey>> ExprAscending,
+            Expression<Func<T, TKey>> ExprDescending,
+            SortOrder? SortDefault)
+            : ColumnReg(SortDefault)
         {
             public override IOrderedQueryable<T> ApplyToQuery(IQueryable<T> query, SortOrder order)
             {
                 return order switch
                 {
-                    SortOrder.Ascending => query.OrderBy(Expr),
-                    SortOrder.Descending => query.OrderByDescending(Expr),
+                    SortOrder.Ascending => query.OrderBy(ExprAscending),
+                    SortOrder.Descending => query.OrderByDescending(ExprDescending),
                     _ => throw new InvalidOperationException()
                 };
             }
