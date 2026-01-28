@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
+using SS14.Admin.AdminLogs.Export;
 using SS14.Admin.Helpers;
 using SS14.Admin.SignIn;
 
@@ -26,7 +27,11 @@ namespace SS14.Admin
             services.AddScoped<LoginHandler>();
             services.AddScoped<BanHelper>();
             services.AddScoped<PlayerLocator>();
+            services.AddScoped<LogExporter>();
+            services.AddSingleton<LogExportQueue>();
             services.AddHttpContextAccessor();
+
+            services.AddHostedService<LogExportBackgroundService>();
 
             var connStr = Configuration.GetConnectionString("DefaultConnection");
             if (connStr == null)
@@ -143,6 +148,7 @@ namespace SS14.Admin
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapLogExportEndpoints();
             });
         }
     }
