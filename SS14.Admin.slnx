@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Files/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Packages.props" />
+    <File Path="Dockerfile" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/GitHub/" />
+  <Folder Name="/GitHub/Workflows/">
+    <File Path=".github/workflows/build-test.yml" />
+    <File Path=".github/workflows/publish-ghcr.yml" />
+  </Folder>
+  <Folder Name="/SS14/">
+    <Project Path="SS14/Content.Server.Database/Content.Server.Database.csproj" />
+    <Project Path="SS14/Content.Shared.Database/Content.Shared.Database.csproj" />
+    <Project Path="SS14/RobustToolbox/Robust.Analyzers/Robust.Analyzers.csproj" />
+    <Project Path="SS14/RobustToolbox/Robust.Serialization.Generator/Robust.Serialization.Generator.csproj" />
+  </Folder>
+  <Project Path="SS14.Admin/SS14.Admin.csproj" />
+</Solution>
